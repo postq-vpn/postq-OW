@@ -5,8 +5,6 @@
     <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg">
     <img height="64" src="docs/logo-light.svg" alt="PostqVPN">
   </picture>
-  <br>
-  для OpenWrt
 </h1>
 
 <p>

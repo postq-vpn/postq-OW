@@ -91,6 +91,10 @@ set netshift.main.global_proxy='0'
 # PostQ XKeen panel (no "⚡ <feed>" group per subscription).
 set netshift.main.subscription_feed_groups='0'
 set netshift.main.auto_exclude_russian='1'
+# Device headers like the PostQ XKeen panel: X-Device-OS 'Router' (Remnawave
+# shows it as the OS); X-Device-Model stays the router's own name from
+# /tmp/sysinfo/model.
+set netshift.main.subscription_device_os='Router'
 # The panel's own balancers ("🇪🇺 Европа | Авто ⚡️") and list headers
 # ("⬇️ Тестовые серверы ⬇️") come to sing-box as dummy servers (ya.ru:443):
 # only the one Auto of NetShift is kept, like in the PostQ XKeen panel.
@@ -125,6 +129,12 @@ EOF
 for url in $subs; do
     uci add_list netshift.main.subscription_url="$url"
 done
+
+# X-Ver-OS: the firmware version like the PostQ XKeen panel sends (OpenWrt
+# "24.10.8"), not the kernel. Refreshed by every install of the package.
+# shellcheck disable=SC1091
+release="$(. /etc/openwrt_release 2>/dev/null && printf '%s' "$DISTRIB_RELEASE")"
+[ -n "$release" ] && uci set netshift.main.subscription_os_version="$release"
 
 # The direct section must come first in the file so that its rules win
 uci reorder netshift.direct=1

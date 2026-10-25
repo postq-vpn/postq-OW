@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 22:05+0300\n"
-"PO-Revision-Date: 2026-10-25 22:05+0300\n"
+"POT-Creation-Date: 2026-10-25 23:07+0300\n"
+"PO-Revision-Date: 2026-10-25 23:07+0300\n"
 "Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -374,8 +374,8 @@ msgstr "Дашборд сейчас недоступен"
 msgid "Dashboard tiles, YACD web dashboard access and remote-access protection"
 msgstr "Плитки дашборда, доступ к веб-панели YACD и защита удалённого доступа"
 
-msgid "days left"
-msgstr "дн. осталось"
+msgid "day|days|days"
+msgstr "день|дня|дней"
 
 msgid "Default (by the lists)"
 msgstr "По умолчанию (по спискам)"
@@ -1517,6 +1517,9 @@ msgstr "Удалить"
 msgid "Removing the NaiveProxy client…"
 msgstr "Удаляем клиент NaiveProxy…"
 
+msgid "renew it"
+msgstr "продлите подписку"
+
 msgid "Report for support"
 msgstr "Отчёт для поддержки"
 
@@ -1820,6 +1823,9 @@ msgstr "Подписка"
 msgid "Subscription cache cleared and re-downloaded"
 msgstr "Кеш подписок очищен и загружен заново"
 
+msgid "Subscription ends in"
+msgstr "До конца подписки"
+
 msgid "Subscription feeds, server filters and URLTest tuning"
 msgstr "Источники подписок, фильтры серверов и настройка URLTest"
 
@@ -2092,6 +2098,9 @@ msgstr "Неизвестная схема DNS. Используйте udp, tcp, 
 
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
+
+msgid "Unlimited subscription"
+msgstr "Бессрочная подписка"
 
 msgid "Update"
 msgstr "Обновить"

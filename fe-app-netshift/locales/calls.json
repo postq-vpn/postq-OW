@@ -94,7 +94,7 @@
     "call": "Active",
     "key": "Active",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:303"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:315"
     ]
   },
   {
@@ -847,7 +847,7 @@
     "call": "Dashboard currently unavailable",
     "key": "Dashboard currently unavailable",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:74"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:75"
     ]
   },
   {
@@ -858,10 +858,10 @@
     ]
   },
   {
-    "call": "days left",
-    "key": "days left",
+    "call": "day|days|days",
+    "key": "day|days|days",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:176"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:181"
     ]
   },
   {
@@ -1660,14 +1660,14 @@
     "call": "Expired",
     "key": "Expired",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:175"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:178"
     ]
   },
   {
     "call": "Expires",
     "key": "Expires",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:176"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:195"
     ]
   },
   {
@@ -2721,7 +2721,7 @@
     "call": "List",
     "key": "List",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:368"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:380"
     ]
   },
   {
@@ -2958,7 +2958,7 @@
     "call": "NetShift is not set up yet",
     "key": "NetShift is not set up yet",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:117"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:118"
     ]
   },
   {
@@ -3067,14 +3067,14 @@
     "call": "No subscription yet",
     "key": "No subscription yet",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:98"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:99"
     ]
   },
   {
     "call": "None of the sections has a connection, so NetShift is not running. Open the Sections tab, paste a server link or a subscription URL into a section (or choose the interface of a VPN section) and press Save & Apply.",
     "key": "None of the sections has a connection, so NetShift is not running. Open the Sections tab, paste a server link or a subscription URL into a section (or choose the interface of a VPN section) and press Save & Apply.",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:121"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:122"
     ]
   },
   {
@@ -3121,7 +3121,7 @@
     "call": "Not recommended: slower than the others, Auto does not pick them",
     "key": "Not recommended: slower than the others, Auto does not pick them",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:317"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:329"
     ]
   },
   {
@@ -3248,7 +3248,7 @@
     "call": "Open Sections",
     "key": "Open Sections",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:126"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:127"
     ]
   },
   {
@@ -3349,7 +3349,7 @@
     "call": "Paste the subscription link into the field above and press Save & Apply: the servers will appear here.",
     "key": "Paste the subscription link into the field above and press Save & Apply: the servers will appear here.",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:102"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:103"
     ]
   },
   {
@@ -3567,7 +3567,7 @@
     "call": "Refresh subscription",
     "key": "Refresh subscription",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:231"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:243"
     ]
   },
   {
@@ -3625,6 +3625,13 @@
     "key": "Removing the NaiveProxy client…",
     "places": [
       "src/netshift/tabs/manager/initController.ts:275"
+    ]
+  },
+  {
+    "call": "renew it",
+    "key": "renew it",
+    "places": [
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:183"
     ]
   },
   {
@@ -4223,7 +4230,7 @@
     "call": "Sort by ping",
     "key": "Sort by ping",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:372"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:384"
     ]
   },
   {
@@ -4347,6 +4354,13 @@
     "key": "Subscription cache cleared and re-downloaded",
     "places": [
       "src/netshift/tabs/diagnostic/initController.ts:348"
+    ]
+  },
+  {
+    "call": "Subscription ends in",
+    "key": "Subscription ends in",
+    "places": [
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:179"
     ]
   },
   {
@@ -4494,7 +4508,7 @@
     "call": "Test latency",
     "key": "Test latency",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:379"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:391"
     ]
   },
   {
@@ -4843,7 +4857,7 @@
     "call": "Tiles",
     "key": "Tiles",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:368"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:380"
     ]
   },
   {
@@ -4901,8 +4915,8 @@
     "key": "Traffic",
     "places": [
       "src/netshift/tabs/dashboard/initController.ts:458",
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:167",
       "src/netshift/tabs/dashboard/partials/renderSections.ts:168",
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:169",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:85",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:152"
     ]
@@ -5017,6 +5031,13 @@
     "key": "Unknown error",
     "places": [
       "src/netshift/api.ts:40"
+    ]
+  },
+  {
+    "call": "Unlimited subscription",
+    "key": "Unlimited subscription",
+    "places": [
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:186"
     ]
   },
   {

@@ -3903,6 +3903,22 @@ function parseSubscriptionInfo(stdout) {
   return result;
 }
 var DAY_SECONDS = 86400;
+var EXPIRY_WARN_DAYS = 5;
+function pluralForm(n, forms, lang) {
+  const list = forms.split("|");
+  if (list.length < 3 || !lang.toLowerCase().startsWith("ru")) {
+    return Math.abs(n) === 1 ? list[0] : list[1] ?? list[0];
+  }
+  const mod10 = Math.abs(n) % 10;
+  const mod100 = Math.abs(n) % 100;
+  if (mod10 === 1 && mod100 !== 11) {
+    return list[0];
+  }
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return list[1];
+  }
+  return list[2];
+}
 function describeSubscriptionInfo(info, now) {
   const hasUsage = info.upload !== null || info.download !== null;
   const used = hasUsage ? (info.upload ?? 0) + (info.download ?? 0) : null;
@@ -3921,6 +3937,8 @@ function describeSubscriptionInfo(info, now) {
     expireDate,
     daysLeft,
     exhausted: daysLeft !== null && daysLeft < 0 || percent === 100,
+    noExpiry: info.expire === 0,
+    expiresSoon: daysLeft !== null && daysLeft >= 0 && daysLeft <= EXPIRY_WARN_DAYS,
     title: info.title
   };
 }
@@ -4032,16 +4050,23 @@ function renderSubscriptionInfo(infos) {
       }
       if (line.expireDate !== null && line.daysLeft !== null) {
         parts.push(
-          line.daysLeft < 0 ? `${_("Expired")}: ${line.expireDate}` : `${_("Expires")}: ${line.expireDate} (${line.daysLeft} ${_("days left")})`
+          line.daysLeft < 0 ? `${_("Expired")}: ${line.expireDate}` : `${_("Subscription ends in")}: ${line.daysLeft} ${pluralForm(
+            line.daysLeft,
+            _("day|days|days"),
+            document.documentElement.lang || ""
+          )}${line.expiresSoon ? ` \u2014 ${_("renew it")}` : ""}`
         );
+      } else if (line.noExpiry) {
+        parts.push(_("Unlimited subscription"));
       }
       const name = infos.length > 1 && line.title ? `${line.title}: ` : "";
       const text2 = E(
         "span",
         {
-          class: `pdk_dashboard-page__subscription-info__text${line.exhausted ? " pdk_dashboard-page__subscription-info__text--exhausted" : ""}`
+          class: `pdk_dashboard-page__subscription-info__text${line.exhausted ? " pdk_dashboard-page__subscription-info__text--exhausted" : line.expiresSoon ? " pdk_dashboard-page__subscription-info__text--soon" : ""}`,
+          ...line.expireDate !== null ? { title: `${_("Expires")}: ${line.expireDate}` } : {}
         },
-        name + parts.join(" \xB7 ")
+        `${line.expiresSoon ? "\u26A0 " : ""}${name}${parts.join(" \xB7 ")}`
       );
       return E("div", { class: "pdk_dashboard-page__subscription-info__row" }, [
         text2,
@@ -5489,6 +5514,13 @@ var styles3 = `
 
 .pdk_dashboard-page__subscription-info__text--exhausted {
     color: var(--error-color-medium, red);
+    opacity: 1;
+}
+
+/* PostQ: few days left, time to renew (like the PostQ XKeen panel) */
+.pdk_dashboard-page__subscription-info__text--soon {
+    color: #c77c02;
+    font-weight: bold;
     opacity: 1;
 }
 
@@ -9542,6 +9574,7 @@ return baseclass.extend({
   EMPTY_LAN_INFO,
   EMPTY_UPDATE_NOTICE,
   ERROR_POLL_INTERVAL,
+  EXPIRY_WARN_DAYS,
   FAKEIP_CHECK_DOMAIN,
   FETCH_TIMEOUT,
   IP_CHECK_DOMAIN,
@@ -9615,6 +9648,7 @@ return baseclass.extend({
   parseSubscriptionInfo,
   parseUpdateNotice,
   parseValueList,
+  pluralForm,
   preserveScrollForPage,
   prettyBytes,
   recentPinGuardEvents,

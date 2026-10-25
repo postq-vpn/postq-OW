@@ -340,6 +340,13 @@ export const styles = `
     opacity: 1;
 }
 
+/* PostQ: few days left, time to renew (like the PostQ XKeen panel) */
+.pdk_dashboard-page__subscription-info__text--soon {
+    color: #c77c02;
+    font-weight: bold;
+    opacity: 1;
+}
+
 .pdk_dashboard-page__subscription-info__bar {
     height: 4px;
     border-radius: 2px;

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   describeSubscriptionInfo,
+  pluralForm,
   parseSubscriptionInfo,
   subscriptionInfoOf,
   type SubscriptionInfo,
@@ -110,6 +111,63 @@ describe('describeSubscriptionInfo', () => {
     expect(
       describeSubscriptionInfo({ ...base, expire: NOW + 3600 }, NOW).daysLeft,
     ).toBe(1);
+  });
+});
+
+describe('expiry flags (PostQ)', () => {
+  it('marks a zero expiry as a subscription without an end', () => {
+    expect(describeSubscriptionInfo({ ...base, expire: 0 }, NOW).noExpiry).toBe(
+      true,
+    );
+    expect(
+      describeSubscriptionInfo({ ...base, expire: null }, NOW).noExpiry,
+    ).toBe(false);
+    expect(describeSubscriptionInfo(base, NOW).noExpiry).toBe(false);
+  });
+
+  it('warns from 5 days left down to the last day, not after the expiry', () => {
+    const soon = (days: number) =>
+      describeSubscriptionInfo({ ...base, expire: NOW + days * 86400 }, NOW)
+        .expiresSoon;
+
+    expect(soon(6)).toBe(false);
+    expect(soon(5)).toBe(true);
+    expect(soon(1)).toBe(true);
+    expect(soon(-1)).toBe(false);
+    expect(
+      describeSubscriptionInfo({ ...base, expire: 0 }, NOW).expiresSoon,
+    ).toBe(false);
+  });
+});
+
+describe('pluralForm', () => {
+  const ru = 'день|дня|дней';
+
+  it('takes the Russian one/few/many rule', () => {
+    const word = (n: number) => pluralForm(n, ru, 'ru');
+
+    expect([1, 21, 101].map(word)).toEqual(['день', 'день', 'день']);
+    expect([2, 3, 4, 22, 34].map(word)).toEqual([
+      'дня',
+      'дня',
+      'дня',
+      'дня',
+      'дня',
+    ]);
+    expect([0, 5, 11, 12, 14, 25, 111].map(word)).toEqual(
+      Array(7).fill('дней'),
+    );
+  });
+
+  it('uses the singular for 1 only in other languages', () => {
+    expect(pluralForm(1, 'day|days|days', 'en')).toBe('day');
+    expect(pluralForm(21, 'day|days|days', 'en')).toBe('days');
+    expect(pluralForm(0, 'day|days|days', '')).toBe('days');
+  });
+
+  it('copes with an untranslated or short list', () => {
+    expect(pluralForm(5, 'day', 'ru')).toBe('day');
+    expect(pluralForm(5, 'day|days', 'ru-RU')).toBe('days');
   });
 });
 

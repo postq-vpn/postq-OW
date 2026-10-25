@@ -5,6 +5,7 @@ import type { DashboardViewMode } from '../../../../helpers/dashboardView';
 import { sortOutboundsByLatency, splitRussianServers } from '../sortOutbounds';
 import {
   describeSubscriptionInfo,
+  pluralForm,
   type SubscriptionInfo,
 } from '../../../../helpers/subscriptionInfo';
 import { prettyBytes } from '../../../../helpers/prettyBytes';
@@ -169,21 +170,32 @@ function renderSubscriptionInfo(infos: SubscriptionInfo[]) {
         );
       }
 
+      // PostQ: the days left like in the PostQ XKeen panel, with a reminder
+      // to renew when few are left; the date itself is in the tooltip.
       if (line.expireDate !== null && line.daysLeft !== null) {
         parts.push(
           line.daysLeft < 0
             ? `${_('Expired')}: ${line.expireDate}`
-            : `${_('Expires')}: ${line.expireDate} (${line.daysLeft} ${_('days left')})`,
+            : `${_('Subscription ends in')}: ${line.daysLeft} ${pluralForm(
+                line.daysLeft,
+                _('day|days|days'),
+                document.documentElement.lang || '',
+              )}${line.expiresSoon ? ` — ${_('renew it')}` : ''}`,
         );
+      } else if (line.noExpiry) {
+        parts.push(_('Unlimited subscription'));
       }
 
       const name = infos.length > 1 && line.title ? `${line.title}: ` : '';
       const text = E(
         'span',
         {
-          class: `pdk_dashboard-page__subscription-info__text${line.exhausted ? ' pdk_dashboard-page__subscription-info__text--exhausted' : ''}`,
+          class: `pdk_dashboard-page__subscription-info__text${line.exhausted ? ' pdk_dashboard-page__subscription-info__text--exhausted' : line.expiresSoon ? ' pdk_dashboard-page__subscription-info__text--soon' : ''}`,
+          ...(line.expireDate !== null
+            ? { title: `${_('Expires')}: ${line.expireDate}` }
+            : {}),
         },
-        name + parts.join(' · '),
+        `${line.expiresSoon ? '⚠ ' : ''}${name}${parts.join(' · ')}`,
       );
 
       return E('div', { class: 'pdk_dashboard-page__subscription-info__row' }, [

@@ -73,10 +73,40 @@ export interface SubscriptionInfoLine {
   daysLeft: number | null;
   // The account is past its expiry date or out of traffic.
   exhausted: boolean;
+  // The panel says the account never ends (expire 0).
+  noExpiry: boolean;
+  // Few days left (EXPIRY_WARN_DAYS or fewer): time to renew.
+  expiresSoon: boolean;
   title: string | null;
 }
 
 const DAY_SECONDS = 86400;
+// Like the PostQ XKeen panel: 5 days or fewer left is shown as a warning.
+export const EXPIRY_WARN_DAYS = 5;
+
+// One of the forms of "day" for a number: `forms` is the translated
+// "day|days|days" (Russian "день|дня|дней"). Russian takes the one/few/many
+// rule, any other language the second form for everything but 1.
+export function pluralForm(n: number, forms: string, lang: string): string {
+  const list = forms.split('|');
+
+  if (list.length < 3 || !lang.toLowerCase().startsWith('ru')) {
+    return Math.abs(n) === 1 ? list[0] : (list[1] ?? list[0]);
+  }
+
+  const mod10 = Math.abs(n) % 10;
+  const mod100 = Math.abs(n) % 100;
+
+  if (mod10 === 1 && mod100 !== 11) {
+    return list[0];
+  }
+
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return list[1];
+  }
+
+  return list[2];
+}
 
 // `now` is in seconds. A total or an expire of 0 means "unlimited" in the
 // panels' convention.
@@ -107,6 +137,9 @@ export function describeSubscriptionInfo(
     expireDate,
     daysLeft,
     exhausted: (daysLeft !== null && daysLeft < 0) || percent === 100,
+    noExpiry: info.expire === 0,
+    expiresSoon:
+      daysLeft !== null && daysLeft >= 0 && daysLeft <= EXPIRY_WARN_DAYS,
     title: info.title,
   };
 }

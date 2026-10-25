@@ -205,7 +205,15 @@ function injectStyles() {
 #cbi-netshift > h2 {
   height: 40px; margin-bottom: 12px; overflow: hidden; color: transparent;
   font-size: 0; white-space: nowrap;
-  background: url("${L.resource("netshift/postq-logo.svg")}") left center / contain no-repeat;
+  background: url("${L.resource("netshift/postq-logo.svg")}") center / contain no-repeat;
+}
+:root[data-darkmode="true"] #cbi-netshift > h2 {
+  background-image: url("${L.resource("netshift/postq-logo-dark.svg")}");
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-darkmode]) #cbi-netshift > h2 {
+    background-image: url("${L.resource("netshift/postq-logo-dark.svg")}");
+  }
 }
 `,
     ),

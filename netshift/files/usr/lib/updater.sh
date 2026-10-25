@@ -2239,8 +2239,12 @@ updates_lite_select_build() {
     '' | *[!0-9]*) free_kb=0 ;;
     esac
 
+    # The current binary frees its space only once no process holds it: while
+    # sing-box runs, the old inode stays allocated until the restart after the
+    # install, so counting it picked the ELF build on a flash it does not fit
+    # (the write filled the disk and the validation failed).
     cur_bytes=0
-    if [ -f "$UPDATES_SING_BOX_BIN" ]; then
+    if [ -f "$UPDATES_SING_BOX_BIN" ] && ! pidof sing-box sing-box-core > /dev/null 2>&1; then
         cur_bytes="$(wc -c <"$UPDATES_SING_BOX_BIN" 2>/dev/null)"
         case "$cur_bytes" in
         '' | *[!0-9]*) cur_bytes=0 ;;

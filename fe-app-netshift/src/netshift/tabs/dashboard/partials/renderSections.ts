@@ -2,7 +2,7 @@ import { renderButton } from '../../../../partials';
 import { NetShift } from '../../../types';
 import { SKELETON_SHIMMER_DURATION } from '../../../../constants';
 import type { DashboardViewMode } from '../../../../helpers/dashboardView';
-import { sortOutboundsByLatency } from '../sortOutbounds';
+import { sortOutboundsByLatency, splitRussianServers } from '../sortOutbounds';
 import {
   describeSubscriptionInfo,
   type SubscriptionInfo,
@@ -85,6 +85,28 @@ function openSectionsTab() {
 // A fresh install: the default section has no link, so NetShift does not run.
 // Say what to do instead of "unavailable".
 function renderNotConfiguredState() {
+  // The simplified PostQ page has no Sections tab: the subscription field is on
+  // the same page, above the servers.
+  if (!document.querySelector('.cbi-tabmenu li[data-tab="section"]')) {
+    return E(
+      'div',
+      {
+        class:
+          'card pdk_dashboard-page__outbound-section pdk_dashboard-page__setup',
+      },
+      [
+        E('b', {}, _('No subscription yet')),
+        E(
+          'p',
+          {},
+          _(
+            'Paste the subscription link into the field above and press Save & Apply: the servers will appear here.',
+          ),
+        ),
+      ],
+    );
+  }
+
   return E(
     'div',
     {
@@ -287,21 +309,37 @@ export function renderDefaultState({
     );
   }
 
+  // PostQ: the line over the Russian servers, which Auto does not pick.
+  function renderNotRecommended() {
+    return E(
+      'div',
+      { class: 'pdk_dashboard-page__not-recommended' },
+      `⚠ ${_('Not recommended: slower than the others, Auto does not pick them')}`,
+    );
+  }
+
   function renderOutbounds(outbounds: NetShift.Outbound[], key: string) {
-    const items = sortByPing ? sortOutboundsByLatency(outbounds) : outbounds;
+    const sorted = sortByPing ? sortOutboundsByLatency(outbounds) : outbounds;
+    const { main, russian } = splitRussianServers(sorted);
+    const render = viewMode === 'tiles' ? renderOutbound : renderRow;
+    const children = [
+      ...main.map((outbound) => render(outbound)),
+      ...(russian.length > 0
+        ? [
+            renderNotRecommended(),
+            ...russian.map((outbound) => render(outbound)),
+          ]
+        : []),
+    ];
 
     if (viewMode === 'tiles') {
-      return E(
-        'div',
-        { class: 'pdk_dashboard-page__outbound-grid' },
-        items.map((outbound) => renderOutbound(outbound)),
-      );
+      return E('div', { class: 'pdk_dashboard-page__outbound-grid' }, children);
     }
 
     const list = E(
       'div',
       { class: 'pdk_dashboard-page__outbound-list' },
-      items.map((outbound) => renderRow(outbound)),
+      children,
     );
     list.dataset.listKey = key;
 

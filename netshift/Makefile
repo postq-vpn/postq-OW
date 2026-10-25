@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=netshift
 
-PKG_VERSION := $(if $(NETSHIFT_VERSION),$(NETSHIFT_VERSION),0.9.12)
+PKG_VERSION := $(if $(NETSHIFT_VERSION),$(NETSHIFT_VERSION),1.0.0)
 
 PKG_RELEASE:=1
 
@@ -61,6 +61,9 @@ define Package/netshift/install
 
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/etc/config/netshift $(1)/etc/config/netshift
+
+	$(INSTALL_DIR) $(1)/etc/uci-defaults
+	$(INSTALL_BIN) ./files/etc/uci-defaults/60_netshift-postq $(1)/etc/uci-defaults/60_netshift-postq
 
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/netshift $(1)/usr/bin/netshift

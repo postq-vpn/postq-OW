@@ -6445,6 +6445,7 @@ nolog() { :; }
 # Pull the shipped helpers VERBATIM out of the live bin so we test shipped code.
 eval "$(awk '/^sing_box_get_unique_outbound_tag\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
 eval "$(awk '/^sing_box_build_subscription_groups\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
+eval "$(awk '/^postq_auto_members\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
 
 # Extract the WHOLE grouping if/else region VERBATIM (the grouped `then` branch
 # AND the flat `off` `else` branch) and wrap it as a function so we can drive
@@ -6691,7 +6692,7 @@ echolog() { :; }
 nolog() { :; }
 is_sing_box_extended() { return 0; }
 
-for fn in sing_box_get_unique_outbound_tag sing_box_build_subscription_feed_groups \
+for fn in sing_box_get_unique_outbound_tag sing_box_build_subscription_feed_groups postq_auto_members \
           get_subscription_feed_display_name subscription_merge_feed_outbounds \
           get_subscription_url_hash subscription_merge_section_feeds \
           subscription_feed_tags_record subscription_feed_tags_publish \
@@ -12986,13 +12987,19 @@ main_body() {
     CASE_LITE_BUILD=banana
     CASE_DF_KB=1000
     select_case sblite-select-unknown-option-auto compressed
-    # the bytes the current /usr/bin/sing-box frees count towards the space
+    # the bytes the current /usr/bin/sing-box frees count towards the space,
+    # but only while no sing-box runs: a running core keeps the old inode
+    # allocated until the restart after the install
     CASE_LITE_BUILD=auto
     CASE_DF_KB=65000
+    pidof() { return 1; }
     place_fake_bin /usr/bin/sing-box "1.14.1" elf
     select_case sblite-select-tiny-bin-still-compressed compressed
     dd if=/dev/zero of=/usr/bin/sing-box bs=1024 count=1024 2>/dev/null
     select_case sblite-select-freed-bin-crosses-threshold elf
+    pidof() { echo 4242; }
+    select_case sblite-select-running-bin-not-freed compressed
+    unset -f pidof
     CASE_DF_KB=999999
 
     if [ -z "$(updates_lite_build_warning compressed)" ] &&
@@ -23152,10 +23159,11 @@ DRVEOF
 
 
 # The test functions of this file, in the order they are written.
-# An upgrade with the installer keeps the sing-box core that is installed (Enter or the end of
-# input), and a section left without usable links names the installed core and what to do.
+# The installer keeps an extended core that is installed and puts the lite build in place of any
+# other (PostQ: without a question), and a section left without usable links names the installed
+# core and what to do.
 test_keep_core() {
-    header "Installer keeps the installed core; unsupported links name the core"
+    header "Installer keeps an extended core, installs lite otherwise; unsupported links name the core"
 
     local installer="${NETSHIFT_SRC}/../install.sh"
     local bin="${NETSHIFT_SRC}/usr/bin/netshift"
@@ -23193,15 +23201,12 @@ run() {
 }
 PATH="$KC_BIN:$PATH"
 run "1.14.3-extended-2.7.3" "" "extended-eof"
-run "1.14.3-extended-2.7.3" "\n" "extended-enter"
-run "1.14.3-extended-2.7.3" "0\n" "extended-zero"
 run "1.14.3-extended-2.7.3" "1\n" "extended-chose-stock"
 run "1.14.3-extended-2.7.3-lite" "\n" "lite-enter"
 run "1.12.22" "" "stock-eof"
 # no core at all: a PATH without the directories sing-box lives in (busybox applets are in /bin)
 PATH="/bin"
 command -v sing-box > /dev/null 2>&1 && echo "none-eof=skipped" || run "" "" "none-eof"
-command -v sing-box > /dev/null 2>&1 && echo "none-enter=skipped" || run "" "\n9\n2\n" "none-enter"
 # the apply step itself does nothing for keep
 SING_BOX_CORE=keep; apply_sing_box_core; echo "apply-keep-rc=$?"
 DRVEOF
@@ -23210,17 +23215,16 @@ DRVEOF
         _kc() {
             if printf '%s\n' "$out" | grep -qxF -- "$2"; then pass "$1"; else fail "$1" "wanted [$2] in: $(printf '%s' "$out" | tr '\n' '~')"; fi
         }
-        _kc "upgrade over sing-box-extended, end of input: the core is kept" "extended-eof=keep action=none offered=1"
-        _kc "...Enter keeps it" "extended-enter=keep action=none offered=1"
-        _kc "...0 keeps it" "extended-zero=keep action=none offered=1"
-        _kc "...1 still switches to the stock core when asked for" "extended-chose-stock=stock action=install_stable offered=1"
-        _kc "the lite core is kept on Enter" "lite-enter=keep action=none offered=1"
-        _kc "a stock core is kept on the end of input too" "stock-eof=keep action=none offered=1"
+        # PostQ: the installer asks nothing. An extended core (full or lite) is kept,
+        # anything else gets the lite build, which the XHTTP servers need.
+        _kc "upgrade over sing-box-extended: the core is kept" "extended-eof=keep action=none offered=0"
+        _kc "...whatever is typed: the installer does not ask" "extended-chose-stock=keep action=none offered=0"
+        _kc "the lite core is kept" "lite-enter=keep action=none offered=0"
+        _kc "a stock core is replaced by the lite build" "stock-eof=extended_lite action=install_extended_lite offered=0"
         if printf '%s\n' "$out" | grep -q '^none-eof=skipped'; then
-            skip "the test image has sing-box on PATH: the first install cases are not run"
+            skip "the test image has sing-box on PATH: the first install case is not run"
         else
-            _kc "a first install without any core: the end of input means stock, as before" "none-eof=stock action=none offered=0"
-            _kc "...Enter and an unknown answer re-ask instead" "none-enter=extended action=install_extended offered=0"
+            _kc "a first install without any core gets the lite build" "none-eof=extended_lite action=install_extended_lite offered=0"
         fi
         _kc "apply does nothing for keep" "apply-keep-rc=0"
     else

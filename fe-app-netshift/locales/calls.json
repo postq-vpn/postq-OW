@@ -94,7 +94,7 @@
     "call": "Active",
     "key": "Active",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:281"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:303"
     ]
   },
   {
@@ -524,7 +524,8 @@
       "src/netshift/tabs/manager/cards.ts:253",
       "src/netshift/tabs/manager/cards.ts:299",
       "src/netshift/tabs/manager/cards.ts:354",
-      "src/netshift/tabs/manager/cards.ts:417"
+      "src/netshift/tabs/manager/cards.ts:417",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:169"
     ]
   },
   {
@@ -544,6 +545,8 @@
     "key": "Checking...",
     "places": [
       "src/netshift/tabs/diagnostic/partials/renderRouteCheck.ts:34",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:56",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:95",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:858"
     ]
   },
@@ -684,13 +687,6 @@
     ]
   },
   {
-    "call": "Component Manager",
-    "key": "Component Manager",
-    "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:123"
-    ]
-  },
-  {
     "call": "Compressed build: uses more RAM at startup",
     "key": "Compressed build: uses more RAM at startup",
     "places": [
@@ -702,13 +698,6 @@
     "key": "Config File Path",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:1439"
-    ]
-  },
-  {
-    "call": "Configuration for NetShift service",
-    "key": "Configuration for NetShift service",
-    "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:38"
     ]
   },
   {
@@ -764,8 +753,7 @@
     "call": "Connections",
     "key": "Connections",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:74",
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:109"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:74"
     ]
   },
   {
@@ -796,6 +784,13 @@
     "key": "Core switch timed out",
     "places": [
       "src/netshift/methods/shell/pollSingBoxComponentAction.ts:112"
+    ]
+  },
+  {
+    "call": "Could not check for updates: %s",
+    "key": "Could not check for updates: %s",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:101"
     ]
   },
   {
@@ -845,7 +840,6 @@
     "call": "Dashboard",
     "key": "Dashboard",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:47",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:36"
     ]
   },
@@ -867,7 +861,7 @@
     "call": "days left",
     "key": "days left",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:154"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:176"
     ]
   },
   {
@@ -950,13 +944,6 @@
     ]
   },
   {
-    "call": "Devices",
-    "key": "Devices",
-    "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:91"
-    ]
-  },
-  {
     "call": "DHCP has DNS server",
     "key": "DHCP has DNS server",
     "places": [
@@ -971,13 +958,6 @@
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:283",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:289",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:403"
-    ]
-  },
-  {
-    "call": "Diagnostics",
-    "key": "Diagnostics",
-    "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:138"
     ]
   },
   {
@@ -1282,6 +1262,13 @@
     "key": "Download Lists via specific proxy section",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:1218"
+    ]
+  },
+  {
+    "call": "Download log",
+    "key": "Download log",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:170"
     ]
   },
   {
@@ -1673,14 +1660,14 @@
     "call": "Expired",
     "key": "Expired",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:153"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:175"
     ]
   },
   {
     "call": "Expires",
     "key": "Expires",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:154"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:176"
     ]
   },
   {
@@ -2734,7 +2721,7 @@
     "call": "List",
     "key": "List",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:330"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:368"
     ]
   },
   {
@@ -2954,17 +2941,24 @@
     ]
   },
   {
-    "call": "NetShift is not set up yet",
-    "key": "NetShift is not set up yet",
+    "call": "NetShift %s is the latest version",
+    "key": "NetShift %s is the latest version",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:95"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:108"
     ]
   },
   {
-    "call": "NetShift Settings",
-    "key": "NetShift Settings",
+    "call": "NetShift has been updated",
+    "key": "NetShift has been updated",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:37"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:140"
+    ]
+  },
+  {
+    "call": "NetShift is not set up yet",
+    "key": "NetShift is not set up yet",
+    "places": [
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:117"
     ]
   },
   {
@@ -3070,10 +3064,17 @@
     ]
   },
   {
+    "call": "No subscription yet",
+    "key": "No subscription yet",
+    "places": [
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:98"
+    ]
+  },
+  {
     "call": "None of the sections has a connection, so NetShift is not running. Open the Sections tab, paste a server link or a subscription URL into a section (or choose the interface of a VPN section) and press Save & Apply.",
     "key": "None of the sections has a connection, so NetShift is not running. Open the Sections tab, paste a server link or a subscription URL into a section (or choose the interface of a VPN section) and press Save & Apply.",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:99"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:121"
     ]
   },
   {
@@ -3114,6 +3115,13 @@
     "key": "Not on the network",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:353"
+    ]
+  },
+  {
+    "call": "Not recommended: slower than the others, Auto does not pick them",
+    "key": "Not recommended: slower than the others, Auto does not pick them",
+    "places": [
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:317"
     ]
   },
   {
@@ -3240,7 +3248,7 @@
     "call": "Open Sections",
     "key": "Open Sections",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:104"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:126"
     ]
   },
   {
@@ -3331,6 +3339,20 @@
     ]
   },
   {
+    "call": "Paste the subscription link from your provider and press Save & Apply. The servers are updated from it every hour.",
+    "key": "Paste the subscription link from your provider and press Save & Apply. The servers are updated from it every hour.",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:53"
+    ]
+  },
+  {
+    "call": "Paste the subscription link into the field above and press Save & Apply: the servers will appear here.",
+    "key": "Paste the subscription link into the field above and press Save & Apply: the servers will appear here.",
+    "places": [
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:102"
+    ]
+  },
+  {
     "call": "Path cannot be empty",
     "key": "Path cannot be empty",
     "places": [
@@ -3392,6 +3414,20 @@
     ]
   },
   {
+    "call": "Please wait...",
+    "key": "Please wait...",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:88"
+    ]
+  },
+  {
+    "call": "PostQ VPN",
+    "key": "PostQ VPN",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:24"
+    ]
+  },
+  {
     "call": "Prefer servers in list order",
     "key": "Prefer servers in list order",
     "places": [
@@ -3417,6 +3453,13 @@
     "key": "Preparing the report...",
     "places": [
       "src/netshift/tabs/diagnostic/partials/renderSupportReport.ts:46"
+    ]
+  },
+  {
+    "call": "Preparing...",
+    "key": "Preparing...",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:145"
     ]
   },
   {
@@ -3524,7 +3567,7 @@
     "call": "Refresh subscription",
     "key": "Refresh subscription",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:209"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:231"
     ]
   },
   {
@@ -3610,6 +3653,13 @@
     "key": "Resolve real IP for routing",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:2175"
+    ]
+  },
+  {
+    "call": "Restart",
+    "key": "Restart",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:64"
     ]
   },
   {
@@ -3828,13 +3878,6 @@
     ]
   },
   {
-    "call": "Sections",
-    "key": "Sections",
-    "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:62"
-    ]
-  },
-  {
     "call": "See the log",
     "key": "See the log",
     "places": [
@@ -4018,6 +4061,13 @@
     ]
   },
   {
+    "call": "Servers",
+    "key": "Servers",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:77"
+    ]
+  },
+  {
     "call": "Servers per feed",
     "key": "Servers per feed",
     "places": [
@@ -4025,17 +4075,17 @@
     ]
   },
   {
+    "call": "Service",
+    "key": "Service",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:30"
+    ]
+  },
+  {
     "call": "Services info",
     "key": "Services info",
     "places": [
       "src/netshift/tabs/dashboard/initController.ts:560"
-    ]
-  },
-  {
-    "call": "Settings",
-    "key": "Settings",
-    "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:75"
     ]
   },
   {
@@ -4173,7 +4223,7 @@
     "call": "Sort by ping",
     "key": "Sort by ping",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:334"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:372"
     ]
   },
   {
@@ -4235,6 +4285,13 @@
     ]
   },
   {
+    "call": "Start",
+    "key": "Start",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:58"
+    ]
+  },
+  {
     "call": "Start NetShift",
     "key": "Start NetShift",
     "places": [
@@ -4256,6 +4313,13 @@
     ]
   },
   {
+    "call": "Stop",
+    "key": "Stop",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:61"
+    ]
+  },
+  {
     "call": "Stop NetShift",
     "key": "Stop NetShift",
     "places": [
@@ -4273,6 +4337,7 @@
     "call": "Subscription",
     "key": "Subscription",
     "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:45",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:29",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:230"
     ]
@@ -4330,6 +4395,7 @@
     "call": "Subscription URLs",
     "key": "Subscription URLs",
     "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:52",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:295"
     ]
   },
@@ -4428,7 +4494,7 @@
     "call": "Test latency",
     "key": "Test latency",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:341"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:379"
     ]
   },
   {
@@ -4590,7 +4656,8 @@
     "key": "The report could not be prepared",
     "places": [
       "src/netshift/tabs/diagnostic/partials/renderSupportReport.ts:56",
-      "src/netshift/tabs/diagnostic/partials/renderSupportReport.ts:71"
+      "src/netshift/tabs/diagnostic/partials/renderSupportReport.ts:71",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:152"
     ]
   },
   {
@@ -4776,7 +4843,7 @@
     "call": "Tiles",
     "key": "Tiles",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:330"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:368"
     ]
   },
   {
@@ -4834,8 +4901,8 @@
     "key": "Traffic",
     "places": [
       "src/netshift/tabs/dashboard/initController.ts:458",
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:145",
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:146",
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:167",
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:168",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:85",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:152"
     ]
@@ -4963,6 +5030,13 @@
     ]
   },
   {
+    "call": "Update failed: %s",
+    "key": "Update failed: %s",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:135"
+    ]
+  },
+  {
     "call": "Update is available",
     "key": "Update is available",
     "places": [
@@ -5005,6 +5079,13 @@
     ]
   },
   {
+    "call": "Update to %s",
+    "key": "Update to %s",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:119"
+    ]
+  },
+  {
     "call": "updated",
     "key": "updated",
     "places": [
@@ -5023,6 +5104,13 @@
     "key": "Updating NetShift, this may take a few minutes; the page will reload…",
     "places": [
       "src/netshift/tabs/manager/initController.ts:313"
+    ]
+  },
+  {
+    "call": "Updating, do not close the page...",
+    "key": "Updating, do not close the page...",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:129"
     ]
   },
   {
@@ -5261,6 +5349,13 @@
     ]
   },
   {
+    "call": "Version %s is available",
+    "key": "Version %s is available",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:116"
+    ]
+  },
+  {
     "call": "via the tunnel",
     "key": "via the tunnel",
     "places": [
@@ -5304,6 +5399,27 @@
     "key": "VMess needs the sing-box-extended core",
     "places": [
       "src/validators/validateProxyUrl.ts:32"
+    ]
+  },
+  {
+    "call": "VPN is running",
+    "key": "VPN is running",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:78"
+    ]
+  },
+  {
+    "call": "VPN is stopped",
+    "key": "VPN is stopped",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:81"
+    ]
+  },
+  {
+    "call": "VPN is stopped: add a subscription below and press Save & Apply",
+    "key": "VPN is stopped: add a subscription below and press Save & Apply",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:80"
     ]
   },
   {

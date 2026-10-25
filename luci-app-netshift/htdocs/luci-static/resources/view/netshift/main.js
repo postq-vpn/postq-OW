@@ -3853,6 +3853,22 @@ function sortOutboundsByLatency(outbounds) {
   }).map(({ item }) => item);
   return [...groups, ...servers];
 }
+function isRussianServer(outbound) {
+  const name = outbound.displayName.toLowerCase();
+  return name.includes("\u{1F1F7}\u{1F1FA}") || name.includes("\u0440\u043E\u0441\u0441\u0438") || name.includes("russia");
+}
+function splitRussianServers(outbounds) {
+  const russian = outbounds.filter(
+    (item) => !isGroup(item) && isRussianServer(item)
+  );
+  if (russian.length === outbounds.filter((item) => !isGroup(item)).length) {
+    return { main: outbounds, russian: [] };
+  }
+  return {
+    main: outbounds.filter((item) => !russian.includes(item)),
+    russian
+  };
+}
 
 // src/helpers/subscriptionInfo.ts
 var asNumberOrNull = (value) => typeof value === "number" && Number.isFinite(value) ? value : null;
@@ -3948,6 +3964,24 @@ function openSectionsTab() {
   document.querySelector('.cbi-tabmenu li[data-tab="section"] a')?.click();
 }
 function renderNotConfiguredState() {
+  if (!document.querySelector('.cbi-tabmenu li[data-tab="section"]')) {
+    return E(
+      "div",
+      {
+        class: "card pdk_dashboard-page__outbound-section pdk_dashboard-page__setup"
+      },
+      [
+        E("b", {}, _("No subscription yet")),
+        E(
+          "p",
+          {},
+          _(
+            "Paste the subscription link into the field above and press Save & Apply: the servers will appear here."
+          )
+        )
+      ]
+    );
+  }
   return E(
     "div",
     {
@@ -4112,19 +4146,31 @@ function renderDefaultState({
       ]
     );
   }
+  function renderNotRecommended() {
+    return E(
+      "div",
+      { class: "pdk_dashboard-page__not-recommended" },
+      `\u26A0 ${_("Not recommended: slower than the others, Auto does not pick them")}`
+    );
+  }
   function renderOutbounds(outbounds, key) {
-    const items = sortByPing ? sortOutboundsByLatency(outbounds) : outbounds;
+    const sorted = sortByPing ? sortOutboundsByLatency(outbounds) : outbounds;
+    const { main, russian } = splitRussianServers(sorted);
+    const render4 = viewMode === "tiles" ? renderOutbound : renderRow;
+    const children = [
+      ...main.map((outbound) => render4(outbound)),
+      ...russian.length > 0 ? [
+        renderNotRecommended(),
+        ...russian.map((outbound) => render4(outbound))
+      ] : []
+    ];
     if (viewMode === "tiles") {
-      return E(
-        "div",
-        { class: "pdk_dashboard-page__outbound-grid" },
-        items.map((outbound) => renderOutbound(outbound))
-      );
+      return E("div", { class: "pdk_dashboard-page__outbound-grid" }, children);
     }
     const list = E(
       "div",
       { class: "pdk_dashboard-page__outbound-list" },
-      items.map((outbound) => renderRow(outbound))
+      children
     );
     list.dataset.listKey = key;
     return list;
@@ -5239,6 +5285,17 @@ var styles3 = `
     max-height: 520px;
     overflow-y: auto;
     padding-right: 4px;
+}
+
+/* PostQ: the line over the Russian servers, across the whole list or grid */
+.pdk_dashboard-page__not-recommended {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: rgba(240, 173, 78, 0.15);
+    color: #c77c02;
+    font-weight: bold;
 }
 
 .pdk_dashboard-page__outbound-row {

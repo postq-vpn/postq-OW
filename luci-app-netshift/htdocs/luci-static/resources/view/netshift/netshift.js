@@ -5,46 +5,76 @@
 "require network";
 "require view.netshift.main as main";
 
-// Settings content
-"require view.netshift.settings as settings";
-
-// Sections content
-"require view.netshift.section as section";
-
 // Dashboard content
 "require view.netshift.dashboard as dashboard";
 
-// Local devices content
-"require view.netshift.devices as devices";
+// PostQ: service status, update and log
+"require view.netshift.control as control";
 
-// Connections content
-"require view.netshift.connections as connections";
-
-// Diagnostic content
-"require view.netshift.diagnostic as diagnostic";
-
-// Component Manager content
-"require view.netshift.manager as manager";
-
+// PostQ simplified UI: one page with the service card, the subscription and the
+// servers. The routing and DNS are fixed by /etc/uci-defaults/60_netshift-postq,
+// so the settings, sections, devices, connections, component manager and
+// diagnostics tabs of the full UI are not shown.
 const EntryPoint = {
   async render() {
     main.injectGlobalStyles();
     // what the installed core can do, for the validators and the hints
     await main.loadCoreCapabilities();
 
-    const netshiftMap = new form.Map(
-      "netshift",
-      _("NetShift Settings"),
-      _("Configuration for NetShift service"),
-    );
-    // Enable tab views
-    netshiftMap.tabbed = true;
+    const netshiftMap = new form.Map("netshift", _("PostQ VPN"));
 
-    // Dashboard tab (first / landing tab)
+    // Service card
+    const controlSection = netshiftMap.section(
+      form.TypedSection,
+      "control",
+      _("Service"),
+    );
+    controlSection.anonymous = true;
+    controlSection.addremove = false;
+    controlSection.cfgsections = function () {
+      return ["control"];
+    };
+
+    control.createControlContent(controlSection);
+
+    // Subscription of the one proxy section of the profile
+    const subscriptionSection = netshiftMap.section(
+      form.NamedSection,
+      "main",
+      "section",
+      _("Subscription"),
+    );
+    subscriptionSection.addremove = false;
+
+    const o = subscriptionSection.option(
+      form.DynamicList,
+      "subscription_url",
+      _("Subscription URLs"),
+      _(
+        "Paste the subscription link from your provider and press Save & Apply. The servers are updated from it every hour.",
+      ),
+    );
+    o.placeholder = "https://example.com/api/sub";
+    o.rmempty = true;
+    o.validate = function (section_id, value) {
+      if (!value || value.length === 0) {
+        return true;
+      }
+
+      const validation = main.validateUrl(value);
+
+      if (validation.valid) {
+        return true;
+      }
+
+      return validation.message;
+    };
+
+    // Servers, ping and the subscription's expiry and traffic
     const dashboardSection = netshiftMap.section(
       form.TypedSection,
       "dashboard",
-      _("Dashboard"),
+      _("Servers"),
     );
     dashboardSection.anonymous = true;
     dashboardSection.addremove = false;
@@ -52,99 +82,7 @@ const EntryPoint = {
       return ["dashboard"];
     };
 
-    // Render dashboard content
     dashboard.createDashboardContent(dashboardSection);
-
-    // Sections tab
-    const sectionsSection = netshiftMap.section(
-      form.TypedSection,
-      "section",
-      _("Sections"),
-    );
-    sectionsSection.anonymous = false;
-    sectionsSection.addremove = true;
-    sectionsSection.template = "cbi/simpleform";
-
-    // Render section content
-    section.createSectionContent(sectionsSection);
-
-    // Settings tab
-    const settingsSection = netshiftMap.section(
-      form.TypedSection,
-      "settings",
-      _("Settings"),
-    );
-    settingsSection.anonymous = true;
-    settingsSection.addremove = false;
-    // Make it named [ config settings 'settings' ]
-    settingsSection.cfgsections = function () {
-      return ["settings"];
-    };
-
-    // Render settings content
-    settings.createSettingsContent(settingsSection);
-
-    // Devices tab: drives the Fully Routed IPs / Routing Excluded IPs widgets
-    const devicesSection = netshiftMap.section(
-      form.TypedSection,
-      "devices",
-      _("Devices"),
-    );
-    devicesSection.anonymous = true;
-    devicesSection.addremove = false;
-    devicesSection.cfgsections = function () {
-      return ["devices"];
-    };
-
-    devices.createDevicesContent(
-      devicesSection,
-      sectionsSection,
-      settingsSection,
-    );
-
-    // Connections tab: the live connection table
-    const connectionsSection = netshiftMap.section(
-      form.TypedSection,
-      "connections",
-      _("Connections"),
-    );
-    connectionsSection.anonymous = true;
-    connectionsSection.addremove = false;
-    connectionsSection.cfgsections = function () {
-      return ["connections"];
-    };
-
-    connections.createConnectionsContent(connectionsSection);
-
-    // Component Manager tab
-    const managerSection = netshiftMap.section(
-      form.TypedSection,
-      "manager",
-      _("Component Manager"),
-    );
-    managerSection.anonymous = true;
-    managerSection.addremove = false;
-    managerSection.cfgsections = function () {
-      return ["manager"];
-    };
-
-    // Render Component Manager content
-    manager.createManagerContent(managerSection);
-
-    // Diagnostic tab
-    const diagnosticSection = netshiftMap.section(
-      form.TypedSection,
-      "diagnostic",
-      _("Diagnostics"),
-    );
-    diagnosticSection.anonymous = true;
-    diagnosticSection.addremove = false;
-    diagnosticSection.cfgsections = function () {
-      return ["diagnostic"];
-    };
-
-    // Render diagnostic content
-    diagnostic.createDiagnosticContent(diagnosticSection);
 
     // Inject core service
     main.coreService();

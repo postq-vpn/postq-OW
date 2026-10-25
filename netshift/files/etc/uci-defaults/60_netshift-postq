@@ -1,0 +1,134 @@
+#!/bin/sh
+# PostQ profile: the routing and DNS are fixed, only the subscription is the user's.
+# Runs on every install and upgrade of the package (uci-defaults), so a config
+# edited by hand or carried over from plain NetShift is brought back to it.
+# The subscription URLs of the 'main' section are the only values kept.
+
+CONFIG=/etc/config/netshift
+[ -f "$CONFIG" ] || exit 0
+
+subs="$(uci -q get netshift.main.subscription_url)"
+
+# Sections other than the profile's own would route on their own and are not
+# shown in the simplified UI.
+for s in $(uci -q show netshift | sed -n "s/^netshift\.\([^.=]*\)=section$/\1/p"); do
+    case "$s" in
+    main | direct) ;;
+    *) uci -q delete "netshift.$s" ;;
+    esac
+done
+uci -q delete netshift.main
+uci -q delete netshift.direct
+
+uci -q batch <<'EOF'
+set netshift.settings=settings
+set netshift.settings.dns_type='doh'
+set netshift.settings.dns_server='1.1.1.1'
+set netshift.settings.bootstrap_dns_server='77.88.8.8'
+delete netshift.settings.dns_pool_server
+delete netshift.settings.dns_pool_mode
+delete netshift.settings.dns_forward
+delete netshift.settings.dns_server_route
+delete netshift.settings.dns_via_outbound
+delete netshift.settings.dns_outbound_section
+set netshift.settings.disable_quic='1'
+set netshift.settings.exclude_bittorrent='1'
+set netshift.settings.enable_ipv6='0'
+set netshift.settings.dashboard_widgets='0'
+set netshift.settings.update_notice='1'
+set netshift.settings.update_repo='upstream'
+
+set netshift.direct=section
+set netshift.direct.connection_type='exclusion'
+set netshift.direct.user_domain_list_type='dynamic'
+add_list netshift.direct.user_domains='postq.space'
+add_list netshift.direct.user_domains='rw.kxp.one'
+add_list netshift.direct.user_domains='2ip.io'
+add_list netshift.direct.user_domains='yandex.cloud'
+add_list netshift.direct.user_domains='sberbank.ru'
+add_list netshift.direct.user_domains='xn--b1auou.xn--p1ai'
+add_list netshift.direct.user_domains='okko.tv'
+add_list netshift.direct.user_domains='dewu.com'
+add_list netshift.direct.user_domains='dewucdn.com'
+add_list netshift.direct.user_domains='wechat.com'
+add_list netshift.direct.user_domains='1688.com'
+add_list netshift.direct.user_domains='steampowered.com'
+add_list netshift.direct.user_domains='steamcommunity.com'
+add_list netshift.direct.user_domains='steamstatic.com'
+add_list netshift.direct.user_domains='steamcontent.com'
+add_list netshift.direct.user_domains='steamserver.net'
+add_list netshift.direct.user_domains='steamusercontent.com'
+add_list netshift.direct.user_domains='steam-chat.com'
+add_list netshift.direct.user_domains='steamgames.com'
+add_list netshift.direct.user_domains='valvesoftware.com'
+add_list netshift.direct.user_domains='steamcdn-a.akamaihd.net'
+add_list netshift.direct.user_domains='steampipe.akamaized.net'
+add_list netshift.direct.user_domains='rockstargames.com'
+add_list netshift.direct.user_domains='rsg.sc'
+add_list netshift.direct.user_domains='rockstarnorth.com'
+set netshift.direct.user_subnet_list_type='dynamic'
+add_list netshift.direct.user_subnets='45.121.184.0/22'
+add_list netshift.direct.user_subnets='103.10.124.0/23'
+add_list netshift.direct.user_subnets='103.28.54.0/23'
+add_list netshift.direct.user_subnets='146.66.152.0/21'
+add_list netshift.direct.user_subnets='155.133.224.0/19'
+add_list netshift.direct.user_subnets='162.254.192.0/21'
+add_list netshift.direct.user_subnets='185.25.180.0/22'
+add_list netshift.direct.user_subnets='192.69.96.0/22'
+add_list netshift.direct.user_subnets='205.196.6.0/24'
+add_list netshift.direct.user_subnets='208.64.200.0/22'
+add_list netshift.direct.user_subnets='208.78.164.0/22'
+
+set netshift.main=section
+set netshift.main.connection_type='proxy'
+set netshift.main.proxy_config_type='subscription'
+set netshift.main.subscription_update_interval='1h'
+# The panel sends its XHTTP servers only in the Xray JSON (Happ UA), not to the
+# singbox UA; they need sing-box-extended (or its lite build).
+set netshift.main.subscription_format_preference='xray'
+set netshift.main.global_proxy='0'
+# One "⚡ Авто" for the section that never picks a Russian server, like in the
+# PostQ XKeen panel (no "⚡ <feed>" group per subscription).
+set netshift.main.subscription_feed_groups='0'
+set netshift.main.auto_exclude_russian='1'
+# The panel's own balancers ("🇪🇺 Европа | Авто ⚡️") and list headers
+# ("⬇️ Тестовые серверы ⬇️") come to sing-box as dummy servers (ya.ru:443):
+# only the one Auto of NetShift is kept, like in the PostQ XKeen panel.
+add_list netshift.main.subscription_filter_exclude_keywords='Авто'
+add_list netshift.main.subscription_filter_exclude_keywords='⬇️'
+add_list netshift.main.community_lists='russia_inside'
+add_list netshift.main.community_lists='youtube'
+add_list netshift.main.community_lists='telegram'
+add_list netshift.main.community_lists='meta'
+add_list netshift.main.community_lists='discord'
+add_list netshift.main.community_lists='twitter'
+add_list netshift.main.community_lists='tiktok'
+add_list netshift.main.community_lists='google_ai'
+add_list netshift.main.community_lists='cloudflare'
+add_list netshift.main.community_lists='cloudfront'
+add_list netshift.main.community_lists='digitalocean'
+add_list netshift.main.community_lists='hetzner'
+add_list netshift.main.community_lists='ovh'
+set netshift.main.user_domain_list_type='dynamic'
+add_list netshift.main.user_domains='claude.com'
+add_list netshift.main.user_domains='claudeusercontent.com'
+add_list netshift.main.user_domains='docs.rw'
+add_list netshift.main.user_domains='glesys.com'
+add_list netshift.main.user_domains='techpowerup.com'
+add_list netshift.main.user_domains='melbicom.net'
+add_list netshift.main.user_domains='swallow.apple.com'
+add_list netshift.main.user_domains='instantmessaging-pa.googleapis.com'
+add_list netshift.main.user_domains='remotedesktop-pa.googleapis.com'
+add_list netshift.main.user_domains='remotedesktop.google.com'
+EOF
+
+for url in $subs; do
+    uci add_list netshift.main.subscription_url="$url"
+done
+
+# The direct section must come first in the file so that its rules win
+uci reorder netshift.direct=1
+uci reorder netshift.main=2
+uci commit netshift
+
+exit 0

@@ -1,13 +1,15 @@
 #!/bin/sh
 # shellcheck shell=dash
 
-REPO="https://api.github.com/repos/yandexru45/netshift/releases/latest"
+REPO="https://api.github.com/repos/postq-vpn/postq-OW/releases/latest"
 # github.com FRONTEND redirect path (NOT the rate-limited api.github.com).
 # /releases/latest 302s to /releases/tag/<tag>; /releases/download/<tag>/<asset>
 # 302s to the CDN. Primary install path so CGNAT / shared-IP routers avoid the
 # 60/hour/IP API limit; REPO stays as the fallback.
-RELEASES_LATEST_REDIRECT="https://github.com/yandexru45/netshift/releases/latest"
-RELEASES_DOWNLOAD_BASE="https://github.com/yandexru45/netshift/releases/download"
+# Both can be overridden from the environment to install from a mirror or a
+# local test server; the defaults are the GitHub releases of the PostQ fork.
+RELEASES_LATEST_REDIRECT="${RELEASES_LATEST_REDIRECT:-https://github.com/postq-vpn/postq-OW/releases/latest}"
+RELEASES_DOWNLOAD_BASE="${RELEASES_DOWNLOAD_BASE:-https://github.com/postq-vpn/postq-OW/releases/download}"
 DOWNLOAD_DIR="/tmp/netshift"
 COUNT=3
 # Seconds of silence after which a download is given up (a stalled connection used to hang the
@@ -90,24 +92,11 @@ update_config() {
     printf "\033[48;5;196m\033[1m║ Are you sure you want to continue?                                   ║\033[0m\n"
     printf "\033[48;5;196m\033[1m╚══════════════════════════════════════════════════════════════════════╝\033[0m\n"
 
-    msg "Continue? (yes/no)"
-
-    while true; do
-            read -r -p '' CONFIG_UPDATE
-            case $CONFIG_UPDATE in
-
-            yes|y|Y)
-                mv /etc/config/netshift /etc/config/netshift-070
-                fetch_url https://raw.githubusercontent.com/yandexru45/netshift/refs/heads/main/netshift/files/etc/config/netshift /etc/config/netshift
-                msg "NetShift config has been reset to default. Your old config saved in /etc/config/netshift-070"
-                break
-                ;;
-            *)
-                msg "Exit"
-                exit 1
-                ;;
-        esac
-    done
+    # PostQ: no question — the PostQ profile configures everything again anyway
+    # (the old config is kept as a backup).
+    mv /etc/config/netshift /etc/config/netshift-070
+    fetch_url https://raw.githubusercontent.com/postq-vpn/postq-OW/refs/heads/main/netshift/files/etc/config/netshift /etc/config/netshift
+    msg "NetShift config has been reset to default. Your old config saved in /etc/config/netshift-070"
 }
 
 # Detect whether an OLD podkop install is present on this router.
@@ -158,17 +147,8 @@ migrate_from_podkop() {
         msg "Detected podkop version: $old_version"
     fi
 
-    msg "Continue migration to NetShift? (yes/no)"
-
-    read -r -p '' MIGRATE_CONFIRM
-    case $MIGRATE_CONFIRM in
-        yes|y|Y)
-            ;;
-        *)
-            msg "Exit"
-            exit 1
-            ;;
-    esac
+    # PostQ: the migration runs without a question (the old config is backed up below).
+    msg "Migrating podkop to NetShift..."
 
     # 2. Stop the old service if running. The old 'stop' restores dnsmasq
     #    (podkop_server/noresolv/cachesize keys in /etc/config/dhcp), removes
@@ -316,66 +296,28 @@ current_sing_box_core() {
     fi
 }
 
-# Asks which sing-box core to install and stores the answer in SING_BOX_CORE
-# (keep|stock|extended|extended_lite). Same plain read loop as the Russian-language
-# prompt below: an unrecognised answer re-asks instead of aborting the install.
-# When a core is installed (an upgrade), Enter and the end of input keep it: an
-# upgrade that only meant to update NetShift must not replace sing-box-extended
-# with the stock core (links with XHTTP, VMess or VLESS Encryption would stop
-# working). Without a core the end of input chooses the stock one, as before.
+# Chooses the sing-box core to install and stores it in SING_BOX_CORE
+# (keep|extended_lite). An upgrade must not replace sing-box-extended with the
+# stock core (links with XHTTP, VMess or VLESS Encryption would stop working).
 select_sing_box_core() {
     local current
     current="$(current_sing_box_core)"
 
-    msg "Какое ядро sing-box поставить? (Which sing-box core to install?)"
-    if [ -n "$current" ]; then
-        msg "0) Оставить установленное ($current) - по умолчанию, Enter (Keep the installed core - the default)"
-    fi
-    msg "1) Стоковый sing-box (stock, из фидов OpenWrt)"
-    msg "2) sing-box-extended (сборка shtorm-7, больше протоколов)"
-    msg "3) sing-box-extended-lite (облегчённая сборка для устройств с малой Flash)"
-
-    while true; do
-        if ! read -r -p '' CORE; then
-            if [ -n "$current" ]; then
-                msg "Нет ответа, ядро не меняется: $current (No input, the installed core is kept)"
-                SING_BOX_CORE="keep"
-            else
-                msg "Нет ответа, ставим стоковый sing-box (No input, installing the stock core)"
-                SING_BOX_CORE="stock"
-            fi
-            break
-        fi
-
-        case $CORE in
-        0 | "")
-            if [ -n "$current" ]; then
-                SING_BOX_CORE="keep"
-                break
-            fi
-            echo "Введите 1, 2 или 3 (Enter 1, 2 or 3)"
-            ;;
-        1)
-            SING_BOX_CORE="stock"
-            break
-            ;;
-        2)
-            SING_BOX_CORE="extended"
-            break
-            ;;
-        3)
-            SING_BOX_CORE="extended_lite"
-            break
-            ;;
-        *)
-            if [ -n "$current" ]; then
-                echo "Введите 0, 1, 2 или 3 (Enter 0, 1, 2 or 3)"
-            else
-                echo "Введите 1, 2 или 3 (Enter 1, 2 or 3)"
-            fi
-            ;;
-        esac
-    done
+    # PostQ: no question. The servers of the PostQ subscription with XHTTP need
+    # sing-box-extended, so an extended core already in place is kept and
+    # otherwise the lite build is installed (the backend picks the ELF or the
+    # UPX-compressed flavour by the free flash; apply_sing_box_core falls back
+    # to the full extended build when lite cannot be installed).
+    case "$current" in
+    extended | extended_lite)
+        msg "sing-box core: $current is kept"
+        SING_BOX_CORE="keep"
+        ;;
+    *)
+        msg "sing-box core: sing-box-extended-lite will be installed (needed for XHTTP servers)"
+        SING_BOX_CORE="extended_lite"
+        ;;
+    esac
 }
 
 # Returns 0 if the sing-box binary on the router is an "extended lite" build
@@ -457,13 +399,28 @@ apply_sing_box_core() {
     case "$result" in
     *'"success":true'*)
         msg "sing-box core switched successfully"
-        ;;
-    *)
-        msg "Failed to switch the sing-box core; NetShift keeps the core it had."
-        msg "$result"
-        return 1
+        return 0
         ;;
     esac
+
+    msg "Failed to switch the sing-box core ($action): $result"
+
+    # PostQ: lite has no build for every CPU and may not fit; the full extended
+    # build is the next core that can run XHTTP.
+    if [ "$action" = "install_extended_lite" ]; then
+        msg "Trying the full sing-box-extended build instead..."
+        result=$(/usr/bin/netshift component_action sing_box install_extended 2>&1)
+        case "$result" in
+        *'"success":true'*)
+            msg "sing-box-extended installed"
+            return 0
+            ;;
+        esac
+        msg "Failed to install sing-box-extended: $result"
+    fi
+
+    msg "NetShift keeps the stock sing-box core: servers with XHTTP will not work."
+    return 1
 }
 
 main() {
@@ -568,35 +525,26 @@ main() {
             break
         fi
     done
+    # PostQ: the Russian interface is always installed (no question).
     if [ -n "$ru" ]; then
         if pkg_is_installed luci-i18n-netshift-ru; then
-                msg "Upgrading Russian translation..."
-                pkg_remove luci-i18n-netshift*
-                pkg_install "$DOWNLOAD_DIR/$ru"
+            msg "Upgrading Russian translation..."
         else
-            msg "Русский язык интерфейса ставим? y/n (Install the Russian interface language?)"
-            while true; do
-                read -r -p '' RUS
-                case $RUS in
-                y)
-                    pkg_remove luci-i18n-netshift*
-                    pkg_install "$DOWNLOAD_DIR/$ru"
-                    break
-                    ;;
-                n)
-                    break
-                    ;;
-                *)
-                    echo "Введите y или n"
-                    ;;
-                esac
-            done
+            msg "Installing Russian translation..."
         fi
+        pkg_remove luci-i18n-netshift*
+        pkg_install "$DOWNLOAD_DIR/$ru"
     fi
 
     apply_sing_box_core
 
     find "$DOWNLOAD_DIR" -type f -name '*netshift*' -exec rm {} \;
+
+    local lan_ip
+    lan_ip="$(uci -q get network.lan.ipaddr | cut -d/ -f1)"
+    msg "Готово! Откройте http://${lan_ip:-192.168.1.1}/cgi-bin/luci/admin/services/netshift"
+    msg "вставьте ссылку на подписку и нажмите «Сохранить и применить» — VPN заработает сразу."
+    msg "Done! Open the page above, paste the subscription link and press Save & Apply."
 }
 
 check_system() {
@@ -614,7 +562,9 @@ check_system() {
     fi
 
     # Check available space
-    AVAILABLE_SPACE=$(df /overlay | awk 'NR==2 {print $4}')
+    # /overlay on squashfs images; an ext4 image has no overlay mount, its root is writable
+    AVAILABLE_SPACE=$(df /overlay 2>/dev/null | awk 'NR==2 {print $4}')
+    [ -n "$AVAILABLE_SPACE" ] || AVAILABLE_SPACE=$(df / | awk 'NR==2 {print $4}')
     REQUIRED_SPACE=15360 # 15MB in KB
 
     if [ "$AVAILABLE_SPACE" -lt "$REQUIRED_SPACE" ]; then
@@ -664,25 +614,13 @@ check_system() {
         fi
     fi
 
+    # PostQ: the conflicting package is removed without a question (it takes over
+    # the router's DNS, which NetShift has to own).
     if pkg_is_installed https-dns-proxy; then
-        msg "Conflicting package detected: https-dns-proxy. Remove?"
-
-        while true; do
-                read -r -p '' DNSPROXY
-                case $DNSPROXY in
-
-                yes|y|Y)
-                    pkg_remove luci-app-https-dns-proxy
-                    pkg_remove https-dns-proxy
-                    pkg_remove luci-i18n-https-dns-proxy*
-                    break
-                    ;;
-                *)
-                    msg "Exit"
-                    exit 1
-                    ;;
-        esac
-    done
+        msg "Conflicting package detected: https-dns-proxy. Removing it..."
+        pkg_remove luci-app-https-dns-proxy
+        pkg_remove https-dns-proxy
+        pkg_remove luci-i18n-https-dns-proxy*
     fi
 }
 

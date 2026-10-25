@@ -1447,8 +1447,10 @@ sing_box_cm_xhttp_extra_options() {
             x_padding_method: ($e.xPaddingMethod | enum(["repeat-x", "tokenish"])),
             uplink_http_method: ($e.uplinkHTTPMethod | if type == "string" then ascii_upcase else null end
                                  | enum(if packet_up then ["POST", "PUT", "GET"] else ["POST", "PUT"] end)),
-            session_placement: ($e.sessionPlacement | enum(["path", "cookie", "header", "query"])),
-            session_key: ($e.sessionKey | key),
+            # newer Xray (Remnawave panels) names these sessionIDPlacement / sessionIDKey;
+            # without them a server that expects the session id in a cookie does not answer
+            session_placement: (($e.sessionPlacement // $e.sessionIDPlacement) | enum(["path", "cookie", "header", "query"])),
+            session_key: (($e.sessionKey // $e.sessionIDKey) | key),
             seq_placement: ($e.seqPlacement | enum(["path", "cookie", "header", "query"])),
             seq_key: ($e.seqKey | key),
             uplink_data_placement: ($e.uplinkDataPlacement | enum(if packet_up then ["auto", "body", "cookie", "header"] else ["auto", "body"] end)),
@@ -1464,7 +1466,8 @@ sing_box_cm_xhttp_extra_ignored() {
     printf '%s' "${1:-null}" | jq -r '
         ["xPaddingBytes", "noGRPCHeader", "noSSEHeader", "scMaxEachPostBytes", "scMinPostsIntervalMs", "scMaxBufferedPosts",
          "scStreamUpServerSecs", "uplinkChunkSize", "xPaddingObfsMode", "xPaddingKey", "xPaddingHeader", "xPaddingPlacement",
-         "xPaddingMethod", "uplinkHTTPMethod", "sessionPlacement", "sessionKey", "seqPlacement", "seqKey",
+         "xPaddingMethod", "uplinkHTTPMethod", "sessionPlacement", "sessionKey", "sessionIDPlacement", "sessionIDKey",
+         "seqPlacement", "seqKey",
          "uplinkDataPlacement", "uplinkDataKey", "headers", "xmux"] as $known
         | if type == "object" then (keys - $known | join(", ")) else "" end' 2> /dev/null
 }

@@ -135,6 +135,17 @@ export const styles = `
     padding-right: 4px;
 }
 
+/* PostQ: the line over the Russian servers, across the whole list or grid */
+.pdk_dashboard-page__not-recommended {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    background: rgba(240, 173, 78, 0.15);
+    color: #c77c02;
+    font-weight: bold;
+}
+
 .pdk_dashboard-page__outbound-row {
     min-width: 0;
     display: flex;

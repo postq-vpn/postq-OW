@@ -284,7 +284,7 @@ UPDATES_APK_FETCH_DIR="/usr/lib/netshift/apk-fetch"
 # Component Manager — NetShift self-update (task-017). The GitHub latest-release
 # API for NetShift itself (same endpoint install.sh and get_system_info use);
 # the self-update worker downloads the release .ipk/.apk assets from it.
-NETSHIFT_RELEASE_API_URL="https://api.github.com/repos/yandexru45/netshift/releases/latest"
+NETSHIFT_RELEASE_API_URL="https://api.github.com/repos/postq-vpn/postq-OW/releases/latest"
 # GitHub FRONTEND (github.com, NOT the rate-limited api.github.com) redirect path
 # for the NetShift repo. /releases/latest 302-redirects to /releases/tag/<tag>
 # (resolve with curl -w '%{redirect_url}' — no API hit, not subject to the
@@ -292,14 +292,14 @@ NETSHIFT_RELEASE_API_URL="https://api.github.com/repos/yandexru45/netshift/relea
 # CDN for direct asset download. Primary path for version-check + self-update;
 # NETSHIFT_RELEASE_API_URL stays as the graceful fallback. Repo slug lives here
 # only — do not hardcode it elsewhere.
-NETSHIFT_REPO_RELEASES_LATEST_URL="https://github.com/yandexru45/netshift/releases/latest"
-NETSHIFT_REPO_RELEASES_DOWNLOAD_BASE="https://github.com/yandexru45/netshift/releases/download"
+NETSHIFT_REPO_RELEASES_LATEST_URL="https://github.com/postq-vpn/postq-OW/releases/latest"
+NETSHIFT_REPO_RELEASES_DOWNLOAD_BASE="https://github.com/postq-vpn/postq-OW/releases/download"
 # Where the NetShift updates come from (settings.update_repo): the developer's repository
 # (default) or the fork. Both are read the same way: the newest release that is not marked as
 # a pre-release (/releases/latest). The builds of the fork are ordinary releases and are offered;
 # only what is marked as a pre-release is not.
 NETSHIFT_GITHUB_API_REPOS="https://api.github.com/repos"
-NETSHIFT_REPO_UPSTREAM="yandexru45/netshift"
+NETSHIFT_REPO_UPSTREAM="postq-vpn/postq-OW"
 NETSHIFT_REPO_FORK="cergo666/netshift"
 # Optional download mirrors for GitHub (settings: list update_mirror 'https://host/'): a mirror
 # is tried only after the direct download failed, and is put in front of the full GitHub URL.

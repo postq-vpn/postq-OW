@@ -1,15 +1,15 @@
 # RU translations for NETSHIFT package.
 # Copyright (C) 2026 THE NETSHIFT'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the NETSHIFT package.
-# agent, 2026.
+# PostqVPN, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-22 21:36+0300\n"
-"PO-Revision-Date: 2026-10-22 21:36+0300\n"
-"Last-Translator: agent\n"
+"POT-Creation-Date: 2026-10-25 22:05+0300\n"
+"PO-Revision-Date: 2026-10-25 22:05+0300\n"
+"Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -302,17 +302,11 @@ msgstr "common.dot.dns.yandex.net (Yandex DoT)"
 msgid "Community Lists"
 msgstr "Списки сообщества"
 
-msgid "Component Manager"
-msgstr "Менеджер компонентов"
-
 msgid "Compressed build: uses more RAM at startup"
 msgstr "Сжатая сборка: при запуске расходует больше RAM"
 
 msgid "Config File Path"
 msgstr "Путь к файлу конфигурации"
-
-msgid "Configuration for NetShift service"
-msgstr "Конфигурация службы NetShift"
 
 msgid "Configuration snapshots"
 msgstr "Снимки настроек"
@@ -349,6 +343,9 @@ msgstr "Не удалось переключить ядро"
 
 msgid "Core switch timed out"
 msgstr "Истекло время ожидания переключения ядра"
+
+msgid "Could not check for updates: %s"
+msgstr "Не удалось проверить обновления: %s"
 
 msgid "Could not duplicate the section: %s"
 msgstr "Не удалось создать копию секции: %s"
@@ -413,17 +410,11 @@ msgstr "Модель устройства"
 msgid "Device OS"
 msgstr "ОС устройства"
 
-msgid "Devices"
-msgstr "Устройства"
-
 msgid "DHCP has DNS server"
 msgstr "DHCP содержит DNS сервер"
 
 msgid "DHCP lease"
 msgstr "Аренда DHCP"
-
-msgid "Diagnostics"
-msgstr "Диагностика"
 
 msgid "did not work, rolled back to"
 msgstr "не заработал, откат на"
@@ -550,6 +541,9 @@ msgstr "Скачивать списки через Proxy/VPN"
 
 msgid "Download Lists via specific proxy section"
 msgstr "Скачивать списки через выбранную секцию"
+
+msgid "Download log"
+msgstr "Скачать лог"
 
 msgid "Download sing-box, NetShift packages and release information through the proxy section selected below. Useful when GitHub is blocked; a failed download falls back to a direct connection."
 msgstr "Скачивать sing-box, пакеты NetShift и сведения о релизах через выбранную ниже секцию с прокси. Полезно, когда GitHub заблокирован; при ошибке загрузка повторяется напрямую."
@@ -753,7 +747,7 @@ msgid "FakeIP: IPv6 goes through sing-box like IPv4, the same way as the section
 msgstr "FakeIP: IPv6 идёт через sing-box так же, как IPv4 этой секции. Настоящие адреса: на запросы AAAA для доменов секции отвечают их реальные IPv6-адреса, и IPv6-трафик уходит напрямую, мимо туннеля (IPv4-трафик сохраняет маршрут секции). Нужно включённое IPv6 в настройках."
 
 msgid "Fastest"
-msgstr "Самый быстрый"
+msgstr "⚡ Авто"
 
 msgid "Fills the five fields below the way the chosen app on the chosen platform sends them, with a new HWID. A HWID copied from a real device the subscription is bound to does not take one more device slot."
 msgstr "Заполняет пять полей ниже так, как их отправляет выбранное приложение на выбранной платформе, с новым HWID. HWID, скопированный с настоящего устройства, к которому привязана подписка, не займёт лишний слот устройства."
@@ -1241,11 +1235,14 @@ msgstr "Клиент NaiveProxy удалён"
 msgid "NetShift"
 msgstr "NetShift"
 
+msgid "NetShift %s is the latest version"
+msgstr "NetShift %s — последняя версия"
+
+msgid "NetShift has been updated"
+msgstr "NetShift обновлён"
+
 msgid "NetShift is not set up yet"
 msgstr "NetShift ещё не настроен"
-
-msgid "NetShift Settings"
-msgstr "Настройки NetShift"
 
 msgid "NetShift update source"
 msgstr "Источник обновлений NetShift"
@@ -1289,6 +1286,9 @@ msgstr "Снимков пока нет"
 msgid "No spaces or colons in the user name"
 msgstr "В имени пользователя не должно быть пробелов и двоеточий"
 
+msgid "No subscription yet"
+msgstr "Подписка ещё не добавлена"
+
 msgid "None of the sections has a connection, so NetShift is not running. Open the Sections tab, paste a server link or a subscription URL into a section (or choose the interface of a VPN section) and press Save & Apply."
 msgstr "Ни в одной секции нет подключения, поэтому NetShift не запущен. Откройте вкладку «Секции», вставьте в секцию ссылку на сервер или адрес подписки (для VPN-секции выберите её интерфейс) и нажмите «Сохранить и применить»."
 
@@ -1306,6 +1306,9 @@ msgstr "Не установлено"
 
 msgid "Not on the network"
 msgstr "Нет в сети"
+
+msgid "Not recommended: slower than the others, Auto does not pick them"
+msgstr "Не рекомендуется — медленнее остальных, «Авто» их не выбирает"
 
 msgid "Not responding"
 msgstr "Не отвечает"
@@ -1394,6 +1397,12 @@ msgstr "Выходной сетевой интерфейс"
 msgid "Parallel: the first usable answer wins"
 msgstr "Параллельно: побеждает первый пригодный ответ"
 
+msgid "Paste the subscription link from your provider and press Save & Apply. The servers are updated from it every hour."
+msgstr "Вставьте ссылку на подписку от провайдера и нажмите «Сохранить и применить». Список серверов обновляется по ней каждый час."
+
+msgid "Paste the subscription link into the field above and press Save & Apply: the servers will appear here."
+msgstr "Вставьте ссылку на подписку в поле выше и нажмите «Сохранить и применить» — здесь появятся серверы."
+
 msgid "Path cannot be empty"
 msgstr "Путь не может быть пустым"
 
@@ -1418,6 +1427,12 @@ msgstr "Закрепить адрес"
 msgid "Plain DNS (port 53) of the devices in the source interfaces is redirected to the router even when a device asks another server, such as a hard-coded 8.8.8.8. Without it such devices never get the FakeIP answers that routing by domain depends on. DNS over TLS/HTTPS is not touched."
 msgstr "Обычный DNS (порт 53) устройств с интерфейсов-источников перенаправляется на роутер, даже если устройство спрашивает другой сервер, например прописанный вручную 8.8.8.8. Без этого такие устройства не получают FakeIP-ответов, от которых зависит маршрутизация по доменам. DNS поверх TLS/HTTPS не затрагивается."
 
+msgid "Please wait..."
+msgstr "Подождите..."
+
+msgid "PostQ VPN"
+msgstr "PostQ VPN"
+
 msgid "Prefer servers in list order"
 msgstr "Предпочитать серверы в порядке списка"
 
@@ -1429,6 +1444,9 @@ msgstr "Подготовить отчёт"
 
 msgid "Preparing the report..."
 msgstr "Готовлю отчёт..."
+
+msgid "Preparing..."
+msgstr "Готовлю..."
 
 msgid "Priority: next server if the previous one fails"
 msgstr "Приоритет: следующий сервер, если предыдущий не отвечает"
@@ -1510,6 +1528,9 @@ msgstr "Требуется серверами REALITY на Xray-core 26.9.8 и �
 
 msgid "Resolve real IP for routing"
 msgstr "Разрешение реальных IP-адресов"
+
+msgid "Restart"
+msgstr "Перезапустить"
 
 msgid "Restart NetShift"
 msgstr "Перезапустить NetShift"
@@ -1601,9 +1622,6 @@ msgstr "Поиск по имени, адресу или MAC"
 msgid "Secret key for authenticating remote access to YACD when WAN access is enabled."
 msgstr "Секретный ключ для аутентификации удаленного доступа к YACD при включенном доступе через WAN."
 
-msgid "Sections"
-msgstr "Секции"
-
 msgid "See the log"
 msgstr "Смотрите логи"
 
@@ -1682,14 +1700,17 @@ msgstr "Передаётся панели как X-Ver-OS, например 14 �
 msgid "Server"
 msgstr "Сервер"
 
+msgid "Servers"
+msgstr "Серверы"
+
 msgid "Servers per feed"
 msgstr "Серверов в ленте"
 
+msgid "Service"
+msgstr "Сервис"
+
 msgid "Services info"
 msgstr "Информация о сервисах"
-
-msgid "Settings"
-msgstr "Настройки"
 
 msgid "Several DNS servers"
 msgstr "Несколько DNS-серверов"
@@ -1772,6 +1793,9 @@ msgstr "Укажите URL-адреса для загрузки и исполь�
 msgid "Specify the path to the list file located on the router filesystem"
 msgstr "Укажите путь к файлу списка, расположенному в файловой системе маршрутизатора."
 
+msgid "Start"
+msgstr "Запустить"
+
 msgid "Start NetShift"
 msgstr "Запустить NetShift"
 
@@ -1780,6 +1804,9 @@ msgstr "запущено вручную"
 
 msgid "Static"
 msgstr "Статический"
+
+msgid "Stop"
+msgstr "Остановить"
 
 msgid "Stop NetShift"
 msgstr "Остановить NetShift"
@@ -2069,6 +2096,9 @@ msgstr "Неизвестная ошибка"
 msgid "Update"
 msgstr "Обновить"
 
+msgid "Update failed: %s"
+msgstr "Не удалось обновить: %s"
+
 msgid "Update is available"
 msgstr "Доступно обновление"
 
@@ -2087,6 +2117,9 @@ msgstr "Обновлять sing-box"
 msgid "Update time"
 msgstr "Время обновления"
 
+msgid "Update to %s"
+msgstr "Обновить до %s"
+
 msgid "updated"
 msgstr "обновлён"
 
@@ -2095,6 +2128,9 @@ msgstr "Обновление всех подписок… это может за
 
 msgid "Updating NetShift, this may take a few minutes; the page will reload…"
 msgstr "Обновление NetShift, это может занять несколько минут; страница перезагрузится…"
+
+msgid "Updating, do not close the page..."
+msgstr "Обновляю, не закрывайте страницу..."
 
 msgid "Uplink"
 msgstr "Исходящий"
@@ -2183,6 +2219,9 @@ msgstr "Ошибки валидации:"
 msgid "Version"
 msgstr "Версия"
 
+msgid "Version %s is available"
+msgstr "Доступна версия %s"
+
 msgid "via the tunnel"
 msgstr "через туннель"
 
@@ -2200,6 +2239,15 @@ msgstr "Ссылки vless://, vmess://, ss://, trojan://, socks4/5://, hy2/hyst
 
 msgid "VMess needs the sing-box-extended core"
 msgstr "VMess требует ядро sing-box-extended"
+
+msgid "VPN is running"
+msgstr "VPN работает"
+
+msgid "VPN is stopped"
+msgstr "VPN остановлен"
+
+msgid "VPN is stopped: add a subscription below and press Save & Apply"
+msgstr "VPN остановлен: добавьте подписку ниже и нажмите «Сохранить и применить»"
 
 msgid "WAN interface for the EDNS Client Subnet"
 msgstr "WAN-интерфейс для EDNS Client Subnet"

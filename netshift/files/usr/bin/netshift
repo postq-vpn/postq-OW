@@ -4428,6 +4428,38 @@ sing_box_build_subscription_groups() {
     ' 2>/dev/null
 }
 
+# PostQ: the members of the subscription's Auto (urltest) group. Russian servers
+# are left out, like in the PostQ XKeen panel: they stay in the selector and can
+# be chosen by hand, but Auto never picks them. A server is Russian when its name
+# has the 🇷🇺 flag or "Росси"/"russia" in it (jq here has no regex, and
+# ascii_downcase leaves Cyrillic alone, so the Cyrillic spellings are listed).
+# When nothing but Russian servers is left, all of them are kept. Only with the
+# section option auto_exclude_russian '1' (set by the PostQ profile); without it
+# the list is returned as it is.
+# $1 = JSON array of outbound tags, $2 = section; echoes the array to use.
+postq_auto_members() {
+    local filtered exclude=""
+
+    command -v config_get > /dev/null 2>&1 && config_get exclude "$2" "auto_exclude_russian" "0"
+    if [ "$exclude" != "1" ]; then
+        printf '%s' "$1"
+        return 0
+    fi
+
+    filtered="$(printf '%s' "$1" | jq -ac '
+        map(select(. as $tag
+            | ["🇷🇺", "Росси", "росси", "РОССИ"] | any(. as $s | $tag | contains($s))
+            | not)
+            | select(ascii_downcase | contains("russia") | not))
+    ' 2>/dev/null)"
+
+    if [ -z "$filtered" ] || [ "$filtered" = "[]" ]; then
+        printf '%s' "$1"
+    else
+        printf '%s' "$filtered"
+    fi
+}
+
 # Display name of one subscription feed, used for its own urltest group: the
 # URL fragment ("https://host/sub#My%20VPN" -> "My VPN") when there is one,
 # else the host. The fragment is decoded like a proxy link name ('+' is a
@@ -5184,10 +5216,10 @@ configure_outbound_handler() {
                     config="$(sing_box_cm_add_selector_outbound "$config" "$selector_tag" "$selector_outbounds" "$selector_default" "true")"
                 else
                     # Create urltest + selector (default subscription behaviour)
-                    local feed_groups_json feed_groups_count feed_group_index feed_group_name feed_group_tags \
+                    local feed_groups_json feed_groups_count feed_groups_enabled feed_group_index feed_group_name feed_group_tags \
                         feed_group_hash feed_urltest_tag feed_urltest_tags_json
                     urltest_tag="$(get_outbound_tag_by_section "$section-urltest")"
-                    urltest_outbounds="$subscription_outbound_tags_json"
+                    urltest_outbounds="$(postq_auto_members "$subscription_outbound_tags_json" "$section")"
 
                     # Two or more feeds with nodes: every feed also gets its own
                     # urltest ("⚡ <feed name>") so the dashboard can offer a
@@ -5207,6 +5239,13 @@ configure_outbound_handler() {
                     case "$feed_groups_count" in
                     '' | *[!0-9]*) feed_groups_count=0 ;;
                     esac
+                    # PostQ: with subscription_feed_groups '0' (the PostQ profile)
+                    # there is one Auto for the whole section, like in the PostQ
+                    # XKeen panel: no "⚡ <feed>" group per subscription.
+                    feed_groups_enabled=1
+                    command -v config_get > /dev/null 2>&1 &&
+                        config_get feed_groups_enabled "$section" "subscription_feed_groups" "1"
+                    [ "$feed_groups_enabled" = "0" ] && feed_groups_count=0
                     if [ "$feed_groups_count" -ge 2 ]; then
                         feed_group_index=0
                         while [ "$feed_group_index" -lt "$feed_groups_count" ]; do

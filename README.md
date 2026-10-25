@@ -1,7 +1,13 @@
 <div align="center">
-  <img width="96" height="96" src="docs/icon.png" alt="PostQ VPN">
 
-<h1>PostQ VPN для OpenWrt</h1>
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.svg">
+    <img height="64" src="docs/logo-light.svg" alt="PostqVPN">
+  </picture>
+  <br>
+  для OpenWrt
+</h1>
 
 <p>
   VPN-подписка <a href="https://postq.space">postq vpn</a> прямо на роутере с <b>OpenWrt</b>

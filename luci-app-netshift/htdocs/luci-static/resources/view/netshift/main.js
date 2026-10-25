@@ -4553,6 +4553,24 @@ function parsePinGuardEvents(input) {
 function recentPinGuardEvents(events, now) {
   return events.filter((event) => now - event.time <= PIN_GUARD_SHOW_SECONDS).sort((a, b) => b.time - a.time);
 }
+var DISMISSED_KEY = "netshift_pin_guard_dismissed";
+function undismissedPinGuardEvents(events, dismissedUntil) {
+  return events.filter((event) => event.time > dismissedUntil);
+}
+function loadPinGuardDismissed() {
+  try {
+    const value = Number(window.localStorage.getItem(DISMISSED_KEY));
+    return Number.isFinite(value) ? value : 0;
+  } catch {
+    return 0;
+  }
+}
+function savePinGuardDismissed(time) {
+  try {
+    window.localStorage.setItem(DISMISSED_KEY, String(time));
+  } catch {
+  }
+}
 
 // src/netshift/fetchers/fetchServicesInfo.ts
 async function fetchServicesInfo() {
@@ -5144,13 +5162,29 @@ async function loadPinGuardEvents() {
   }
   try {
     const response = await NetShiftShellMethods.getPinGuardEvents();
-    const events = response.success ? recentPinGuardEvents(
-      parsePinGuardEvents(response.data),
-      Math.floor(Date.now() / 1e3)
+    const events = response.success ? undismissedPinGuardEvents(
+      recentPinGuardEvents(
+        parsePinGuardEvents(response.data),
+        Math.floor(Date.now() / 1e3)
+      ),
+      loadPinGuardDismissed()
     ) : [];
+    const close = () => {
+      savePinGuardDismissed(events[0].time);
+      container.replaceChildren();
+    };
     container.replaceChildren(
       ...events.length === 0 ? [] : [
         E("div", { class: "card pdk_dashboard-page__pin-guard" }, [
+          E(
+            "button",
+            {
+              class: "pdk_dashboard-page__pin-guard__close",
+              title: _("Close"),
+              click: close
+            },
+            "\xD7"
+          ),
           E("b", {}, _("A dead server was left")),
           ...events.map(
             (event) => E(
@@ -5512,10 +5546,30 @@ var styles3 = `
 
 .pdk_dashboard-page__update-notice,
 .pdk_dashboard-page__pin-guard {
+    position: relative;
     margin-top: 10px;
     display: grid;
     grid-row-gap: 4px;
+    padding-right: 36px;
     border: 2px var(--warn-color-medium, orange) solid;
+}
+
+/* PostQ: the notice can be closed */
+.pdk_dashboard-page__pin-guard__close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.6;
+    color: inherit;
+}
+
+.pdk_dashboard-page__pin-guard__close:hover {
+    opacity: 1;
 }
 
 .pdk_dashboard-page__update-notice__hint {
@@ -9658,6 +9712,7 @@ return baseclass.extend({
   listedDeviceIps,
   loadCoreCapabilities,
   loadDashboardViewPrefs,
+  loadPinGuardDismissed,
   logLineMessage,
   logger,
   maskIP,
@@ -9681,6 +9736,7 @@ return baseclass.extend({
   prettyBytes,
   recentPinGuardEvents,
   saveDashboardViewPrefs,
+  savePinGuardDismissed,
   setCoreCapabilities,
   setDeviceRoute,
   shouldRefreshUpdateNotice,
@@ -9694,6 +9750,7 @@ return baseclass.extend({
   summarizeLogErrors,
   svgEl,
   toIpList,
+  undismissedPinGuardEvents,
   validateAnytlsUrl,
   validateDNS,
   validateDnsForward,

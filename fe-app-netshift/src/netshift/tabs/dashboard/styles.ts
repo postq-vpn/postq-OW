@@ -325,10 +325,30 @@ export const styles = `
 
 .pdk_dashboard-page__update-notice,
 .pdk_dashboard-page__pin-guard {
+    position: relative;
     margin-top: 10px;
     display: grid;
     grid-row-gap: 4px;
+    padding-right: 36px;
     border: 2px var(--warn-color-medium, orange) solid;
+}
+
+/* PostQ: the notice can be closed */
+.pdk_dashboard-page__pin-guard__close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    border: none;
+    background: none;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.6;
+    color: inherit;
+}
+
+.pdk_dashboard-page__pin-guard__close:hover {
+    opacity: 1;
 }
 
 .pdk_dashboard-page__update-notice__hint {

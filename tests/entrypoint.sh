@@ -11130,9 +11130,9 @@ test_luci_cache_bust() {
         echo "has-requires:$(grep -hc "require view\.$tag\." "$W/a/$view_rel/$tag"/*.js | awk '{n+=$1} END{print (n>0)?"yes":"no"}')"
 
         menu="$W/a/root/usr/share/luci/menu.d/luci-app-netshift.json"
-        echo "menu-path:$(jq -r '."admin/services/netshift".action.path' "$menu")"
-        echo "menu-only-path-changed:$([ "$(jq -S 'del(."admin/services/netshift".action.path)' "$menu")" = "$(jq -S 'del(."admin/services/netshift".action.path)' "$src/root/usr/share/luci/menu.d/luci-app-netshift.json")" ] && echo yes || echo no)"
-        echo "menu-target-exists:$([ -f "$W/a/$view_rel/$(jq -r '."admin/services/netshift".action.path' "$menu" | cut -d/ -f1)/netshift.js" ] && echo yes || echo no)"
+        echo "menu-path:$(jq -r '."admin/services/postq".action.path' "$menu")"
+        echo "menu-only-path-changed:$([ "$(jq -S 'del(."admin/services/postq".action.path)' "$menu")" = "$(jq -S 'del(."admin/services/postq".action.path)' "$src/root/usr/share/luci/menu.d/luci-app-netshift.json")" ] && echo yes || echo no)"
+        echo "menu-target-exists:$([ -f "$W/a/$view_rel/$(jq -r '."admin/services/postq".action.path' "$menu" | cut -d/ -f1)/netshift.js" ] && echo yes || echo no)"
 
         # Deterministic: the same build gives the same directory.
         fresh b

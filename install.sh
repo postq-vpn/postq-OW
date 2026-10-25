@@ -542,7 +542,7 @@ main() {
 
     local lan_ip
     lan_ip="$(uci -q get network.lan.ipaddr | cut -d/ -f1)"
-    msg "Готово! Откройте http://${lan_ip:-192.168.1.1}/cgi-bin/luci/admin/services/netshift"
+    msg "Готово! Откройте http://${lan_ip:-192.168.1.1}/cgi-bin/luci/admin/services/postq"
     msg "вставьте ссылку на подписку и нажмите «Сохранить и применить» — VPN заработает сразу."
     msg "Done! Open the page above, paste the subscription link and press Save & Apply."
 }

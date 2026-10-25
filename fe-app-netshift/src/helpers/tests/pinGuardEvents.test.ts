@@ -3,6 +3,7 @@ import {
   PIN_GUARD_SHOW_SECONDS,
   parsePinGuardEvents,
   recentPinGuardEvents,
+  undismissedPinGuardEvents,
 } from '../pinGuardEvents';
 
 const NOW = 1790000000;
@@ -56,5 +57,17 @@ describe('recentPinGuardEvents', () => {
   it('is empty when nothing is recent', () => {
     expect(recentPinGuardEvents([event(1)], NOW)).toEqual([]);
     expect(recentPinGuardEvents([], NOW)).toEqual([]);
+  });
+});
+
+describe('undismissedPinGuardEvents (PostQ)', () => {
+  it('hides what was closed and shows a newer switch again', () => {
+    const events = [event(NOW - 10), event(NOW - 100)];
+
+    expect(undismissedPinGuardEvents(events, 0)).toEqual(events);
+    expect(undismissedPinGuardEvents(events, NOW - 10)).toEqual([]);
+    expect(undismissedPinGuardEvents(events, NOW - 50)).toEqual([
+      event(NOW - 10),
+    ]);
   });
 });

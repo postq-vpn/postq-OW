@@ -1,5 +1,5 @@
 {
-  "admin/services/netshift": {
+  "admin/services/postq": {
     "title": "PostQvpn",
     "order": 42,
     "action": {
@@ -10,5 +10,11 @@
 			"acl": [ "luci-app-netshift" ],
 			"uci": { "netshift": true }
 		}
+  },
+  "admin/services/netshift": {
+    "action": {
+      "type": "alias",
+      "path": "admin/services/postq"
+    }
   }
 }

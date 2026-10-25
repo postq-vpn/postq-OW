@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 20:16+0300\n"
-"PO-Revision-Date: 2026-10-25 20:16+0300\n"
+"POT-Creation-Date: 2026-10-25 20:44+0300\n"
+"PO-Revision-Date: 2026-10-25 20:44+0300\n"
 "Last-Translator: PostqVPN <postq.space>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -24,19 +24,19 @@ msgstr ""
 msgid "%d servers cannot be used by this core whatever the filters say."
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:565
+#: src/netshift/tabs/dashboard/initController.ts:568
 msgid "✔ Enabled"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:576
+#: src/netshift/tabs/dashboard/initController.ts:579
 msgid "✔ Running"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:566
+#: src/netshift/tabs/dashboard/initController.ts:569
 msgid "✘ Disabled"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:577
+#: src/netshift/tabs/dashboard/initController.ts:580
 msgid "✘ Stopped"
 msgstr ""
 
@@ -48,7 +48,7 @@ msgstr ""
 msgid "77.88.8.8 (Yandex)"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:778
+#: src/netshift/tabs/dashboard/initController.ts:798
 msgid "A dead server was left"
 msgstr ""
 
@@ -56,7 +56,7 @@ msgstr ""
 msgid "A few minutes after the router has started."
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:710
+#: src/netshift/tabs/dashboard/initController.ts:713
 msgid "A newer version is available"
 msgstr ""
 
@@ -68,11 +68,11 @@ msgstr ""
 msgid "A section cannot be chained through itself"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:332
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:326
 msgid "Active"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:527
+#: src/netshift/tabs/dashboard/initController.ts:530
 msgid "Active Connections"
 msgstr ""
 
@@ -142,7 +142,7 @@ msgstr ""
 msgid "All QUIC (UDP/443)"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:326
+#: src/netshift/tabs/dashboard/initController.ts:329
 msgid "All subscriptions updated"
 msgstr ""
 
@@ -381,6 +381,7 @@ msgstr ""
 msgid "Client User-Agent"
 msgstr ""
 
+#: src/netshift/tabs/dashboard/initController.ts:793
 #: src/partials/modal/renderModal.ts:26
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:93
 msgid "Close"
@@ -734,8 +735,8 @@ msgstr ""
 msgid "Dont Touch My DHCP!"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:461
-#: src/netshift/tabs/dashboard/initController.ts:495
+#: src/netshift/tabs/dashboard/initController.ts:464
+#: src/netshift/tabs/dashboard/initController.ts:498
 msgid "Downlink"
 msgstr ""
 
@@ -1038,13 +1039,13 @@ msgstr ""
 msgid "Failed to start the task"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:307
-#: src/netshift/tabs/dashboard/initController.ts:313
+#: src/netshift/tabs/dashboard/initController.ts:310
+#: src/netshift/tabs/dashboard/initController.ts:316
 msgid "Failed to update subscription"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:334
-#: src/netshift/tabs/dashboard/initController.ts:340
+#: src/netshift/tabs/dashboard/initController.ts:337
+#: src/netshift/tabs/dashboard/initController.ts:343
 msgid "Failed to update subscriptions"
 msgstr ""
 
@@ -1609,7 +1610,7 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:397
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:391
 msgid "List"
 msgstr ""
 
@@ -1671,7 +1672,7 @@ msgstr ""
 msgid "Matches no list, goes through the global proxy section"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:531
+#: src/netshift/tabs/dashboard/initController.ts:534
 msgid "Memory Usage"
 msgstr ""
 
@@ -1734,8 +1735,8 @@ msgstr ""
 msgid "NaiveProxy client removed"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:563
-#: src/netshift/tabs/dashboard/initController.ts:704
+#: src/netshift/tabs/dashboard/initController.ts:566
+#: src/netshift/tabs/dashboard/initController.ts:707
 msgid "NetShift"
 msgstr ""
 
@@ -1844,7 +1845,7 @@ msgstr ""
 msgid "Not on the network"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:346
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:340
 msgid "Not recommended: slower than the others, Auto does not pick them"
 msgstr ""
 
@@ -2414,7 +2415,7 @@ msgstr ""
 msgid "Service"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:560
+#: src/netshift/tabs/dashboard/initController.ts:563
 msgid "Services info"
 msgstr ""
 
@@ -2441,8 +2442,8 @@ msgstr ""
 msgid "Shows how many servers of the downloaded subscription the filters above keep, and which. Nothing is saved or changed."
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:574
-#: src/netshift/tabs/dashboard/initController.ts:705
+#: src/netshift/tabs/dashboard/initController.ts:577
+#: src/netshift/tabs/dashboard/initController.ts:708
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:437
 msgid "Sing-box"
 msgstr ""
@@ -2495,7 +2496,7 @@ msgstr ""
 msgid "Some rules depend on the client address, traffic type or lists that are not available here and were skipped. Enter the address of the device for a precise answer."
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:401
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:395
 msgid "Sort by ping"
 msgstr ""
 
@@ -2557,7 +2558,7 @@ msgstr ""
 msgid "Stop NetShift"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:783
+#: src/netshift/tabs/dashboard/initController.ts:803
 msgid "stopped answering, the automatic choice is on again"
 msgstr ""
 
@@ -2595,7 +2596,7 @@ msgstr ""
 msgid "Subscription update timed out"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:303
+#: src/netshift/tabs/dashboard/initController.ts:306
 msgid "Subscription updated"
 msgstr ""
 
@@ -2632,7 +2633,7 @@ msgstr ""
 msgid "Switching sing-box core, this may take a few minutes…"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:524
+#: src/netshift/tabs/dashboard/initController.ts:527
 msgid "System info"
 msgstr ""
 
@@ -2656,7 +2657,7 @@ msgstr ""
 msgid "TCP ports that always go directly"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:408
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:402
 msgid "Test latency"
 msgstr ""
 
@@ -2861,7 +2862,7 @@ msgstr ""
 msgid "Through %s (not available)"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:397
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:391
 msgid "Tiles"
 msgstr ""
 
@@ -2894,7 +2895,7 @@ msgstr ""
 msgid "TLS and Reality fail with a wrong time: check NTP"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:458
+#: src/netshift/tabs/dashboard/initController.ts:461
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:168
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:169
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:85
@@ -2914,7 +2915,7 @@ msgstr ""
 msgid "Traffic to these UDP ports never takes the tunnel (voice calls, games, NTP). Ports and ranges, separated by commas."
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:488
+#: src/netshift/tabs/dashboard/initController.ts:491
 msgid "Traffic Total"
 msgstr ""
 
@@ -2991,7 +2992,7 @@ msgstr ""
 msgid "Update is available"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:721
+#: src/netshift/tabs/dashboard/initController.ts:724
 msgid "Update it in the Component Manager tab."
 msgstr ""
 
@@ -3019,7 +3020,7 @@ msgstr ""
 msgid "updated"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:320
+#: src/netshift/tabs/dashboard/initController.ts:323
 msgid "Updating all subscriptions… this may take a minute"
 msgstr ""
 
@@ -3031,8 +3032,8 @@ msgstr ""
 msgid "Updating, do not close the page..."
 msgstr ""
 
-#: src/netshift/tabs/dashboard/initController.ts:460
-#: src/netshift/tabs/dashboard/initController.ts:491
+#: src/netshift/tabs/dashboard/initController.ts:463
+#: src/netshift/tabs/dashboard/initController.ts:494
 msgid "Uplink"
 msgstr ""
 

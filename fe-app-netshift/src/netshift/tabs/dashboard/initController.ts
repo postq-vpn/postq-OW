@@ -21,8 +21,11 @@ import {
   type UpdateNotice,
 } from '../../../helpers/updateNotice';
 import {
+  loadPinGuardDismissed,
   parsePinGuardEvents,
   recentPinGuardEvents,
+  savePinGuardDismissed,
+  undismissedPinGuardEvents,
 } from '../../../helpers/pinGuardEvents';
 import { logger, socket, store, StoreType } from '../../services';
 import {
@@ -764,17 +767,34 @@ async function loadPinGuardEvents() {
   try {
     const response = await NetShiftShellMethods.getPinGuardEvents();
     const events = response.success
-      ? recentPinGuardEvents(
-          parsePinGuardEvents(response.data),
-          Math.floor(Date.now() / 1000),
+      ? undismissedPinGuardEvents(
+          recentPinGuardEvents(
+            parsePinGuardEvents(response.data),
+            Math.floor(Date.now() / 1000),
+          ),
+          loadPinGuardDismissed(),
         )
       : [];
+    // the events come newest first: closing remembers the newest one
+    const close = () => {
+      savePinGuardDismissed(events[0].time);
+      container.replaceChildren();
+    };
 
     container.replaceChildren(
       ...(events.length === 0
         ? []
         : [
             E('div', { class: 'card pdk_dashboard-page__pin-guard' }, [
+              E(
+                'button',
+                {
+                  class: 'pdk_dashboard-page__pin-guard__close',
+                  title: _('Close'),
+                  click: close,
+                },
+                '×',
+              ),
               E('b', {}, _('A dead server was left')),
               ...events.map((event) =>
                 E(

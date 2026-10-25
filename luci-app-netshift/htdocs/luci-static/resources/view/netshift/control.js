@@ -202,6 +202,11 @@ function injectStyles() {
 .pq-control__dot--on { background: #2ea44f; }
 .pq-control__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .pq-control__update:empty { display: none; }
+#cbi-netshift > h2 { display: flex; align-items: center; gap: 10px; }
+#cbi-netshift > h2::before {
+  content: ""; flex: none; width: 1.4em; height: 1.4em;
+  background: url("${L.resource("netshift/postq-logo.svg")}") center / contain no-repeat;
+}
 `,
     ),
   );

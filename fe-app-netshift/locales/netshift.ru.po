@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 23:07+0300\n"
-"PO-Revision-Date: 2026-10-25 23:07+0300\n"
+"POT-Creation-Date: 2026-10-25 23:16+0300\n"
+"PO-Revision-Date: 2026-10-25 23:16+0300\n"
 "Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -1330,6 +1330,9 @@ msgstr "ничего не обновлялось: менеджер компон�
 
 msgid "Notify about new versions"
 msgstr "Уведомлять о новых версиях"
+
+msgid "now"
+msgstr "сейчас"
 
 msgid "Number of leading characters of each proxy name to group by."
 msgstr "Количество начальных символов имени каждого прокси для группировки."

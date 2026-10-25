@@ -102,6 +102,8 @@ export namespace NetShift {
     latency: number;
     type: string;
     selected: boolean;
+    // For an Auto (URLTest) group: the server it uses right now.
+    current?: string;
   }
 
   // The answer of preview_subscription_filter: the counts and names, or an error.

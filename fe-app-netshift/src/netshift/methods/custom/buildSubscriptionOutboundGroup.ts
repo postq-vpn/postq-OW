@@ -39,12 +39,17 @@ export function buildSubscriptionOutboundGroup(
     item: ProxyEntry,
     displayName?: string,
   ): NetShift.Outbound {
+    // the server an Auto group picked, by its name (like the PostQ XKeen panel)
+    const now = isUrlTest(item) ? item.value?.now : undefined;
+    const current = now ? byCode.get(now)?.value?.name || now : undefined;
+
     return {
       code: item.code,
       displayName: displayName ?? (item.value?.name || ''),
       latency: item.value?.history?.[0]?.delay || 0,
       type: item.value?.type || '',
       selected: selectedCode === item.code,
+      ...(current ? { current } : {}),
     };
   }
 

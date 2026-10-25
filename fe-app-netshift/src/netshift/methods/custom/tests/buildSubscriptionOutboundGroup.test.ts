@@ -51,6 +51,7 @@ describe('buildSubscriptionOutboundGroup', () => {
         latency: 110,
         type: 'URLTest',
         selected: false,
+        current: 'a1',
       },
     ]);
     expect(group.subgroups).toEqual([
@@ -64,6 +65,7 @@ describe('buildSubscriptionOutboundGroup', () => {
             latency: 0,
             type: 'URLTest',
             selected: false,
+            current: 'a1',
           },
           {
             code: 'a1',
@@ -91,6 +93,7 @@ describe('buildSubscriptionOutboundGroup', () => {
             latency: 0,
             type: 'URLTest',
             selected: true,
+            current: 'b1',
           },
           {
             code: 'b1',
@@ -102,6 +105,40 @@ describe('buildSubscriptionOutboundGroup', () => {
         ],
       },
     ]);
+  });
+
+  it('names the server an Auto group uses now, by its display name', () => {
+    const proxies = [
+      proxy('a1', 'VLESS', { name: '🇳🇱 Нидерланды' }),
+      node('a2'),
+      proxy('main-urltest-out', 'URLTest', { now: 'a1', all: ['a1', 'a2'] }),
+      proxy('main-out', 'Selector', {
+        now: 'main-urltest-out',
+        all: ['a1', 'a2', 'main-urltest-out'],
+      }),
+    ];
+
+    const group = buildSubscriptionOutboundGroup('main', proxies);
+    const auto = group.outbounds.find((o) => o.code === 'main-urltest-out');
+
+    expect(auto?.current).toBe('🇳🇱 Нидерланды');
+    expect(
+      group.outbounds.find((o) => o.code === 'a1')?.current,
+    ).toBeUndefined();
+  });
+
+  it('gives no current server for an Auto group that has not picked one', () => {
+    const proxies = [
+      node('a1'),
+      proxy('main-urltest-out', 'URLTest', { all: ['a1'] }),
+      proxy('main-out', 'Selector', { all: ['a1', 'main-urltest-out'] }),
+    ];
+
+    const auto = buildSubscriptionOutboundGroup('main', proxies).outbounds.find(
+      (o) => o.code === 'main-urltest-out',
+    );
+
+    expect(auto && 'current' in auto).toBe(false);
   });
 
   it('keeps a single-subscription section flat', () => {

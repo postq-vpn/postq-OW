@@ -91,6 +91,9 @@ set netshift.main.global_proxy='0'
 # PostQ XKeen panel (no "⚡ <feed>" group per subscription).
 set netshift.main.subscription_feed_groups='0'
 set netshift.main.auto_exclude_russian='1'
+# A server chosen by hand that stops answering (3 checks in a row, ~1.5 min)
+# gives way to "⚡ Авто" instead of leaving the router without VPN.
+set netshift.main.pin_guard='1'
 # Device headers like the PostQ XKeen panel: X-Device-OS 'Router' (Remnawave
 # shows it as the OS); X-Device-Model stays the router's own name from
 # /tmp/sysinfo/model.

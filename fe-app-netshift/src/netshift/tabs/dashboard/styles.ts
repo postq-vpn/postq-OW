@@ -176,6 +176,23 @@ export const styles = `
     white-space: nowrap;
 }
 
+/* PostQ: the name with the server "⚡ Авто" uses under it */
+.pdk_dashboard-page__outbound-row__name-block {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.pdk_dashboard-page__outbound-current {
+    display: block;
+    min-width: 0;
+    font-size: 0.8em;
+    opacity: 0.7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .pdk_dashboard-page__outbound-row__type {
     flex: none;
     font-size: 0.85em;
@@ -288,7 +305,8 @@ export const styles = `
         padding: 8px;
     }
 
-    .pdk_dashboard-page__outbound-row__name {
+    .pdk_dashboard-page__outbound-row__name,
+    .pdk_dashboard-page__outbound-row__name-block {
         flex: 1 0 100%;
     }
 

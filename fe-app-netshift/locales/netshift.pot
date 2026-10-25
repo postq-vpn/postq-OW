@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 20:07+0300\n"
-"PO-Revision-Date: 2026-10-25 20:07+0300\n"
+"POT-Creation-Date: 2026-10-25 20:16+0300\n"
+"PO-Revision-Date: 2026-10-25 20:16+0300\n"
 "Last-Translator: PostqVPN <postq.space>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -68,7 +68,7 @@ msgstr ""
 msgid "A section cannot be chained through itself"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:315
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:332
 msgid "Active"
 msgstr ""
 
@@ -1056,9 +1056,9 @@ msgstr ""
 msgid "FakeIP: IPv6 goes through sing-box like IPv4, the same way as the section's IPv4 traffic. Real addresses: the domains of this section are answered with their real IPv6 addresses, so their IPv6 traffic goes out directly, outside the tunnel (their IPv4 traffic keeps the section's route). Needs IPv6 enabled in the settings."
 msgstr ""
 
-#: src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:72
-#: src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:101
-#: src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:109
+#: src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:77
+#: src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:106
+#: src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:114
 #: src/netshift/methods/custom/getDashboardSections.ts:209
 #: src/netshift/tabs/diagnostic/checks/runSectionsCheck.ts:56
 msgid "Fastest"
@@ -1609,7 +1609,7 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:380
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:397
 msgid "List"
 msgstr ""
 
@@ -1844,7 +1844,7 @@ msgstr ""
 msgid "Not on the network"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:329
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:346
 msgid "Not recommended: slower than the others, Auto does not pick them"
 msgstr ""
 
@@ -1880,6 +1880,10 @@ msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:1196
 msgid "Notify about new versions"
+msgstr ""
+
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:258
+msgid "now"
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:668
@@ -2491,7 +2495,7 @@ msgstr ""
 msgid "Some rules depend on the client address, traffic type or lists that are not available here and were skipped. Enter the address of the device for a precise answer."
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:384
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:401
 msgid "Sort by ping"
 msgstr ""
 
@@ -2652,7 +2656,7 @@ msgstr ""
 msgid "TCP ports that always go directly"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:391
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:408
 msgid "Test latency"
 msgstr ""
 
@@ -2857,7 +2861,7 @@ msgstr ""
 msgid "Through %s (not available)"
 msgstr ""
 
-#: src/netshift/tabs/dashboard/partials/renderSections.ts:380
+#: src/netshift/tabs/dashboard/partials/renderSections.ts:397
 msgid "Tiles"
 msgstr ""
 

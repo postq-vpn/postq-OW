@@ -94,7 +94,7 @@
     "call": "Active",
     "key": "Active",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:315"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:332"
     ]
   },
   {
@@ -1772,9 +1772,9 @@
     "call": "Fastest",
     "key": "Fastest",
     "places": [
-      "src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:72",
-      "src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:101",
-      "src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:109",
+      "src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:77",
+      "src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:106",
+      "src/netshift/methods/custom/buildSubscriptionOutboundGroup.ts:114",
       "src/netshift/methods/custom/getDashboardSections.ts:209",
       "src/netshift/tabs/diagnostic/checks/runSectionsCheck.ts:56"
     ]
@@ -2721,7 +2721,7 @@
     "call": "List",
     "key": "List",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:380"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:397"
     ]
   },
   {
@@ -3121,7 +3121,7 @@
     "call": "Not recommended: slower than the others, Auto does not pick them",
     "key": "Not recommended: slower than the others, Auto does not pick them",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:329"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:346"
     ]
   },
   {
@@ -3177,6 +3177,13 @@
     "key": "Notify about new versions",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:1196"
+    ]
+  },
+  {
+    "call": "now",
+    "key": "now",
+    "places": [
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:258"
     ]
   },
   {
@@ -4230,7 +4237,7 @@
     "call": "Sort by ping",
     "key": "Sort by ping",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:384"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:401"
     ]
   },
   {
@@ -4508,7 +4515,7 @@
     "call": "Test latency",
     "key": "Test latency",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:391"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:408"
     ]
   },
   {
@@ -4857,7 +4864,7 @@
     "call": "Tiles",
     "key": "Tiles",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:380"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:397"
     ]
   },
   {

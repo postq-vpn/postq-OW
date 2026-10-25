@@ -1743,12 +1743,15 @@ function buildSubscriptionOutboundGroup(sectionName, proxies) {
   const fallbackUrltest = byCode.get(legacyFastestCode);
   const selectedCode = selector?.value?.now;
   function toOutbound(item, displayName) {
+    const now = isUrlTest(item) ? item.value?.now : void 0;
+    const current2 = now ? byCode.get(now)?.value?.name || now : void 0;
     return {
       code: item.code,
       displayName: displayName ?? (item.value?.name || ""),
       latency: item.value?.history?.[0]?.delay || 0,
       type: item.value?.type || "",
-      selected: selectedCode === item.code
+      selected: selectedCode === item.code,
+      ...current2 ? { current: current2 } : {}
     };
   }
   const selectorCodes = selector?.value?.all ?? [];
@@ -4111,6 +4114,15 @@ function renderDefaultState({
       classNames: ["dashboard-sections-grid-item-refresh-subscription"]
     });
   }
+  function renderCurrent(outbound) {
+    return outbound.current ? [
+      E(
+        "span",
+        { class: "pdk_dashboard-page__outbound-current" },
+        `${_("now")}: ${outbound.current}`
+      )
+    ] : [];
+  }
   function renderOutbound(outbound) {
     const getLatencyClass = () => getLatencyClassName(outbound.latency);
     return E(
@@ -4121,12 +4133,11 @@ function renderDefaultState({
       },
       [
         E("b", {}, outbound.displayName),
+        ...renderCurrent(outbound),
         E("div", { class: "pdk_dashboard-page__outbound-grid__item__footer" }, [
-          E(
-            "div",
-            { class: "pdk_dashboard-page__outbound-grid__item__type" },
-            outbound.type
-          ),
+          // PostQ: no protocol / group type badge (VLESS, URLTest); the empty
+          // cell keeps the delay on the right of the footer
+          E("div", {}),
           pendingOutbounds.includes(outbound.code) ? renderSkeleton("width: 44px; height: 16px") : E(
             "div",
             { class: getLatencyClass() },
@@ -4144,16 +4155,15 @@ function renderDefaultState({
         click: () => section.withTagSelect && onChooseOutbound(section.code, outbound.code)
       },
       [
-        E(
-          "b",
-          { class: "pdk_dashboard-page__outbound-row__name" },
-          outbound.displayName
-        ),
-        E(
-          "span",
-          { class: "pdk_dashboard-page__outbound-row__type" },
-          outbound.type
-        ),
+        E("span", { class: "pdk_dashboard-page__outbound-row__name-block" }, [
+          E(
+            "b",
+            { class: "pdk_dashboard-page__outbound-row__name" },
+            outbound.displayName
+          ),
+          ...renderCurrent(outbound)
+        ]),
+        // PostQ: no protocol / group type badge (VLESS, URLTest)
         pendingOutbounds.includes(outbound.code) ? renderSkeleton("width: 44px; height: 16px; margin-left: auto") : E(
           "span",
           {
@@ -5353,6 +5363,23 @@ var styles3 = `
     white-space: nowrap;
 }
 
+/* PostQ: the name with the server "\u26A1 \u0410\u0432\u0442\u043E" uses under it */
+.pdk_dashboard-page__outbound-row__name-block {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.pdk_dashboard-page__outbound-current {
+    display: block;
+    min-width: 0;
+    font-size: 0.8em;
+    opacity: 0.7;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .pdk_dashboard-page__outbound-row__type {
     flex: none;
     font-size: 0.85em;
@@ -5465,7 +5492,8 @@ var styles3 = `
         padding: 8px;
     }
 
-    .pdk_dashboard-page__outbound-row__name {
+    .pdk_dashboard-page__outbound-row__name,
+    .pdk_dashboard-page__outbound-row__name-block {
         flex: 1 0 100%;
     }
 

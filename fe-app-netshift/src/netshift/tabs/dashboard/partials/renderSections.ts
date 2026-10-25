@@ -248,6 +248,19 @@ export function renderDefaultState({
     });
   }
 
+  // PostQ: under "⚡ Авто", the server it uses right now (like the PostQ XKeen panel)
+  function renderCurrent(outbound: NetShift.Outbound) {
+    return outbound.current
+      ? [
+          E(
+            'span',
+            { class: 'pdk_dashboard-page__outbound-current' },
+            `${_('now')}: ${outbound.current}`,
+          ),
+        ]
+      : [];
+  }
+
   function renderOutbound(outbound: NetShift.Outbound) {
     const getLatencyClass = () => getLatencyClassName(outbound.latency);
 
@@ -261,12 +274,11 @@ export function renderDefaultState({
       },
       [
         E('b', {}, outbound.displayName),
+        ...renderCurrent(outbound),
         E('div', { class: 'pdk_dashboard-page__outbound-grid__item__footer' }, [
-          E(
-            'div',
-            { class: 'pdk_dashboard-page__outbound-grid__item__type' },
-            outbound.type,
-          ),
+          // PostQ: no protocol / group type badge (VLESS, URLTest); the empty
+          // cell keeps the delay on the right of the footer
+          E('div', {}),
           pendingOutbounds.includes(outbound.code)
             ? renderSkeleton('width: 44px; height: 16px')
             : E(
@@ -289,16 +301,15 @@ export function renderDefaultState({
           onChooseOutbound(section.code, outbound.code),
       },
       [
-        E(
-          'b',
-          { class: 'pdk_dashboard-page__outbound-row__name' },
-          outbound.displayName,
-        ),
-        E(
-          'span',
-          { class: 'pdk_dashboard-page__outbound-row__type' },
-          outbound.type,
-        ),
+        E('span', { class: 'pdk_dashboard-page__outbound-row__name-block' }, [
+          E(
+            'b',
+            { class: 'pdk_dashboard-page__outbound-row__name' },
+            outbound.displayName,
+          ),
+          ...renderCurrent(outbound),
+        ]),
+        // PostQ: no protocol / group type badge (VLESS, URLTest)
         pendingOutbounds.includes(outbound.code)
           ? renderSkeleton('width: 44px; height: 16px; margin-left: auto')
           : E(

@@ -51,7 +51,14 @@ if grep -q '__COMPILED_VERSION_VARIABLE__' "$VIEW"/netshift/main.js; then
     echo "cache-bust: version placeholder not stamped in $VIEW/netshift/main.js" >&2
     exit 1
 fi
-tag="$(cat "$VIEW"/netshift/*.js | md5sum | cut -c1-8)"
+# PostQ: the page's own stylesheet and images (resources/netshift/) count too,
+# and the views get the same tag for their URLs (__POSTQ_ASSETS_TAG__), so a
+# change of the stylesheet alone also reaches a browser that cached the old one.
+ASSETS="$HTDOCS/luci-static/resources/netshift"
+tag="$({
+    cat "$VIEW"/netshift/*.js
+    if [ -d "$ASSETS" ]; then cat "$ASSETS"/*; fi
+} | md5sum | cut -c1-8)"
 new="netshift_$tag"
 
 # Never move the views INTO an existing hashed directory (a second run over an
@@ -63,6 +70,7 @@ new="netshift_$tag"
 
 mv "$VIEW/netshift" "$VIEW/$new"
 sed -i -e "s/view\.netshift\./view.$new./g" "$VIEW/$new"/*.js
+sed -i -e "s/__POSTQ_ASSETS_TAG__/$tag/g" "$VIEW/$new"/*.js
 sed -i -e "s#\"netshift/netshift\"#\"$new/netshift\"#" "$MENU"
 
 # A rewrite that missed something would ship a UI that cannot load: fail the

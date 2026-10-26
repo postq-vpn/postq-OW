@@ -187,8 +187,9 @@ function renderControl() {
 }
 
 // The look of the page (logo, cards, the server list of the XKeen UI) lives in
-// netshift/postq.css, scoped to body.pq-page; the version in its URL makes a
-// browser fetch it again after an update.
+// netshift/postq.css, scoped to body.pq-page. Its URL carries the build's tag
+// of the views and assets (put in by cache-bust.sh), so a changed stylesheet is
+// fetched again even when the version stays the same.
 function injectStyles() {
   document.body.classList.add("pq-page");
 
@@ -200,7 +201,7 @@ function injectStyles() {
     E("link", {
       id: "pq-page-styles",
       rel: "stylesheet",
-      href: `${L.resource("netshift/postq.css")}?v=${encodeURIComponent(main.NETSHIFT_LUCI_APP_VERSION)}`,
+      href: `${L.resource("netshift/postq.css")}?v=__POSTQ_ASSETS_TAG__`,
     }),
   );
 }

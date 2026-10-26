@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-26 10:32+0300\n"
-"PO-Revision-Date: 2026-10-26 10:32+0300\n"
+"POT-Creation-Date: 2026-10-26 11:42+0300\n"
+"PO-Revision-Date: 2026-10-26 11:42+0300\n"
 "Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -1307,6 +1307,9 @@ msgstr "Сеть"
 msgid "Network Interface"
 msgstr "Сетевой интерфейс"
 
+msgid "newest"
+msgstr "последний"
+
 msgid "Newest first"
 msgstr "Сначала новые"
 
@@ -1414,6 +1417,9 @@ msgstr "Только эти UDP-порты идут в туннель"
 
 msgid "Open Sections"
 msgstr "Открыть секции"
+
+msgid "Open snapshots"
+msgstr "Открыть снимки"
 
 msgid "Operation timed out"
 msgstr "Время ожидания истекло"
@@ -1781,6 +1787,9 @@ msgstr "Сервис"
 msgid "Services info"
 msgstr "Информация о сервисах"
 
+msgid "Settings snapshots"
+msgstr "Снимки настроек"
+
 msgid "Several DNS servers"
 msgstr "Несколько DNS-серверов"
 
@@ -1831,6 +1840,9 @@ msgstr "пропущен: этот выпуск уже откатывали"
 
 msgid "Snapshot saved"
 msgstr "Снимок сохранён"
+
+msgid "Snapshots"
+msgstr "Снимков"
 
 msgid "Some rules depend on the client address, traffic type or lists that are not available here and were skipped. Enter the address of the device for a precise answer."
 msgstr "Часть правил зависит от адреса клиента, типа трафика или списков, недоступных здесь, и была пропущена. Для точного ответа укажите адрес устройства."

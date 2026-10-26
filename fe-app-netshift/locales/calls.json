@@ -674,7 +674,8 @@
     "places": [
       "src/netshift/tabs/dashboard/initController.ts:793",
       "src/partials/modal/renderModal.ts:26",
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:93"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:93",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:74"
     ]
   },
   {
@@ -1055,8 +1056,8 @@
     "call": "Diagnostics",
     "key": "Diagnostics",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:25",
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:144"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:28",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:147"
     ]
   },
   {
@@ -2866,7 +2867,8 @@
     "call": "Loading...",
     "key": "Loading...",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:1099"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:1099",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:28"
     ]
   },
   {
@@ -2910,7 +2912,7 @@
     "call": "Main",
     "key": "Main",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:24"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:27"
     ]
   },
   {
@@ -3121,6 +3123,13 @@
     ]
   },
   {
+    "call": "newest",
+    "key": "newest",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:18"
+    ]
+  },
+  {
     "call": "Newest first",
     "key": "Newest first",
     "places": [
@@ -3178,7 +3187,8 @@
     "call": "No snapshots yet",
     "key": "No snapshots yet",
     "places": [
-      "src/netshift/tabs/diagnostic/partials/renderSnapshots.ts:41"
+      "src/netshift/tabs/diagnostic/partials/renderSnapshots.ts:41",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:13"
     ]
   },
   {
@@ -3392,6 +3402,13 @@
     ]
   },
   {
+    "call": "Open snapshots",
+    "key": "Open snapshots",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:97"
+    ]
+  },
+  {
     "call": "Operation timed out",
     "key": "Operation timed out",
     "places": [
@@ -3593,7 +3610,7 @@
     "call": "PostQ VPN",
     "key": "PostQ VPN",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:109"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:112"
     ]
   },
   {
@@ -4256,7 +4273,7 @@
     "call": "Service",
     "key": "Service",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:115"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:118"
     ]
   },
   {
@@ -4264,6 +4281,14 @@
     "key": "Services info",
     "places": [
       "src/netshift/tabs/dashboard/initController.ts:563"
+    ]
+  },
+  {
+    "call": "Settings snapshots",
+    "key": "Settings snapshots",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:60",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:85"
     ]
   },
   {
@@ -4388,6 +4413,13 @@
     "key": "Snapshot saved",
     "places": [
       "src/netshift/tabs/diagnostic/partials/renderSnapshots.ts:96"
+    ]
+  },
+  {
+    "call": "Snapshots",
+    "key": "Snapshots",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:18"
     ]
   },
   {

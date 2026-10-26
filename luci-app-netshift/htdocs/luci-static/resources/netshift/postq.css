@@ -969,3 +969,44 @@ body.pq-page {
   font-weight: 600;
   color: var(--pq-fg);
 }
+
+/* ── Settings snapshots: a short card, the full list in a dialog ── */
+
+.pq-page .pq-snapshots-holder {
+  display: none;
+}
+
+.pq-page .pq-snapshots-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pq-page .pq-snapshots-card__sub {
+  color: var(--pq-muted-fg);
+  font-size: 12px;
+}
+
+.pq-page .pq-snapshots-card .btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* the stock widget inside the dialog: its own card frame is not needed */
+.pq-page .pq-snapshots-dialog > .card {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.pq-page .pq-snapshots-dialog > .card > b:first-child {
+  display: none;
+}
+
+.pq-page .pq-snapshots-dialog {
+  max-height: 60vh;
+  overflow-y: auto;
+  margin-bottom: 12px;
+}

@@ -14,6 +14,9 @@
 // PostQ: the DNS card in the diagnostics' right column
 "require view.netshift.dns as dns";
 
+// PostQ: the settings snapshots as a short card with a dialog
+"require view.netshift.snapshots as snapshots";
+
 // PostQ: service status, update and log
 "require view.netshift.control as control";
 
@@ -157,6 +160,7 @@ const EntryPoint = {
     return netshiftMap.render().then((node) => {
       addTabs(node);
       dns.mountDnsCard(node);
+      snapshots.mountSnapshotsCard(node);
       return node;
     });
   },

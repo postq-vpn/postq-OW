@@ -5,6 +5,11 @@ NETSHIFT_VERSION="__COMPILED_VERSION_VARIABLE__"
 ## Common
 NETSHIFT_CONFIG="/etc/config/netshift"
 NETSHIFT_STATE_DIR="/etc/netshift"
+# PostQ: the log of NetShift and sing-box kept on flash (one file, lines older
+# than NETSHIFT_LOG_KEEP_DAYS days are dropped once an hour), written by the
+# netshift-log service from the system log (lib/logkeep.sh).
+NETSHIFT_LOG_FILE="$NETSHIFT_STATE_DIR/netshift.log"
+NETSHIFT_LOG_KEEP_DAYS=4
 # The live sing-box cache DB (settings.cache_path, /tmp/sing-box/cache.db by
 # default) is on tmpfs, and it is where sing-box keeps the server picked in a
 # selector. The DB is copied to flash when the selection changes and put back

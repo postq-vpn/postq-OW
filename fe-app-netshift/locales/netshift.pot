@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 20:44+0300\n"
-"PO-Revision-Date: 2026-10-25 20:44+0300\n"
+"POT-Creation-Date: 2026-10-26 05:53+0300\n"
+"PO-Revision-Date: 2026-10-26 05:53+0300\n"
 "Last-Translator: PostqVPN <postq.space>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -76,6 +76,10 @@ msgstr ""
 msgid "Active Connections"
 msgstr ""
 
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:357
+msgid "Add"
+msgstr ""
+
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:1359
 msgid "Add a DNS server above first"
 msgstr ""
@@ -90,6 +94,10 @@ msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:296
 msgid "Add one or more subscription URLs to fetch proxy configurations from. All feeds are downloaded and merged."
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:331
+msgid "Add subscription"
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:399
@@ -276,6 +284,7 @@ msgid "Cache file path cannot be empty"
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:254
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:236
 msgid "Cancel"
 msgstr ""
 
@@ -292,6 +301,10 @@ msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:1466
 msgid "Chain the connection (double hop): this section's servers are reached through the outbound of the selected section. If the chain cannot be built, this section's traffic is rejected rather than sent directly."
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:287
+msgid "Change the link"
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:243
@@ -435,6 +448,10 @@ msgstr ""
 msgid "Configuration Type"
 msgstr ""
 
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:342
+msgid "Connect"
+msgstr ""
+
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:1465
 msgid "Connect through another section"
 msgstr ""
@@ -519,6 +536,7 @@ msgid "Dashboard tiles, YACD web dashboard access and remote-access protection"
 msgstr ""
 
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:181
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:103
 msgid "day|days|days"
 msgstr ""
 
@@ -532,6 +550,18 @@ msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:986
 msgid "Delay value cannot be empty"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:291
+msgid "Delete subscription"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:295
+msgid "Delete the subscription «%s»?"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:296
+msgid "Delete the subscription «%s»? The VPN stops until a subscription is added."
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:79
@@ -577,6 +607,11 @@ msgstr ""
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:289
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:403
 msgid "DHCP lease"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:22
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:123
+msgid "Diagnostics"
 msgstr ""
 
 #: src/helpers/autoUpdateStatus.ts:57
@@ -985,6 +1020,7 @@ msgid "Exclusion"
 msgstr ""
 
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:178
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:107
 msgid "Expired"
 msgstr ""
 
@@ -1652,6 +1688,10 @@ msgstr ""
 msgid "main"
 msgstr ""
 
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:21
+msgid "Main"
+msgstr ""
+
 #: src/netshift/tabs/diagnostic/checks/runDnsCheck.ts:72
 msgid "Main DNS"
 msgstr ""
@@ -1980,8 +2020,8 @@ msgstr ""
 msgid "Parallel: the first usable answer wins"
 msgstr ""
 
-#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:53
-msgid "Paste the subscription link from your provider and press Save & Apply. The servers are updated from it every hour."
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:195
+msgid "Paste the subscription link https://…"
 msgstr ""
 
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:103
@@ -2021,6 +2061,10 @@ msgstr ""
 msgid "Pin the address"
 msgstr ""
 
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:321
+msgid "Ping servers"
+msgstr ""
+
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:870
 msgid "Plain DNS (port 53) of the devices in the source interfaces is redirected to the router even when a device asks another server, such as a hard-coded 8.8.8.8. Without it such devices never get the FakeIP answers that routing by domain depends on. DNS over TLS/HTTPS is not touched."
 msgstr ""
@@ -2029,7 +2073,7 @@ msgstr ""
 msgid "Please wait..."
 msgstr ""
 
-#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:24
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:88
 msgid "PostQ VPN"
 msgstr ""
 
@@ -2113,6 +2157,7 @@ msgid "Refresh all subscriptions"
 msgstr ""
 
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:243
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:273
 msgid "Refresh subscription"
 msgstr ""
 
@@ -2263,6 +2308,7 @@ msgid "same as now"
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:256
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:252
 msgid "Save"
 msgstr ""
 
@@ -2403,15 +2449,15 @@ msgstr ""
 msgid "Server"
 msgstr ""
 
-#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:77
-msgid "Servers"
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:124
+msgid "server|servers|servers"
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:415
 msgid "Servers per feed"
 msgstr ""
 
-#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:30
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:94
 msgid "Service"
 msgstr ""
 
@@ -2562,10 +2608,13 @@ msgstr ""
 msgid "stopped answering, the automatic choice is on again"
 msgstr ""
 
-#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:45
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:29
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:230
 msgid "Subscription"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:329
+msgid "Subscription and servers"
 msgstr ""
 
 #: src/netshift/tabs/diagnostic/initController.ts:348
@@ -2573,6 +2622,7 @@ msgid "Subscription cache cleared and re-downloaded"
 msgstr ""
 
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:179
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:103
 msgid "Subscription ends in"
 msgstr ""
 
@@ -2588,6 +2638,10 @@ msgstr ""
 msgid "Subscription grouping"
 msgstr ""
 
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:196
+msgid "Subscription link"
+msgstr ""
+
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:601
 msgid "Subscription Update Interval"
 msgstr ""
@@ -2600,7 +2654,6 @@ msgstr ""
 msgid "Subscription updated"
 msgstr ""
 
-#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:52
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:295
 msgid "Subscription URLs"
 msgstr ""
@@ -2799,6 +2852,10 @@ msgstr ""
 msgid "The servers above are reached through the outbound of this section (a resolver that exists only inside the VPN or tunnel). If the outbound is not usable they are asked directly."
 msgstr ""
 
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:346
+msgid "The servers appear here a few seconds after connecting."
+msgstr ""
+
 #: src/netshift/tabs/diagnostic/partials/renderSnapshots.ts:71
 msgid "The service will restart."
 msgstr ""
@@ -2895,6 +2952,11 @@ msgstr ""
 msgid "TLS and Reality fail with a wrong time: check NTP"
 msgstr ""
 
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:116
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:117
+msgid "traffic"
+msgstr ""
+
 #: src/netshift/tabs/dashboard/initController.ts:461
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:168
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:169
@@ -2974,6 +3036,7 @@ msgid "Unknown error"
 msgstr ""
 
 #: src/netshift/tabs/dashboard/partials/renderSections.ts:186
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:110
 msgid "Unlimited subscription"
 msgstr ""
 
@@ -3018,6 +3081,22 @@ msgstr ""
 
 #: src/helpers/autoUpdateStatus.ts:53
 msgid "updated"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:88
+msgid "updated %d d ago"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:85
+msgid "updated %d h ago"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:82
+msgid "updated %d min ago"
+msgstr ""
+
+#: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:79
+msgid "updated just now"
 msgstr ""
 
 #: src/netshift/tabs/dashboard/initController.ts:323
@@ -3221,7 +3300,7 @@ msgid "VPN is stopped"
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:80
-msgid "VPN is stopped: add a subscription below and press Save & Apply"
+msgid "VPN is stopped: add a subscription below"
 msgstr ""
 
 #: ../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:672

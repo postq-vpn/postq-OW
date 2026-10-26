@@ -6,6 +6,9 @@ export interface SubscriptionInfo {
   total: number | null;
   expire: number | null;
   title: string | null;
+  // PostQ: when the feed was last checked (unix seconds) and its address
+  updated?: number | null;
+  url?: string | null;
 }
 
 export type SubscriptionInfoBySection = Record<string, SubscriptionInfo[]>;
@@ -54,6 +57,10 @@ export function parseSubscriptionInfo(
         total: asNumberOrNull(entry.total),
         expire: asNumberOrNull(entry.expire),
         title: typeof entry.title === 'string' ? entry.title : null,
+        ...(entry.updated !== undefined
+          ? { updated: asNumberOrNull(entry.updated) }
+          : {}),
+        ...(typeof entry.url === 'string' ? { url: entry.url } : {}),
       }));
   }
 

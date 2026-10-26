@@ -105,6 +105,13 @@
     ]
   },
   {
+    "call": "Add",
+    "key": "Add",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:357"
+    ]
+  },
+  {
     "call": "Add a DNS server above first",
     "key": "Add a DNS server above first",
     "places": [
@@ -130,6 +137,13 @@
     "key": "Add one or more subscription URLs to fetch proxy configurations from. All feeds are downloaded and merged.",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:296"
+    ]
+  },
+  {
+    "call": "Add subscription",
+    "key": "Add subscription",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:331"
     ]
   },
   {
@@ -454,7 +468,8 @@
     "call": "Cancel",
     "key": "Cancel",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:254"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:254",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:236"
     ]
   },
   {
@@ -479,6 +494,13 @@
     "key": "Chain the connection (double hop): this section's servers are reached through the outbound of the selected section. If the chain cannot be built, this section's traffic is rejected rather than sent directly.",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:1466"
+    ]
+  },
+  {
+    "call": "Change the link",
+    "key": "Change the link",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:287"
     ]
   },
   {
@@ -716,6 +738,13 @@
     ]
   },
   {
+    "call": "Connect",
+    "key": "Connect",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:342"
+    ]
+  },
+  {
     "call": "Connect through another section",
     "key": "Connect through another section",
     "places": [
@@ -862,7 +891,8 @@
     "call": "day|days|days",
     "key": "day|days|days",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:181"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:181",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:103"
     ]
   },
   {
@@ -884,6 +914,27 @@
     "key": "Delay value cannot be empty",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:986"
+    ]
+  },
+  {
+    "call": "Delete subscription",
+    "key": "Delete subscription",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:291"
+    ]
+  },
+  {
+    "call": "Delete the subscription «%s»?",
+    "key": "Delete the subscription «%s»?",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:295"
+    ]
+  },
+  {
+    "call": "Delete the subscription «%s»? The VPN stops until a subscription is added.",
+    "key": "Delete the subscription «%s»? The VPN stops until a subscription is added.",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:296"
     ]
   },
   {
@@ -959,6 +1010,14 @@
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:283",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:289",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:403"
+    ]
+  },
+  {
+    "call": "Diagnostics",
+    "key": "Diagnostics",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:22",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:123"
     ]
   },
   {
@@ -1661,7 +1720,8 @@
     "call": "Expired",
     "key": "Expired",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:178"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:178",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:107"
     ]
   },
   {
@@ -2791,6 +2851,13 @@
     ]
   },
   {
+    "call": "Main",
+    "key": "Main",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:21"
+    ]
+  },
+  {
     "call": "Main DNS",
     "key": "Main DNS",
     "places": [
@@ -3347,10 +3414,10 @@
     ]
   },
   {
-    "call": "Paste the subscription link from your provider and press Save & Apply. The servers are updated from it every hour.",
-    "key": "Paste the subscription link from your provider and press Save & Apply. The servers are updated from it every hour.",
+    "call": "Paste the subscription link https://…",
+    "key": "Paste the subscription link https://…",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:53"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:195"
     ]
   },
   {
@@ -3415,6 +3482,13 @@
     ]
   },
   {
+    "call": "Ping servers",
+    "key": "Ping servers",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:321"
+    ]
+  },
+  {
     "call": "Plain DNS (port 53) of the devices in the source interfaces is redirected to the router even when a device asks another server, such as a hard-coded 8.8.8.8. Without it such devices never get the FakeIP answers that routing by domain depends on. DNS over TLS/HTTPS is not touched.",
     "key": "Plain DNS (port 53) of the devices in the source interfaces is redirected to the router even when a device asks another server, such as a hard-coded 8.8.8.8. Without it such devices never get the FakeIP answers that routing by domain depends on. DNS over TLS/HTTPS is not touched.",
     "places": [
@@ -3432,7 +3506,7 @@
     "call": "PostQ VPN",
     "key": "PostQ VPN",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:24"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:88"
     ]
   },
   {
@@ -3575,7 +3649,8 @@
     "call": "Refresh subscription",
     "key": "Refresh subscription",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:243"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:243",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:273"
     ]
   },
   {
@@ -3833,7 +3908,8 @@
     "call": "Save",
     "key": "Save",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:256"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:256",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:252"
     ]
   },
   {
@@ -4076,10 +4152,10 @@
     ]
   },
   {
-    "call": "Servers",
-    "key": "Servers",
+    "call": "server|servers|servers",
+    "key": "server|servers|servers",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:77"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:124"
     ]
   },
   {
@@ -4093,7 +4169,7 @@
     "call": "Service",
     "key": "Service",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:30"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:94"
     ]
   },
   {
@@ -4352,9 +4428,15 @@
     "call": "Subscription",
     "key": "Subscription",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:45",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:29",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:230"
+    ]
+  },
+  {
+    "call": "Subscription and servers",
+    "key": "Subscription and servers",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:329"
     ]
   },
   {
@@ -4368,7 +4450,8 @@
     "call": "Subscription ends in",
     "key": "Subscription ends in",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:179"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:179",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:103"
     ]
   },
   {
@@ -4390,6 +4473,13 @@
     "key": "Subscription grouping",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:651"
+    ]
+  },
+  {
+    "call": "Subscription link",
+    "key": "Subscription link",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:196"
     ]
   },
   {
@@ -4417,7 +4507,6 @@
     "call": "Subscription URLs",
     "key": "Subscription URLs",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:52",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:295"
     ]
   },
@@ -4754,6 +4843,13 @@
     ]
   },
   {
+    "call": "The servers appear here a few seconds after connecting.",
+    "key": "The servers appear here a few seconds after connecting.",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:346"
+    ]
+  },
+  {
     "call": "The service will restart.",
     "key": "The service will restart.",
     "places": [
@@ -4919,6 +5015,14 @@
     ]
   },
   {
+    "call": "traffic",
+    "key": "traffic",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:116",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:117"
+    ]
+  },
+  {
     "call": "Traffic",
     "key": "Traffic",
     "places": [
@@ -5045,7 +5149,8 @@
     "call": "Unlimited subscription",
     "key": "Unlimited subscription",
     "places": [
-      "src/netshift/tabs/dashboard/partials/renderSections.ts:186"
+      "src/netshift/tabs/dashboard/partials/renderSections.ts:186",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:110"
     ]
   },
   {
@@ -5119,6 +5224,34 @@
     "key": "updated",
     "places": [
       "src/helpers/autoUpdateStatus.ts:53"
+    ]
+  },
+  {
+    "call": "updated %d d ago",
+    "key": "updated %d d ago",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:88"
+    ]
+  },
+  {
+    "call": "updated %d h ago",
+    "key": "updated %d h ago",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:85"
+    ]
+  },
+  {
+    "call": "updated %d min ago",
+    "key": "updated %d min ago",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:82"
+    ]
+  },
+  {
+    "call": "updated just now",
+    "key": "updated just now",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:79"
     ]
   },
   {
@@ -5445,8 +5578,8 @@
     ]
   },
   {
-    "call": "VPN is stopped: add a subscription below and press Save & Apply",
-    "key": "VPN is stopped: add a subscription below and press Save & Apply",
+    "call": "VPN is stopped: add a subscription below",
+    "key": "VPN is stopped: add a subscription below",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:80"
     ]

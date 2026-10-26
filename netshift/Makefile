@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=netshift
 
-PKG_VERSION := $(if $(NETSHIFT_VERSION),$(NETSHIFT_VERSION),1.0.0)
+PKG_VERSION := $(if $(NETSHIFT_VERSION),$(NETSHIFT_VERSION),1.0.1)
 
 PKG_RELEASE:=1
 
@@ -58,6 +58,7 @@ define Package/netshift/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/etc/init.d/netshift $(1)/etc/init.d/netshift
 	$(INSTALL_BIN) ./files/etc/init.d/netshift-naive $(1)/etc/init.d/netshift-naive
+	$(INSTALL_BIN) ./files/etc/init.d/netshift-log $(1)/etc/init.d/netshift-log
 
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/etc/config/netshift $(1)/etc/config/netshift

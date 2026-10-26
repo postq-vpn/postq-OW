@@ -1,0 +1,14 @@
+#!/bin/sh /etc/rc.common
+# PostQ: the log of NetShift and sing-box kept on flash for a few days (see
+# /usr/lib/netshift/logkeep.sh). Runs on its own, whether the VPN is on or not,
+# so the log also shows why it did not start.
+
+USE_PROCD=1
+START=60
+
+start_service() {
+    procd_open_instance
+    procd_set_param command /bin/sh /usr/lib/netshift/logkeep.sh
+    procd_set_param respawn 3600 5 0
+    procd_close_instance
+}

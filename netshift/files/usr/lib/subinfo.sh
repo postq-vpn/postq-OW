@@ -125,12 +125,20 @@ get_subscription_info() {
         return 0
     }
 
+    # PostQ: each entry also carries when the feed was last checked (the time of
+    # its info file, rewritten on every update) and the feed's address from the
+    # .url file next to it, so the page can show each subscription its own line.
+    local updated url
     for file in "$SUBSCRIPTION_CACHE_FOLDER"/*.info.json; do
         [ -f "$file" ] || continue
         name="${file##*/}"
         section="${name%%.*}"
+        updated="$(date -r "$file" +%s 2> /dev/null)"
+        url="$(cat "${file%.info.json}.url" 2> /dev/null)"
         next="$(printf '%s' "$result" | jq -c --arg section "$section" --slurpfile info "$file" \
-            '.[$section] = ((.[$section] // []) + $info)' 2> /dev/null)" || continue
+            --arg updated "${updated:-0}" --arg url "$url" \
+            '.[$section] = ((.[$section] // []) + ($info | map(. + {updated: ($updated | tonumber), url: $url})))' \
+            2> /dev/null)" || continue
         result="$next"
     done
 

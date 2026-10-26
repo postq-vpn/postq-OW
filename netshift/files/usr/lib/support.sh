@@ -232,11 +232,14 @@ support_report() {
         local_crash="$(get_sing_box_crash_log)"
         [ -n "$local_crash" ] && printf "%s\n" "$local_crash" || echo "(none in the log)"
 
-        support_section "Log of netshift (last $SUPPORT_LOG_LINES lines)"
-        logread -e netshift 2> /dev/null | tail -n "$SUPPORT_LOG_LINES"
+        # PostQ: the log kept on flash (netshift-log) comes last, below
+        if [ ! -s "$NETSHIFT_LOG_FILE" ]; then
+            support_section "Log of netshift (last $SUPPORT_LOG_LINES lines)"
+            logread -e netshift 2> /dev/null | tail -n "$SUPPORT_LOG_LINES"
 
-        support_section "Errors of sing-box (last $SUPPORT_ERROR_LINES lines)"
-        logread -e sing-box 2> /dev/null | grep -iE "error|fatal|panic|warn" | tail -n "$SUPPORT_ERROR_LINES"
+            support_section "Errors of sing-box (last $SUPPORT_ERROR_LINES lines)"
+            logread -e sing-box 2> /dev/null | grep -iE "error|fatal|panic|warn" | tail -n "$SUPPORT_ERROR_LINES"
+        fi
     } 2>&1 | support_mask_text | sed -f "$sed_script" > "$tmp"
 
     if [ "$(wc -c < "$tmp")" -gt "$SUPPORT_REPORT_MAX_BYTES" ]; then
@@ -244,6 +247,21 @@ support_report() {
         printf '\n\n(the report is cut at %s KB)\n' "$((SUPPORT_REPORT_MAX_BYTES / 1024))"
     else
         cat "$tmp"
+        # PostQ: the log of the last days takes the room that is left; the newest
+        # lines are kept when it does not fit.
+        if [ -s "$NETSHIFT_LOG_FILE" ]; then
+            local room log_tmp="$tmp.log"
+            room=$((SUPPORT_REPORT_MAX_BYTES - $(wc -c < "$tmp")))
+            support_mask_text < "$NETSHIFT_LOG_FILE" | sed -f "$sed_script" > "$log_tmp"
+            support_section "Log of NetShift and sing-box (last $NETSHIFT_LOG_KEEP_DAYS days)"
+            if [ "$(wc -c < "$log_tmp")" -gt "$room" ]; then
+                printf '(older lines are cut: the report keeps %s KB)\n' "$((SUPPORT_REPORT_MAX_BYTES / 1024))"
+                tail -c "$room" "$log_tmp" | sed '1d'
+            else
+                cat "$log_tmp"
+            fi
+            rm -f "$log_tmp"
+        fi
     fi
     rm -f "$sed_script" "$tmp"
     trap - EXIT INT TERM

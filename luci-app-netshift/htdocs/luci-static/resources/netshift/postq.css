@@ -1,0 +1,721 @@
+/*
+ * PostQ: the look of the PostQ XKeen panel for the PostQvpn page only.
+ * Everything is scoped to the page (body.pq-page / #cbi-netshift), so the rest
+ * of LuCI keeps its theme. Colours follow the light and the dark theme of the
+ * XKeen UI; the dark set is used when LuCI is dark (html[data-darkmode="true"])
+ * or, for themes that do not say, when the system is.
+ */
+
+body.pq-page {
+  --pq-fg: #212023;
+  --pq-muted-fg: #77757a;
+  --pq-card: #ffffff;
+  --pq-muted: #f8f8f8;
+  --pq-muted-hover: #f2f2f3;
+  --pq-border: #ececee;
+  --pq-input: #e4e4e7;
+  --pq-primary: #ff2181;
+  --pq-primary-hover: #e81574;
+  --pq-primary-bg: #ff2181;
+  --pq-secondary: #ffe9f2;
+  --pq-accent: rgba(255, 33, 129, 0.08);
+  --pq-ring: rgba(255, 33, 129, 0.5);
+  --pq-shadow: 0 1px 2px rgba(16, 8, 34, 0.04), 0 4px 16px rgba(16, 8, 34, 0.04);
+  --pq-green: #16a34a;
+  --pq-yellow: #ca8a04;
+  --pq-orange: #ea580c;
+  --pq-red: #dc2626;
+  --pq-warn-fg: #c2410c;
+  --pq-warn-bg: rgba(249, 115, 22, 0.1);
+  --pq-warn-border: rgba(249, 115, 22, 0.25);
+  --pq-radius: 12px;
+  --pq-radius-sm: 8px;
+  --pq-logo: url("postq-logo.svg");
+}
+
+:root[data-darkmode="true"] body.pq-page {
+  --pq-fg: #f4eefc;
+  --pq-muted-fg: rgba(215, 194, 240, 0.66);
+  --pq-card: rgba(16, 8, 34, 0.72);
+  --pq-muted: rgba(255, 255, 255, 0.06);
+  --pq-muted-hover: rgba(255, 255, 255, 0.09);
+  --pq-border: rgba(255, 255, 255, 0.09);
+  --pq-input: rgba(255, 255, 255, 0.09);
+  --pq-primary: #cf00a3;
+  --pq-primary-hover: #e01bb4;
+  --pq-primary-bg: linear-gradient(135deg, #cf00a3 0%, #931b79 100%);
+  --pq-secondary: rgba(255, 255, 255, 0.06);
+  --pq-accent: rgba(207, 0, 163, 0.15);
+  --pq-ring: rgba(207, 0, 163, 0.6);
+  --pq-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+  --pq-green: #4ade80;
+  --pq-yellow: #facc15;
+  --pq-orange: #fb923c;
+  --pq-red: #f87171;
+  --pq-warn-fg: #fb923c;
+  --pq-logo: url("postq-logo-dark.svg");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-darkmode]) body.pq-page {
+    --pq-fg: #f4eefc;
+    --pq-muted-fg: rgba(215, 194, 240, 0.66);
+    --pq-card: rgba(16, 8, 34, 0.72);
+    --pq-muted: rgba(255, 255, 255, 0.06);
+    --pq-muted-hover: rgba(255, 255, 255, 0.09);
+    --pq-border: rgba(255, 255, 255, 0.09);
+    --pq-input: rgba(255, 255, 255, 0.09);
+    --pq-primary: #cf00a3;
+    --pq-primary-hover: #e01bb4;
+    --pq-primary-bg: linear-gradient(135deg, #cf00a3 0%, #931b79 100%);
+    --pq-secondary: rgba(255, 255, 255, 0.06);
+    --pq-accent: rgba(207, 0, 163, 0.15);
+    --pq-ring: rgba(207, 0, 163, 0.6);
+    --pq-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+    --pq-green: #4ade80;
+    --pq-yellow: #facc15;
+    --pq-orange: #fb923c;
+    --pq-red: #f87171;
+    --pq-warn-fg: #fb923c;
+    --pq-logo: url("postq-logo-dark.svg");
+  }
+}
+
+/* ── Page: logo in place of the title, sections as cards ───────── */
+
+.pq-page #cbi-netshift {
+  max-width: 980px;
+  margin: 0 auto;
+  color: var(--pq-fg);
+}
+
+.pq-page #cbi-netshift > h2 {
+  height: 40px;
+  margin: 8px 0 20px;
+  overflow: hidden;
+  color: transparent;
+  font-size: 0;
+  white-space: nowrap;
+  background: var(--pq-logo) center / contain no-repeat;
+}
+
+.pq-page #cbi-netshift > .cbi-section {
+  margin: 0 0 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius);
+  background: var(--pq-card);
+  box-shadow: var(--pq-shadow);
+}
+
+.pq-page #cbi-netshift > .cbi-section > h3 {
+  margin: 0 0 12px;
+  padding: 0;
+  border: none;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--pq-fg);
+}
+
+.pq-page #cbi-netshift .cbi-section-node {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.pq-page #cbi-netshift .cbi-value {
+  padding: 0;
+  border: none;
+}
+
+.pq-page #cbi-netshift .cbi-value-description {
+  color: var(--pq-muted-fg);
+  font-size: 12px;
+}
+
+/* ── Buttons and fields ───────────────────────────────────────── */
+
+.pq-page #cbi-netshift .btn,
+.pq-page #cbi-netshift .cbi-button,
+.pq-page .cbi-page-actions .btn,
+.pq-page .cbi-page-actions .cbi-button {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-muted);
+  color: var(--pq-fg);
+  font-weight: 500;
+  box-shadow: none;
+  text-shadow: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pq-page #cbi-netshift .btn:hover,
+.pq-page #cbi-netshift .cbi-button:hover,
+.pq-page .cbi-page-actions .btn:hover,
+.pq-page .cbi-page-actions .cbi-button:hover {
+  background: var(--pq-muted-hover);
+  border-color: var(--pq-ring);
+}
+
+/* the main action: pink like the brand button of the XKeen UI */
+.pq-page .cbi-page-actions .cbi-button-apply,
+.pq-page .cbi-page-actions .cbi-button-apply + .cbi-dropdown,
+.pq-page #cbi-netshift .pq-control .cbi-button-save {
+  border-color: transparent;
+  background: var(--pq-primary-bg);
+  color: #ffffff;
+}
+
+.pq-page .cbi-page-actions .cbi-button-apply:hover,
+.pq-page #cbi-netshift .pq-control .cbi-button-save:hover {
+  background: var(--pq-primary-hover);
+  border-color: transparent;
+}
+
+.pq-page #cbi-netshift .pq-control .cbi-button-remove {
+  color: var(--pq-red);
+}
+
+.pq-page #cbi-netshift input[type="text"],
+.pq-page #cbi-netshift .cbi-input-text {
+  height: 34px;
+  border: 1px solid var(--pq-input);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-muted);
+  color: var(--pq-fg);
+  box-shadow: none;
+}
+
+.pq-page #cbi-netshift input[type="text"]:focus {
+  border-color: var(--pq-primary);
+  outline: 2px solid var(--pq-ring);
+  outline-offset: -1px;
+}
+
+.pq-page .cbi-page-actions {
+  max-width: 980px;
+  margin: 0 auto 24px;
+  padding: 12px 20px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius);
+  background: var(--pq-card);
+}
+
+/* ── Service card ─────────────────────────────────────────────── */
+
+.pq-page .pq-control {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pq-page .pq-control__status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.pq-page .pq-control__dot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--pq-red);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pq-red) 20%, transparent);
+}
+
+.pq-page .pq-control__dot--on {
+  background: var(--pq-green);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pq-green) 20%, transparent);
+}
+
+.pq-page .pq-control__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pq-page .pq-control__update {
+  color: var(--pq-muted-fg);
+}
+
+.pq-page .pq-control__update:empty {
+  display: none;
+}
+
+/* ── Servers ──────────────────────────────────────────────────── */
+
+.pq-page .pdk_dashboard-page__sections-toolbar {
+  display: none;
+}
+
+.pq-page .pdk_dashboard-page__outbound-section {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+.pq-page .pdk_dashboard-page__outbound-section__title-section {
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.pq-page .pdk_dashboard-page__outbound-section__title-section__title {
+  font-weight: 600;
+  color: var(--pq-fg);
+}
+
+.pq-page .pdk_dashboard-page__outbound-section__controls .btn,
+.pq-page .pdk_dashboard-page__outbound-section__controls .cbi-button {
+  height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.pq-page .pdk_dashboard-page__subscription-info__text {
+  color: var(--pq-muted-fg);
+  font-size: 12px;
+}
+
+.pq-page .pdk_dashboard-page__subscription-info__text--soon {
+  color: var(--pq-warn-fg);
+}
+
+/* one column of rows in a rounded box, like the server list of the XKeen UI */
+.pq-page .pdk_dashboard-page__outbound-list {
+  display: block;
+  max-height: none;
+  margin-top: 10px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-muted);
+}
+
+.pq-page .pdk_dashboard-page__outbound-row {
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: none;
+  border-bottom: 1px solid var(--pq-border);
+  border-radius: 0;
+  background: var(--pq-card);
+  font-size: 13px;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pq-page .pdk_dashboard-page__outbound-row:last-child {
+  border-bottom: none;
+}
+
+.pq-page .pdk_dashboard-page__outbound-row--selectable:hover {
+  border-color: var(--pq-border);
+  background: var(--pq-muted-hover);
+  box-shadow: inset 2px 0 0 var(--pq-ring);
+}
+
+.pq-page .pdk_dashboard-page__outbound-row--active,
+.pq-page .pdk_dashboard-page__outbound-row--active:hover {
+  border-color: var(--pq-border);
+  background: var(--pq-accent);
+  box-shadow: inset 2px 0 0 var(--pq-primary);
+}
+
+/* a radio circle in front of every server; filled for the chosen one */
+.pq-page .pdk_dashboard-page__outbound-row::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  flex: none;
+  box-sizing: border-box;
+  border: 1.5px solid var(--pq-input);
+  border-radius: 50%;
+  background: var(--pq-card);
+}
+
+.pq-page .pdk_dashboard-page__outbound-row--active::before {
+  border: 5px solid var(--pq-primary);
+  background: #ffffff;
+}
+
+.pq-page .pdk_dashboard-page__outbound-row__name {
+  font-weight: 500;
+}
+
+.pq-page .pdk_dashboard-page__outbound-current {
+  color: var(--pq-muted-fg);
+  font-size: 11px;
+}
+
+/* the radio says which server is chosen: no "Active" badge */
+.pq-page .pdk_dashboard-page__outbound-row__badge,
+.pq-page .pdk_dashboard-page__outbound-row__badge-space {
+  display: none;
+}
+
+.pq-page .pdk_dashboard-page__outbound-row__latency {
+  min-width: 64px;
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pq-page .pdk_dashboard-page__outbound-grid__item__latency--green {
+  color: var(--pq-green);
+}
+
+.pq-page .pdk_dashboard-page__outbound-grid__item__latency--yellow {
+  color: var(--pq-yellow);
+}
+
+.pq-page .pdk_dashboard-page__outbound-grid__item__latency--red {
+  color: var(--pq-orange);
+}
+
+.pq-page .pdk_dashboard-page__outbound-grid__item__latency--empty {
+  color: var(--pq-muted-fg);
+}
+
+/* "Not recommended": an orange band across the list, as in the XKeen UI */
+.pq-page .pdk_dashboard-page__not-recommended {
+  margin: 0;
+  padding: 6px 16px;
+  border: none;
+  border-top: 1px solid var(--pq-warn-border);
+  border-bottom: 1px solid var(--pq-warn-border);
+  border-radius: 0;
+  background: var(--pq-warn-bg);
+  color: var(--pq-warn-fg);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* notices on the page */
+.pq-page .pdk_dashboard-page__pin-guard,
+.pq-page .pdk_dashboard-page__update-notice,
+.pq-page .pdk_dashboard-page__setup {
+  margin: 0 0 12px;
+  border: 1px solid var(--pq-warn-border);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-warn-bg);
+  box-shadow: none;
+}
+
+.pq-page .pdk_dashboard-page__setup {
+  border-color: var(--pq-border);
+  background: var(--pq-muted);
+}
+
+/* tiles view: the same colours */
+.pq-page .pdk_dashboard-page__outbound-grid__item {
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-card);
+  box-shadow: none;
+}
+
+.pq-page .pdk_dashboard-page__outbound-grid__item--active {
+  background: var(--pq-accent);
+  box-shadow: inset 2px 0 0 var(--pq-primary);
+}
+
+/* ── Tabs: Main / Diagnostics (a segmented switch under the logo) ── */
+
+.pq-page #cbi-netshift > .pq-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  width: fit-content;
+  margin: 0 auto 20px;
+  padding: 4px;
+  border: 1px solid var(--pq-border);
+  border-radius: 10px;
+  background: var(--pq-muted);
+  list-style: none;
+}
+
+.pq-page #cbi-netshift > .pq-tabs > li {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.pq-page #cbi-netshift > .pq-tabs > li > a {
+  display: block;
+  padding: 6px 18px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--pq-muted-fg);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pq-page #cbi-netshift > .pq-tabs > li > a:hover {
+  color: var(--pq-fg);
+}
+
+.pq-page #cbi-netshift > .pq-tabs > li.cbi-tab > a {
+  background: var(--pq-card);
+  color: var(--pq-fg);
+  box-shadow: 0 1px 3px rgba(16, 8, 34, 0.12);
+}
+
+/* nothing to save on the diagnostics tab */
+.pq-page--diagnostic .cbi-page-actions {
+  display: none;
+}
+
+/* the diagnostics: its cards in the colours of the page */
+.pq-page #cbi-netshift-diagnostic .card {
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-muted);
+  box-shadow: none;
+  color: var(--pq-fg);
+}
+
+/* the theme caps a tab at half the menu and cuts its name */
+.pq-page #cbi-netshift > .pq-tabs > li {
+  max-width: none;
+  width: auto;
+  flex: none;
+}
+
+.pq-page #cbi-netshift > .pq-tabs > li > a {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+/* the troubleshooting block links to the NetShift wiki, not to PostQ */
+.pq-page #pdk_diagnostic-page-wiki {
+  display: none;
+}
+
+/* ── Subscription and servers (variant A: the subscription line over the list) ── */
+
+/* the subscription saves and applies by itself: no form buttons on the page */
+.pq-page .cbi-page-actions {
+  display: none;
+}
+
+/* the dashboard's own header and subscription line: replaced by the card */
+.pq-page .pdk_dashboard-page__outbound-section__title-section,
+.pq-page .pdk_dashboard-page__subscription-info,
+.pq-page .pdk_dashboard-page__setup {
+  display: none;
+}
+
+.pq-page .pq-sub {
+  display: flex;
+  flex-direction: column;
+}
+
+.pq-page .pq-sub__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.pq-page .pq-sub__head h3 {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--pq-fg);
+}
+
+.pq-page .pq-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--pq-muted-fg);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pq-page .pq-icon-btn:hover {
+  background: var(--pq-muted-hover);
+  color: var(--pq-fg);
+}
+
+.pq-page .pq-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.pq-page .pq-sub__head .pq-icon-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-muted);
+  color: var(--pq-fg);
+}
+
+/* the subscription lines and the server list make one rounded box */
+.pq-page .pq-sub__list {
+  border: 1px solid var(--pq-border);
+  border-bottom: none;
+  border-radius: var(--pq-radius-sm) var(--pq-radius-sm) 0 0;
+  overflow: hidden;
+}
+
+.pq-page .pq-sub__list + * {
+  margin: 0;
+}
+
+.pq-page .pq-servers .pdk_dashboard-page__outbound-list {
+  margin-top: 0;
+  border-radius: 0 0 var(--pq-radius-sm) var(--pq-radius-sm);
+}
+
+.pq-page .pq-sub__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px 12px 6px 16px;
+  border-bottom: 1px solid var(--pq-border);
+  background: var(--pq-muted);
+  font-size: 13px;
+}
+
+.pq-page .pq-sub__name {
+  margin-right: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pq-page .pq-sub__info {
+  flex: 1;
+  min-width: 0;
+  padding: 0 8px;
+  overflow: hidden;
+  color: var(--pq-muted-fg);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pq-page .pq-sub__info--soon {
+  color: var(--pq-warn-fg);
+  font-weight: 600;
+}
+
+.pq-page .pq-sub__ping {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  height: 28px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--pq-muted-fg);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.pq-page .pq-sub__ping:hover {
+  background: var(--pq-muted-hover);
+  color: var(--pq-fg);
+}
+
+.pq-page .pq-sub__ping-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.pq-page .pq-sub__row--edit {
+  padding: 8px 12px;
+}
+
+.pq-page .pq-sub__form-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pq-page .pq-sub__form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pq-page #cbi-netshift .pq-sub__input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--pq-input);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-card);
+  color: var(--pq-fg);
+  font: inherit;
+  font-size: 13px;
+}
+
+.pq-page #cbi-netshift .pq-sub__submit {
+  border-color: transparent;
+  background: var(--pq-primary-bg);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.pq-page #cbi-netshift .pq-sub__submit:hover {
+  background: var(--pq-primary-hover);
+}
+
+.pq-page .pq-sub__error {
+  color: var(--pq-red);
+  font-size: 12px;
+}
+
+.pq-page .pq-sub__error:empty {
+  display: none;
+}
+
+.pq-page .pq-sub__hint {
+  margin: 8px 0 0;
+  color: var(--pq-muted-fg);
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .pq-page .pq-sub__row {
+    flex-wrap: wrap;
+  }
+
+  .pq-page .pq-sub__info {
+    flex-basis: 100%;
+    order: 9;
+    padding: 0 0 4px;
+    text-align: left;
+    white-space: normal;
+  }
+}

@@ -3900,7 +3900,9 @@ function parseSubscriptionInfo(stdout) {
       download: asNumberOrNull(entry.download),
       total: asNumberOrNull(entry.total),
       expire: asNumberOrNull(entry.expire),
-      title: typeof entry.title === "string" ? entry.title : null
+      title: typeof entry.title === "string" ? entry.title : null,
+      ...entry.updated !== void 0 ? { updated: asNumberOrNull(entry.updated) } : {},
+      ...typeof entry.url === "string" ? { url: entry.url } : {}
     }));
   }
   return result;

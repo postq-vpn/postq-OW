@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 23:44+0300\n"
-"PO-Revision-Date: 2026-10-25 23:44+0300\n"
+"POT-Creation-Date: 2026-10-26 08:53+0300\n"
+"PO-Revision-Date: 2026-10-26 08:53+0300\n"
 "Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -62,6 +62,9 @@ msgstr "Активный"
 msgid "Active Connections"
 msgstr "Активные соединения"
 
+msgid "Add"
+msgstr "Добавить"
+
 msgid "Add a DNS server above first"
 msgstr "Сначала добавьте DNS-сервер выше"
 
@@ -73,6 +76,9 @@ msgstr "Добавить ленты из списка"
 
 msgid "Add one or more subscription URLs to fetch proxy configurations from. All feeds are downloaded and merged."
 msgstr "Добавьте один или несколько URL подписок для получения конфигураций прокси. Все источники загружаются и объединяются."
+
+msgid "Add subscription"
+msgstr "Добавить подписку"
 
 msgid "Add the feeds"
 msgstr "Добавить ленты"
@@ -221,6 +227,9 @@ msgstr "cergo666/netshift (сборки форка)"
 msgid "Chain the connection (double hop): this section's servers are reached through the outbound of the selected section. If the chain cannot be built, this section's traffic is rejected rather than sent directly."
 msgstr "Соединить цепочкой (двойной хоп): серверы этой секции достигаются через выход выбранной секции. Если цепочку построить нельзя, трафик этой секции отклоняется, а не отправляется напрямую."
 
+msgid "Change the link"
+msgstr "Изменить ссылку"
+
 msgid "Change the static lease"
 msgstr "Изменить статическую аренду"
 
@@ -314,6 +323,9 @@ msgstr "Снимки настроек"
 msgid "Configuration Type"
 msgstr "Тип конфигурации"
 
+msgid "Connect"
+msgstr "Подключить"
+
 msgid "Connect through another section"
 msgstr "Подключение через другую секцию"
 
@@ -386,6 +398,15 @@ msgstr "Задержка в миллисекундах перед перезаг
 msgid "Delay value cannot be empty"
 msgstr "Значение задержки не может быть пустым"
 
+msgid "Delete subscription"
+msgstr "Удалить подписку"
+
+msgid "Delete the subscription «%s»?"
+msgstr "Удалить подписку «%s»?"
+
+msgid "Delete the subscription «%s»? The VPN stops until a subscription is added."
+msgstr "Удалить подписку «%s»? VPN остановится, пока не будет добавлена подписка."
+
 msgid "Destination"
 msgstr "Назначение"
 
@@ -415,6 +436,9 @@ msgstr "DHCP содержит DNS сервер"
 
 msgid "DHCP lease"
 msgstr "Аренда DHCP"
+
+msgid "Diagnostics"
+msgstr "Диагностика"
 
 msgid "did not work, rolled back to"
 msgstr "не заработал, откат на"
@@ -1172,6 +1196,9 @@ msgstr "MAC-адрес"
 msgid "main"
 msgstr "основной"
 
+msgid "Main"
+msgstr "Главная"
+
 msgid "Main DNS"
 msgstr "Основной DNS"
 
@@ -1400,8 +1427,8 @@ msgstr "Выходной сетевой интерфейс"
 msgid "Parallel: the first usable answer wins"
 msgstr "Параллельно: побеждает первый пригодный ответ"
 
-msgid "Paste the subscription link from your provider and press Save & Apply. The servers are updated from it every hour."
-msgstr "Вставьте ссылку на подписку от провайдера и нажмите «Сохранить и применить». Список серверов обновляется по ней каждый час."
+msgid "Paste the subscription link https://…"
+msgstr "Вставьте ссылку на подписку https://…"
 
 msgid "Paste the subscription link into the field above and press Save & Apply: the servers will appear here."
 msgstr "Вставьте ссылку на подписку в поле выше и нажмите «Сохранить и применить» — здесь появятся серверы."
@@ -1426,6 +1453,9 @@ msgstr "Закрепить адрес"
 
 msgid "Pin the address"
 msgstr "Закрепить адрес"
+
+msgid "Ping servers"
+msgstr "Пинг"
 
 msgid "Plain DNS (port 53) of the devices in the source interfaces is redirected to the router even when a device asks another server, such as a hard-coded 8.8.8.8. Without it such devices never get the FakeIP answers that routing by domain depends on. DNS over TLS/HTTPS is not touched."
 msgstr "Обычный DNS (порт 53) устройств с интерфейсов-источников перенаправляется на роутер, даже если устройство спрашивает другой сервер, например прописанный вручную 8.8.8.8. Без этого такие устройства не получают FakeIP-ответов, от которых зависит маршрутизация по доменам. DNS поверх TLS/HTTPS не затрагивается."
@@ -1706,8 +1736,8 @@ msgstr "Передаётся панели как X-Ver-OS, например 14 �
 msgid "Server"
 msgstr "Сервер"
 
-msgid "Servers"
-msgstr "Серверы"
+msgid "server|servers|servers"
+msgstr "сервер|сервера|серверов"
 
 msgid "Servers per feed"
 msgstr "Серверов в ленте"
@@ -1823,6 +1853,9 @@ msgstr "перестал отвечать, снова включён автом�
 msgid "Subscription"
 msgstr "Подписка"
 
+msgid "Subscription and servers"
+msgstr "Подписка и серверы"
+
 msgid "Subscription cache cleared and re-downloaded"
 msgstr "Кеш подписок очищен и загружен заново"
 
@@ -1837,6 +1870,9 @@ msgstr "Формат подписки"
 
 msgid "Subscription grouping"
 msgstr "Группировка подписки"
+
+msgid "Subscription link"
+msgstr "Ссылка на подписку"
 
 msgid "Subscription Update Interval"
 msgstr "Интервал обновления подписки"
@@ -1988,6 +2024,9 @@ msgstr "Сервер должен быть IP-адресом, при необх�
 msgid "The servers above are reached through the outbound of this section (a resolver that exists only inside the VPN or tunnel). If the outbound is not usable they are asked directly."
 msgstr "Серверы выше опрашиваются через исходящее соединение этой секции (резолвер, который существует только внутри VPN или туннеля). Если соединение недоступно, серверы опрашиваются напрямую."
 
+msgid "The servers appear here a few seconds after connecting."
+msgstr "Серверы появятся здесь через несколько секунд после подключения."
+
 msgid "The service will restart."
 msgstr "Служба перезапустится."
 
@@ -2056,6 +2095,9 @@ msgstr "Замеряет каждый DNS-сервер списка (UDP, TCP, D
 
 msgid "TLS and Reality fail with a wrong time: check NTP"
 msgstr "С неверным временем не работают TLS и Reality: проверьте NTP"
+
+msgid "traffic"
+msgstr "трафик"
 
 msgid "Traffic"
 msgstr "Трафик"
@@ -2134,6 +2176,18 @@ msgstr "Обновить до %s"
 
 msgid "updated"
 msgstr "обновлён"
+
+msgid "updated %d d ago"
+msgstr "обновлена %d дн. назад"
+
+msgid "updated %d h ago"
+msgstr "обновлена %d ч назад"
+
+msgid "updated %d min ago"
+msgstr "обновлена %d мин назад"
+
+msgid "updated just now"
+msgstr "обновлена только что"
 
 msgid "Updating all subscriptions… this may take a minute"
 msgstr "Обновление всех подписок… это может занять минуту"
@@ -2258,8 +2312,8 @@ msgstr "VPN работает"
 msgid "VPN is stopped"
 msgstr "VPN остановлен"
 
-msgid "VPN is stopped: add a subscription below and press Save & Apply"
-msgstr "VPN остановлен: добавьте подписку ниже и нажмите «Сохранить и применить»"
+msgid "VPN is stopped: add a subscription below"
+msgstr "VPN остановлен: добавьте подписку ниже"
 
 msgid "WAN interface for the EDNS Client Subnet"
 msgstr "WAN-интерфейс для EDNS Client Subnet"

@@ -25655,6 +25655,8 @@ CJ
         nft() { printf 'table inet NetShiftTable\ntable inet NetShiftGuard\ntable inet other\n'; }
         logread() { printf 'Thu Oct 15 17:00:00 2026 daemon.info netshift: dial srv.example.org:443 via https://panel.example.net/sub/TOKENVALUE\nThu Oct 15 17:00:00 2026 daemon.info netshift: EDNS Client Subnet detected from the WAN: 203.0.113.0/24\nThu Oct 15 17:00:01 2026 daemon.err sing-box[1]: ERROR connection to secret-domain.example:443\n'; }
         NFT_TABLE_NAME="NetShiftTable"
+        # without the log kept on flash the report shows the system log (PostQ)
+        NETSHIFT_LOG_FILE="$work/no-such.log"
         support_report > "$work/report.txt" 2>&1
         echo "report-warnings-masked=$(grep -c 'secretdomain.example' "$work/report.txt") hidden=$(grep -c '"domain":"<hidden>"' "$work/report.txt")"
         echo "report-nft-only-ours=$(grep -c 'NetShiftTable' "$work/report.txt") guard=$(grep -c 'NetShiftGuard' "$work/report.txt")"
@@ -25664,6 +25666,12 @@ CJ
         echo "report-no-ecs=$(grep -c '198.51.100\|203.0.113' "$work/report.txt")"
         echo "report-complete=$(grep -c '===== Errors of sing-box' "$work/report.txt")"
         echo "report-no-dns-ids=$(grep -c 'pk_abc123secret\|myid123\|mydns\|front.example.org\|wspathsecret\|secret-domain' "$work/report.txt")"
+        # PostQ: with the log kept on flash, that log is the last section, masked the same way
+        NETSHIFT_LOG_FILE="$work/netshift.log"
+        printf '2026-10-15 17:00:00 daemon.info netshift: dial srv.example.org:443 via https://panel.example.net/sub/TOKENVALUE\n2026-10-15 17:00:01 daemon.err sing-box[1]: ERROR connection failed\n' > "$NETSHIFT_LOG_FILE"
+        support_report > "$work/report-log.txt" 2>&1
+        echo "report-kept-log=$(grep -c '===== Log of NetShift and sing-box (last' "$work/report-log.txt") system-log=$(grep -c '===== Errors of sing-box' "$work/report-log.txt") secrets=$(grep -c 'TOKENVALUE\|srv.example.org' "$work/report-log.txt") lines=$(grep -c 'ERROR connection failed' "$work/report-log.txt")"
+        NETSHIFT_LOG_FILE="$work/no-such.log"
         # without a readable configuration the header does not promise host-N
         SR_config_path="$work/none.json"; support_report > "$work/report2.txt" 2>&1; SR_config_path="$work/config.json"
         echo "report-header-no-config=$(grep -c 'NOT replaced' "$work/report2.txt") promise=$(grep -c 'are shown as host-N' "$work/report2.txt")"
@@ -25754,6 +25762,7 @@ LR
     _sr "config: the Host header of a transport is host-N, its path hidden" 'cfg-transport-host-hidden=["host-1","<hidden>"]'
     _sr "the report: no EDNS Client Subnet (settings, config and the log)" "report-no-ecs=0"
     _sr "the report goes on to its last section on a system without /overlay" "report-complete=1"
+    _sr "with the log kept on flash the report ends with it, masked (PostQ)" "report-kept-log=1 system-log=0 secrets=0 lines=1"
     _sr "without a readable configuration the header says server names are not replaced" "report-header-no-config=1 promise=0"
     _sr "a report over the cap is cut with a note" "report-cut=short note=1"
     _sr "log lines: the EDNS Client Subnet goes" "text-ecs=EDNS Client Subnet detected from the WAN: <hidden>|EDNS Client Subnet: no WAN address could be determined, using the configured <hidden>|Ignoring invalid EDNS Client Subnet '<hidden>': expected|"

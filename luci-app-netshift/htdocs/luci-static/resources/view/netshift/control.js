@@ -77,7 +77,7 @@ function renderControl() {
     statusText.textContent = running
       ? _("VPN is running")
       : enabled
-        ? _("VPN is stopped: add a subscription below and press Save & Apply")
+        ? _("VPN is stopped: add a subscription below")
         : _("VPN is stopped");
     startBtn.style.display = running ? "none" : "";
     stopBtn.style.display = running ? "" : "none";
@@ -186,37 +186,22 @@ function renderControl() {
   return node;
 }
 
+// The look of the page (logo, cards, the server list of the XKeen UI) lives in
+// netshift/postq.css, scoped to body.pq-page; the version in its URL makes a
+// browser fetch it again after an update.
 function injectStyles() {
-  if (document.getElementById("pq-control-styles")) {
+  document.body.classList.add("pq-page");
+
+  if (document.getElementById("pq-page-styles")) {
     return;
   }
 
   document.head.appendChild(
-    E(
-      "style",
-      { id: "pq-control-styles" },
-      `
-.pq-control { display: flex; flex-direction: column; gap: 10px; padding: 4px 0; }
-.pq-control__status { display: flex; align-items: center; gap: 8px; font-weight: bold; }
-.pq-control__dot { width: 10px; height: 10px; border-radius: 50%; background: #d9534f; flex: none; }
-.pq-control__dot--on { background: #2ea44f; }
-.pq-control__actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.pq-control__update:empty { display: none; }
-#cbi-netshift > h2 {
-  height: 40px; margin-bottom: 12px; overflow: hidden; color: transparent;
-  font-size: 0; white-space: nowrap;
-  background: url("${L.resource("netshift/postq-logo.svg")}") center / contain no-repeat;
-}
-:root[data-darkmode="true"] #cbi-netshift > h2 {
-  background-image: url("${L.resource("netshift/postq-logo-dark.svg")}");
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-darkmode]) #cbi-netshift > h2 {
-    background-image: url("${L.resource("netshift/postq-logo-dark.svg")}");
-  }
-}
-`,
-    ),
+    E("link", {
+      id: "pq-page-styles",
+      rel: "stylesheet",
+      href: `${L.resource("netshift/postq.css")}?v=${encodeURIComponent(main.NETSHIFT_LUCI_APP_VERSION)}`,
+    }),
   );
 }
 

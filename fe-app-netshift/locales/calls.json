@@ -275,6 +275,13 @@
     ]
   },
   {
+    "call": "Apply",
+    "key": "Apply",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:279"
+    ]
+  },
+  {
     "call": "Ask for a user name and a password. Without a login anyone in your network can use this proxy. If the login is not complete the proxy is not created at all.",
     "key": "Ask for a user name and a password. Without a login anyone in your network can use this proxy. If the login is not complete the proxy is not created at all.",
     "places": [
@@ -388,6 +395,14 @@
     ]
   },
   {
+    "call": "Bootstrap DNS",
+    "key": "Bootstrap DNS",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:325",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:338"
+    ]
+  },
+  {
     "call": "Bootstrap DNS server",
     "key": "Bootstrap DNS server",
     "places": [
@@ -469,6 +484,7 @@
     "key": "Cancel",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/devices.js:254",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:391",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:236"
     ]
   },
@@ -532,6 +548,13 @@
     ]
   },
   {
+    "call": "Check servers",
+    "key": "Check servers",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:379"
+    ]
+  },
+  {
     "call": "Check the filters",
     "key": "Check the filters",
     "places": [
@@ -569,6 +592,7 @@
       "src/netshift/tabs/diagnostic/partials/renderRouteCheck.ts:34",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:56",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:95",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:379",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:858"
     ]
   },
@@ -738,6 +762,13 @@
     ]
   },
   {
+    "call": "Configure DNS",
+    "key": "Configure DNS",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:423"
+    ]
+  },
+  {
     "call": "Connect",
     "key": "Connect",
     "places": [
@@ -896,6 +927,14 @@
     ]
   },
   {
+    "call": "default",
+    "key": "default",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:304",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:347"
+    ]
+  },
+  {
     "call": "Default (by the lists)",
     "key": "Default (by the lists)",
     "places": [
@@ -1016,8 +1055,8 @@
     "call": "Diagnostics",
     "key": "Diagnostics",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:22",
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:123"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:25",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:144"
     ]
   },
   {
@@ -1169,7 +1208,10 @@
     "call": "DNS server",
     "key": "DNS server",
     "places": [
-      "src/netshift/tabs/diagnostic/helpers/describeRouteCheck.ts:41"
+      "src/netshift/tabs/diagnostic/helpers/describeRouteCheck.ts:41",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:295",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:404",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:410"
     ]
   },
   {
@@ -1855,6 +1897,13 @@
     ]
   },
   {
+    "call": "Finds the address of a DNS server given by name (AdGuard, Yandex DoT). It must answer too.",
+    "key": "Finds the address of a DNS server given by name (AdGuard, Yandex DoT). It must answer too.",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:327"
+    ]
+  },
+  {
     "call": "First server only",
     "key": "First server only",
     "places": [
@@ -2031,6 +2080,13 @@
     "key": "How often to automatically update the subscription",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:602"
+    ]
+  },
+  {
+    "call": "How the router finds the addresses of sites. If sites do not open, check the servers and pick one that answers.",
+    "key": "How the router finds the addresses of sites. If sites do not open, check the servers and pick one that answers.",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:284"
     ]
   },
   {
@@ -2854,7 +2910,7 @@
     "call": "Main",
     "key": "Main",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:21"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:24"
     ]
   },
   {
@@ -3082,6 +3138,7 @@
     "call": "no answer",
     "key": "no answer",
     "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:201",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:1233",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:1381",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:252"
@@ -3255,6 +3312,14 @@
     ]
   },
   {
+    "call": "Now",
+    "key": "Now",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:288",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:331"
+    ]
+  },
+  {
     "call": "Number of leading characters of each proxy name to group by.",
     "key": "Number of leading characters of each proxy name to group by.",
     "places": [
@@ -3405,6 +3470,28 @@
     ]
   },
   {
+    "call": "Own bootstrap DNS",
+    "key": "Own bootstrap DNS",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:361"
+    ]
+  },
+  {
+    "call": "Own DNS server",
+    "key": "Own DNS server",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:320"
+    ]
+  },
+  {
+    "call": "Own server",
+    "key": "Own server",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:314",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:355"
+    ]
+  },
+  {
     "call": "Parallel: the first usable answer wins",
     "key": "Parallel: the first usable answer wins",
     "places": [
@@ -3506,7 +3593,7 @@
     "call": "PostQ VPN",
     "key": "PostQ VPN",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:88"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:109"
     ]
   },
   {
@@ -4169,7 +4256,7 @@
     "call": "Service",
     "key": "Service",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:94"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/netshift.js:115"
     ]
   },
   {
@@ -4661,6 +4748,13 @@
     ]
   },
   {
+    "call": "The bootstrap DNS is an IP address, for example 77.88.8.8",
+    "key": "The bootstrap DNS is an IP address, for example 77.88.8.8",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:259"
+    ]
+  },
+  {
     "call": "The check could not be completed",
     "key": "The check could not be completed",
     "places": [
@@ -4847,6 +4941,13 @@
     "key": "The servers appear here a few seconds after connecting.",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/subscription.js:346"
+    ]
+  },
+  {
+    "call": "The servers could not be checked",
+    "key": "The servers could not be checked",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:161"
     ]
   },
   {
@@ -5690,6 +5791,13 @@
     ]
   },
   {
+    "call": "Write the server as scheme://address, for example doh://dns.example.com/dns-query",
+    "key": "Write the server as scheme://address, for example doh://dns.example.com/dns-query",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:243"
+    ]
+  },
+  {
     "call": "Xray JSON (Happ)",
     "key": "Xray JSON (Happ)",
     "places": [
@@ -5701,6 +5809,15 @@
     "key": "YACD Secret Key",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/settings.js:1303"
+    ]
+  },
+  {
+    "call": "Yandex",
+    "key": "Yandex",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:27",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:30",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:36"
     ]
   },
   {

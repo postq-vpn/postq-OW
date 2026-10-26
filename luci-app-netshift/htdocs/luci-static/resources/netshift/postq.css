@@ -719,3 +719,253 @@ body.pq-page {
     white-space: normal;
   }
 }
+
+/* ── DNS server: the card in Diagnostics and its dialog ── */
+
+/* the card in the diagnostics' right column, like its neighbours */
+.pq-page .pq-dns-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pq-page .pq-dns-card .pq-dns__now {
+  font-size: 12px;
+}
+
+.pq-page .pq-dns-card__sub {
+  color: var(--pq-muted-fg);
+  font-size: 12px;
+}
+
+.pq-page .pq-dns-card .btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* the dialog (LuCI puts it outside the page body's sections) */
+body.pq-page {
+  --pq-surface: #ffffff;
+}
+
+:root[data-darkmode="true"] body.pq-page {
+  --pq-surface: #140b28;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-darkmode]) body.pq-page {
+    --pq-surface: #140b28;
+  }
+}
+
+.pq-page .modal.pq-modal {
+  max-width: 640px;
+  padding: 20px 24px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius);
+  background: var(--pq-surface);
+  color: var(--pq-fg);
+  box-shadow: 0 20px 60px rgba(16, 8, 34, 0.25);
+}
+
+.pq-page .modal.pq-modal > h4 {
+  margin: 0 0 12px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--pq-fg);
+}
+
+.pq-page .pq-modal .btn,
+.pq-page .pq-modal .cbi-button {
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-muted);
+  color: var(--pq-fg);
+  font-weight: 500;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.pq-page .pq-modal .pq-dns__check {
+  margin-right: auto;
+}
+
+/* the old block styles below (rows, inputs) also dress the dialog */
+
+.pq-page .pq-dns {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pq-page .pq-dns__hint {
+  margin: 0;
+  color: var(--pq-muted-fg);
+  font-size: 13px;
+}
+
+.pq-page .pq-dns__now {
+  color: var(--pq-fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.pq-page .pq-dns__list {
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  overflow: hidden;
+}
+
+.pq-page .pq-dns__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  margin: 0;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--pq-border);
+  background: var(--pq-card);
+  font-size: 13px;
+  font-weight: normal;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pq-page .pq-dns__row:last-child {
+  border-bottom: none;
+}
+
+.pq-page .pq-dns__row:hover {
+  background: var(--pq-muted-hover);
+  box-shadow: inset 2px 0 0 var(--pq-ring);
+}
+
+.pq-page .pq-dns__row--active,
+.pq-page .pq-dns__row--active:hover {
+  background: var(--pq-accent);
+  box-shadow: inset 2px 0 0 var(--pq-primary);
+}
+
+/* the same radio circle as the server list */
+.pq-page .pq-dns .pq-dns__radio {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: none;
+  box-sizing: border-box;
+  border: 1.5px solid var(--pq-input);
+  border-radius: 50%;
+  background: var(--pq-card);
+  cursor: pointer;
+}
+
+.pq-page .pq-dns .pq-dns__radio:checked {
+  border: 5px solid var(--pq-primary);
+  background: #ffffff;
+}
+
+/* the theme draws its own mark on a checked radio */
+.pq-page .pq-dns .pq-dns__radio,
+.pq-page .pq-dns .pq-dns__radio:checked {
+  background-image: none;
+  box-shadow: none;
+}
+
+.pq-page .pq-dns .pq-dns__radio::before,
+.pq-page .pq-dns .pq-dns__radio::after {
+  display: none;
+  content: none;
+}
+
+.pq-page .pq-dns .pq-dns__radio:focus-visible {
+  outline: 2px solid var(--pq-ring);
+  outline-offset: 2px;
+}
+
+.pq-page .pq-dns__name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pq-page .pq-dns__name b {
+  font-weight: 500;
+}
+
+.pq-page .pq-dns__sub {
+  color: var(--pq-muted-fg);
+  font-size: 11px;
+}
+
+.pq-page .pq-dns .pq-dns__input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid var(--pq-input);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-card);
+  color: var(--pq-fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
+.pq-page .pq-dns__ms {
+  min-width: 80px;
+  margin-left: auto;
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pq-page .pq-dns__ms--good {
+  color: var(--pq-green);
+}
+
+.pq-page .pq-dns__ms--mid {
+  color: var(--pq-yellow);
+}
+
+.pq-page .pq-dns__ms--slow {
+  color: var(--pq-orange);
+}
+
+.pq-page .pq-dns__ms--none {
+  color: var(--pq-red);
+}
+
+.pq-page .pq-dns__error {
+  color: var(--pq-red);
+  font-size: 12px;
+}
+
+.pq-page .pq-dns__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.pq-page .pq-dns .pq-dns__apply:not(:disabled) {
+  border-color: transparent;
+  background: var(--pq-primary-bg);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.pq-page .pq-dns .pq-dns__apply:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.pq-page .pq-dns .pq-dns__title {
+  margin: 8px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--pq-fg);
+}

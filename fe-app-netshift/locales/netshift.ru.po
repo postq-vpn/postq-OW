@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-26 08:53+0300\n"
-"PO-Revision-Date: 2026-10-26 08:53+0300\n"
+"POT-Creation-Date: 2026-10-26 10:32+0300\n"
+"PO-Revision-Date: 2026-10-26 10:32+0300\n"
 "Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -134,6 +134,9 @@ msgstr "Доступна другая сборка"
 msgid "Applicable for SOCKS and Shadowsocks proxy"
 msgstr "Применимо для SOCKS и Shadowsocks прокси"
 
+msgid "Apply"
+msgstr "Применить"
+
 msgid "Ask for a user name and a password. Without a login anyone in your network can use this proxy. If the login is not complete the proxy is not created at all."
 msgstr "Запрашивать имя пользователя и пароль. Без логина этим прокси может пользоваться любой в вашей сети. Если логин задан не полностью, прокси не создаётся вовсе."
 
@@ -180,6 +183,9 @@ msgid "Blocked by a rule"
 msgstr "Заблокировано правилом"
 
 msgid "Bootsrap DNS"
+msgstr "Bootstrap DNS"
+
+msgid "Bootstrap DNS"
 msgstr "Bootstrap DNS"
 
 msgid "Bootstrap DNS server"
@@ -241,6 +247,9 @@ msgstr "Проверять после загрузки"
 
 msgid "Check on schedule"
 msgstr "Проверять по расписанию"
+
+msgid "Check servers"
+msgstr "Проверить серверы"
 
 msgid "Check the filters"
 msgstr "Проверить фильтры"
@@ -323,6 +332,9 @@ msgstr "Снимки настроек"
 msgid "Configuration Type"
 msgstr "Тип конфигурации"
 
+msgid "Configure DNS"
+msgstr "Настроить DNS"
+
 msgid "Connect"
 msgstr "Подключить"
 
@@ -388,6 +400,9 @@ msgstr "Плитки дашборда, доступ к веб-панели YACD 
 
 msgid "day|days|days"
 msgstr "день|дня|дней"
+
+msgid "default"
+msgstr "по умолчанию"
 
 msgid "Default (by the lists)"
 msgstr "По умолчанию (по спискам)"
@@ -779,6 +794,9 @@ msgstr "Заполняет пять полей ниже так, как их от
 msgid "Filter preview"
 msgstr "Предпросмотр фильтров"
 
+msgid "Finds the address of a DNS server given by name (AdGuard, Yandex DoT). It must answer too."
+msgstr "Через него роутер узнаёт адрес DNS-сервера, заданного именем (AdGuard, Яндекс DoT). Он тоже должен отвечать."
+
 msgid "First server only"
 msgstr "Только первый сервер"
 
@@ -853,6 +871,9 @@ msgstr "Сколько серверов одной ленты используе
 
 msgid "How often to automatically update the subscription"
 msgstr "Как часто автоматически обновлять подписку"
+
+msgid "How the router finds the addresses of sites. If sites do not open, check the servers and pick one that answers."
+msgstr "Через этот сервер роутер узнаёт адреса сайтов. Если сайты не открываются, проверьте серверы и выберите тот, что отвечает."
 
 msgid "How the servers of the list are used together when there are several. Needs sing-box 1.14 or newer; on an older core only the first server is used."
 msgstr "Как серверы списка используются вместе, если их несколько. Нужен sing-box 1.14 или новее; на старом ядре используется только первый сервер."
@@ -1361,6 +1382,9 @@ msgstr "Уведомлять о новых версиях"
 msgid "now"
 msgstr "сейчас"
 
+msgid "Now"
+msgstr "Сейчас"
+
 msgid "Number of leading characters of each proxy name to group by."
 msgstr "Количество начальных символов имени каждого прокси для группировки."
 
@@ -1423,6 +1447,15 @@ msgstr "Устаревшая"
 
 msgid "Output Network Interface"
 msgstr "Выходной сетевой интерфейс"
+
+msgid "Own bootstrap DNS"
+msgstr "Свой bootstrap DNS"
+
+msgid "Own DNS server"
+msgstr "Свой DNS-сервер"
+
+msgid "Own server"
+msgstr "Свой сервер"
 
 msgid "Parallel: the first usable answer wins"
 msgstr "Параллельно: побеждает первый пригодный ответ"
@@ -1949,6 +1982,9 @@ msgstr "Адрес опубликованного списка подписок:
 msgid "The app the subscription is fetched as, e.g. Happ/4.7.1/Android/<number> or INCY/3.7.9/android Dalvik/2.1.0 (the generator above fills it in). Only this User-Agent is used then. Empty tries well-known clients."
 msgstr "Каким приложением представляться при загрузке подписки, например Happ/4.7.1/Android/<число> или INCY/3.7.9/android Dalvik/2.1.0 (его заполняет генератор выше). Тогда используется только этот User-Agent. Пусто — перебираются известные клиенты."
 
+msgid "The bootstrap DNS is an IP address, for example 77.88.8.8"
+msgstr "Bootstrap DNS — это IP-адрес, например 77.88.8.8"
+
 msgid "The check could not be completed"
 msgstr "Проверку выполнить не удалось"
 
@@ -2026,6 +2062,9 @@ msgstr "Серверы выше опрашиваются через исходя
 
 msgid "The servers appear here a few seconds after connecting."
 msgstr "Серверы появятся здесь через несколько секунд после подключения."
+
+msgid "The servers could not be checked"
+msgstr "Не удалось проверить серверы"
 
 msgid "The service will restart."
 msgstr "Служба перезапустится."
@@ -2360,11 +2399,17 @@ msgstr "Звонки по Wi-Fi напрямую"
 msgid "With several WAN interfaces choose the one whose address represents you. Automatic uses the first working one."
 msgstr "Если WAN-интерфейсов несколько, выберите тот, чей адрес вас представляет. Автоматически берётся первый рабочий."
 
+msgid "Write the server as scheme://address, for example doh://dns.example.com/dns-query"
+msgstr "Укажите сервер в виде схема://адрес, например doh://dns.example.com/dns-query"
+
 msgid "Xray JSON (Happ)"
 msgstr "Xray JSON (Happ)"
 
 msgid "YACD Secret Key"
 msgstr "Секретный ключ YACD"
+
+msgid "Yandex"
+msgstr "Яндекс"
 
 msgid "yandexru45/netshift (developer, stable releases)"
 msgstr "yandexru45/netshift (разработчик, стабильные релизы)"

@@ -1,43 +1,30 @@
 #!/bin/sh
-# PostQ profile: the routing and DNS are fixed, only the subscription is the user's.
-# Runs on every install and upgrade of the package (uci-defaults), so a config
-# edited by hand or carried over from plain NetShift is brought back to it.
-# The subscription URLs of the 'main' section are the only values kept.
+# PostQ profile: the routing and DNS PostQ ships with.
+#
+# The first install sets it whole: the sections of another setup are removed and
+# every value below is set (the subscription URLs found are kept). The device
+# gets settings.postq_profile '1'. Every later install or upgrade only adds what
+# is missing: a value of the profile the config does not have yet (a new option
+# of a later release); anything that is there, changed on the router or not
+# (the DNS server picked on the Diagnostics tab, an edit with uci), is kept.
 
 CONFIG=/etc/config/netshift
 [ -f "$CONFIG" ] || exit 0
 
-subs="$(uci -q get netshift.main.subscription_url)"
-
-# Sections other than the profile's own would route on their own and are not
-# shown in the simplified UI.
-for s in $(uci -q show netshift | sed -n "s/^netshift\.\([^.=]*\)=section$/\1/p"); do
-    case "$s" in
-    main | direct) ;;
-    *) uci -q delete "netshift.$s" ;;
-    esac
-done
-uci -q delete netshift.main
-uci -q delete netshift.direct
-
-uci -q batch <<'EOF'
+# The values of the profile, as uci batch lines (set / add_list only); the
+# comments among them are for the reader and are dropped here.
+profile() {
+    sed '/^#/d; /^$/d' <<'EOF'
 set netshift.settings=settings
 set netshift.settings.dns_type='doh'
 set netshift.settings.dns_server='1.1.1.1'
 set netshift.settings.bootstrap_dns_server='77.88.8.8'
-delete netshift.settings.dns_pool_server
-delete netshift.settings.dns_pool_mode
-delete netshift.settings.dns_forward
-delete netshift.settings.dns_server_route
-delete netshift.settings.dns_via_outbound
-delete netshift.settings.dns_outbound_section
 set netshift.settings.disable_quic='1'
 set netshift.settings.exclude_bittorrent='1'
 set netshift.settings.enable_ipv6='0'
 set netshift.settings.dashboard_widgets='0'
 set netshift.settings.update_notice='1'
 set netshift.settings.update_repo='upstream'
-
 set netshift.direct=section
 set netshift.direct.connection_type='exclusion'
 set netshift.direct.user_domain_list_type='dynamic'
@@ -78,7 +65,6 @@ add_list netshift.direct.user_subnets='192.69.96.0/22'
 add_list netshift.direct.user_subnets='205.196.6.0/24'
 add_list netshift.direct.user_subnets='208.64.200.0/22'
 add_list netshift.direct.user_subnets='208.78.164.0/22'
-
 set netshift.main=section
 set netshift.main.connection_type='proxy'
 set netshift.main.proxy_config_type='subscription'
@@ -128,13 +114,65 @@ add_list netshift.main.user_domains='instantmessaging-pa.googleapis.com'
 add_list netshift.main.user_domains='remotedesktop-pa.googleapis.com'
 add_list netshift.main.user_domains='remotedesktop.google.com'
 EOF
+}
 
-for url in $subs; do
-    uci add_list netshift.main.subscription_url="$url"
-done
+# The lines of the profile whose value the config does not have: a `set` of a
+# missing option or section, every `add_list` of a list option that is missing.
+missing_only() {
+    local line cmd rest key filled=" "
+
+    while IFS= read -r line; do
+        case "$line" in "" | "#"*) continue ;; esac
+        cmd="${line%% *}"
+        rest="${line#* }"
+        key="${rest%%=*}"
+        case "$cmd" in
+        set)
+            uci -q get "$key" > /dev/null || printf '%s\n' "$line"
+            ;;
+        add_list)
+            case "$filled" in
+            *" $key "*) printf '%s\n' "$line" ;;
+            *)
+                if ! uci -q get "$key" > /dev/null; then
+                    filled="$filled$key "
+                    printf '%s\n' "$line"
+                fi
+                ;;
+            esac
+            ;;
+        esac
+    done
+}
+
+if [ "$(uci -q get netshift.settings.postq_profile)" != "1" ]; then
+    subs="$(uci -q get netshift.main.subscription_url)"
+
+    # Sections other than the profile's own would route on their own and are
+    # not shown in the simplified UI.
+    for s in $(uci -q show netshift | sed -n "s/^netshift\.\([^.=]*\)=section$/\1/p"); do
+        case "$s" in
+        main | direct) ;;
+        *) uci -q delete "netshift.$s" ;;
+        esac
+    done
+    uci -q delete netshift.main
+    uci -q delete netshift.direct
+    for opt in dns_pool_server dns_pool_mode dns_forward dns_server_route dns_via_outbound dns_outbound_section; do
+        uci -q delete "netshift.settings.$opt"
+    done
+
+    profile | uci -q batch
+    for url in $subs; do
+        uci add_list netshift.main.subscription_url="$url"
+    done
+    uci set netshift.settings.postq_profile='1'
+else
+    profile | missing_only | uci -q batch
+fi
 
 # X-Ver-OS: the firmware version like the PostQ XKeen panel sends (OpenWrt
-# "24.10.8"), not the kernel. Refreshed by every install of the package.
+# "24.10.8"), not the kernel. Follows the firmware on every install.
 # shellcheck disable=SC1091
 release="$(. /etc/openwrt_release 2>/dev/null && printf '%s' "$DISTRIB_RELEASE")"
 [ -n "$release" ] && uci set netshift.main.subscription_os_version="$release"

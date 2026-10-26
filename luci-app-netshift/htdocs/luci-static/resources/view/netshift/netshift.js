@@ -11,6 +11,9 @@
 // Diagnostic content
 "require view.netshift.diagnostic as diagnostic";
 
+// PostQ: the DNS card in the diagnostics' right column
+"require view.netshift.dns as dns";
+
 // PostQ: service status, update and log
 "require view.netshift.control as control";
 
@@ -22,10 +25,12 @@ const TABS = [
   { tab: "diagnostic", title: () => _("Diagnostics") },
 ];
 
-// The diagnostics section is the second tab; every other section of the page
-// (service, subscription, servers) is the main one.
+// The diagnostics (with the DNS card) are the second tab; every other section of
+// the page (service, subscription and servers) is the main one.
+const DIAGNOSTIC_SECTIONS = ["cbi-netshift-diagnostic"];
+
 function sectionTab(section) {
-  return section.id === "cbi-netshift-diagnostic" ? "diagnostic" : "dashboard";
+  return DIAGNOSTIC_SECTIONS.includes(section.id) ? "diagnostic" : "dashboard";
 }
 
 function addTabs(node) {
@@ -72,7 +77,23 @@ function addTabs(node) {
   } else {
     node.prepend(menu);
   }
-  showTab(location.hash === "#diagnostic" ? "diagnostic" : "dashboard");
+  // the tab to open: the address, or the one an apply asked to come back to
+  let reopen = null;
+
+  try {
+    reopen = sessionStorage.getItem("pq-open-tab");
+    sessionStorage.removeItem("pq-open-tab");
+  } catch {
+    // no storage: the address decides
+  }
+  showTab(
+    location.hash === "#diagnostic" || reopen === "diagnostic"
+      ? "diagnostic"
+      : "dashboard",
+  );
+  window.addEventListener("hashchange", () => {
+    showTab(location.hash === "#diagnostic" ? "diagnostic" : "dashboard");
+  });
 }
 
 // PostQ simplified UI: the service card, the subscription and the servers on the
@@ -135,6 +156,7 @@ const EntryPoint = {
 
     return netshiftMap.render().then((node) => {
       addTabs(node);
+      dns.mountDnsCard(node);
       return node;
     });
   },

@@ -11148,9 +11148,13 @@ test_luci_cache_bust() {
         run d || echo "run-d:failed"
         echo "changes-with-content:$([ "$(tag_of d)" != "$tag" ] && echo yes || echo no)"
 
-        # The tag is the md5 of the stamped views concatenated in byte order.
+        # The tag is the md5 of the stamped views concatenated in byte order,
+        # then the page's own assets (resources/netshift/, PostQ) when there are any.
         fresh m
-        want_tag="netshift_$(cd "$W/m/$view_rel/netshift" && LC_ALL=C cat ./*.js | LC_ALL=C md5sum | cut -c1-8)"
+        want_tag="netshift_$( (
+            cd "$W/m/$view_rel/netshift" && LC_ALL=C cat ./*.js
+            if [ -d ../../netshift ]; then LC_ALL=C cat ../../netshift/*; fi
+        ) | LC_ALL=C md5sum | cut -c1-8)"
         run m || echo "run-m:failed"
         echo "tag-is-content-md5:$([ "$(tag_of m)" = "$want_tag" ] && echo yes || echo no)"
 

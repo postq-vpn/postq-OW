@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: NETSHIFT\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-26 11:42+0300\n"
-"PO-Revision-Date: 2026-10-26 11:42+0300\n"
+"POT-Creation-Date: 2026-10-26 13:26+0300\n"
+"PO-Revision-Date: 2026-10-26 13:26+0300\n"
 "Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -46,6 +46,9 @@ msgstr "Мёртвый сервер оставлен"
 
 msgid "A few minutes after the router has started."
 msgstr "Через несколько минут после запуска роутера."
+
+msgid "A new version is available"
+msgstr "Доступна новая версия"
 
 msgid "A newer version is available"
 msgstr "Доступна новая версия"
@@ -908,6 +911,9 @@ msgstr "Установить"
 msgid "Install %s"
 msgstr "Установить %s"
 
+msgid "Installed"
+msgstr "Установлена"
+
 msgid "Installed version is newer than release"
 msgstr "Установленная версия новее релиза"
 
@@ -1282,9 +1288,6 @@ msgstr "Клиент NaiveProxy удалён"
 
 msgid "NetShift"
 msgstr "NetShift"
-
-msgid "NetShift %s is the latest version"
-msgstr "NetShift %s — последняя версия"
 
 msgid "NetShift has been updated"
 msgstr "NetShift обновлён"
@@ -2033,6 +2036,9 @@ msgstr "Интервал между проверками связи. Чем он
 msgid "the latest version"
 msgstr "последняя версия"
 
+msgid "The latest version is installed"
+msgstr "Установлена последняя версия"
+
 msgid "The maximum difference in response times (ms) allowed when comparing servers"
 msgstr "Максимально допустимая разница во времени отклика (мс) при сравнении серверов"
 
@@ -2083,6 +2089,9 @@ msgstr "Служба перезапустится."
 
 msgid "The settings are kept every time the service starts successfully (the last ten). A snapshot brings them back after a change that broke the service."
 msgstr "Настройки сохраняются при каждом удачном запуске службы (последние десять). Снимок возвращает их после изменения, которое сломало службу."
+
+msgid "The sing-box core has been updated to %s"
+msgstr "Ядро sing-box обновлено до %s"
 
 msgid "The snapshot could not be restored"
 msgstr "Не удалось восстановить снимок"
@@ -2216,14 +2225,17 @@ msgstr "Обновить NetShift"
 msgid "Update NetShift automatically"
 msgstr "Обновлять NetShift"
 
+msgid "Update of PostQ VPN"
+msgstr "Обновление PostQ VPN"
+
+msgid "Update of the sing-box core"
+msgstr "Обновление ядра sing-box"
+
 msgid "Update sing-box automatically"
 msgstr "Обновлять sing-box"
 
 msgid "Update time"
 msgstr "Время обновления"
-
-msgid "Update to %s"
-msgstr "Обновить до %s"
 
 msgid "updated"
 msgstr "обновлён"

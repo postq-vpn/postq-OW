@@ -70,6 +70,13 @@
     ]
   },
   {
+    "call": "A new version is available",
+    "key": "A new version is available",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:306"
+    ]
+  },
+  {
     "call": "A newer version is available",
     "key": "A newer version is available",
     "places": [
@@ -569,8 +576,7 @@
       "src/netshift/tabs/manager/cards.ts:253",
       "src/netshift/tabs/manager/cards.ts:299",
       "src/netshift/tabs/manager/cards.ts:354",
-      "src/netshift/tabs/manager/cards.ts:417",
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:169"
+      "src/netshift/tabs/manager/cards.ts:417"
     ]
   },
   {
@@ -591,7 +597,7 @@
     "places": [
       "src/netshift/tabs/diagnostic/partials/renderRouteCheck.ts:34",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:56",
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:95",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:181",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/dns.js:379",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:858"
     ]
@@ -675,6 +681,7 @@
       "src/netshift/tabs/dashboard/initController.ts:793",
       "src/partials/modal/renderModal.ts:26",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/connections.js:93",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:213",
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/snapshots.js:74"
     ]
   },
@@ -852,7 +859,7 @@
     "call": "Could not check for updates: %s",
     "key": "Could not check for updates: %s",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:101"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:223"
     ]
   },
   {
@@ -1371,7 +1378,7 @@
     "call": "Download log",
     "key": "Download log",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:170"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:344"
     ]
   },
   {
@@ -2170,7 +2177,16 @@
       "src/netshift/tabs/manager/cards.ts:246",
       "src/netshift/tabs/manager/cards.ts:292",
       "src/netshift/tabs/manager/cards.ts:347",
-      "src/netshift/tabs/manager/cards.ts:410"
+      "src/netshift/tabs/manager/cards.ts:410",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:253",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:293"
+    ]
+  },
+  {
+    "call": "Installed",
+    "key": "Installed",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:299"
     ]
   },
   {
@@ -2804,14 +2820,16 @@
     "key": "Latest",
     "places": [
       "src/netshift/tabs/diagnostic/helpers/getNetshiftVersionRow.ts:48",
-      "src/netshift/tabs/manager/cards.ts:153"
+      "src/netshift/tabs/manager/cards.ts:153",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:300"
     ]
   },
   {
     "call": "Latest version is installed",
     "key": "Latest version is installed",
     "places": [
-      "src/netshift/tabs/manager/initController.ts:121"
+      "src/netshift/tabs/manager/initController.ts:121",
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:294"
     ]
   },
   {
@@ -3067,17 +3085,10 @@
     ]
   },
   {
-    "call": "NetShift %s is the latest version",
-    "key": "NetShift %s is the latest version",
-    "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:108"
-    ]
-  },
-  {
     "call": "NetShift has been updated",
     "key": "NetShift has been updated",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:140"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:271"
     ]
   },
   {
@@ -3603,7 +3614,7 @@
     "call": "Please wait...",
     "key": "Please wait...",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:88"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:87"
     ]
   },
   {
@@ -3645,7 +3656,7 @@
     "call": "Preparing...",
     "key": "Preparing...",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:145"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:320"
     ]
   },
   {
@@ -3853,7 +3864,7 @@
     "call": "Restart",
     "key": "Restart",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:64"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:63"
     ]
   },
   {
@@ -4498,7 +4509,7 @@
     "call": "Start",
     "key": "Start",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:58"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:57"
     ]
   },
   {
@@ -4526,7 +4537,7 @@
     "call": "Stop",
     "key": "Stop",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:61"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:60"
     ]
   },
   {
@@ -4875,6 +4886,13 @@
     ]
   },
   {
+    "call": "The latest version is installed",
+    "key": "The latest version is installed",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:307"
+    ]
+  },
+  {
     "call": "The maximum difference in response times (ms) allowed when comparing servers",
     "key": "The maximum difference in response times (ms) allowed when comparing servers",
     "places": [
@@ -4894,7 +4912,7 @@
     "places": [
       "src/netshift/tabs/diagnostic/partials/renderSupportReport.ts:56",
       "src/netshift/tabs/diagnostic/partials/renderSupportReport.ts:71",
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:152"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:327"
     ]
   },
   {
@@ -4994,6 +5012,13 @@
     "key": "The settings are kept every time the service starts successfully (the last ten). A snapshot brings them back after a change that broke the service.",
     "places": [
       "src/netshift/tabs/diagnostic/partials/renderSnapshots.ts:109"
+    ]
+  },
+  {
+    "call": "The sing-box core has been updated to %s",
+    "key": "The sing-box core has been updated to %s",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:282"
     ]
   },
   {
@@ -5300,7 +5325,7 @@
     "call": "Update failed: %s",
     "key": "Update failed: %s",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:135"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:260"
     ]
   },
   {
@@ -5332,6 +5357,20 @@
     ]
   },
   {
+    "call": "Update of PostQ VPN",
+    "key": "Update of PostQ VPN",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:187"
+    ]
+  },
+  {
+    "call": "Update of the sing-box core",
+    "key": "Update of the sing-box core",
+    "places": [
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:188"
+    ]
+  },
+  {
     "call": "Update sing-box automatically",
     "key": "Update sing-box automatically",
     "places": [
@@ -5343,13 +5382,6 @@
     "key": "Update time",
     "places": [
       "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js:617"
-    ]
-  },
-  {
-    "call": "Update to %s",
-    "key": "Update to %s",
-    "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:119"
     ]
   },
   {
@@ -5405,7 +5437,7 @@
     "call": "Updating, do not close the page...",
     "key": "Updating, do not close the page...",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:129"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:243"
     ]
   },
   {
@@ -5647,7 +5679,7 @@
     "call": "Version %s is available",
     "key": "Version %s is available",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:116"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:133"
     ]
   },
   {
@@ -5700,21 +5732,21 @@
     "call": "VPN is running",
     "key": "VPN is running",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:78"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:77"
     ]
   },
   {
     "call": "VPN is stopped",
     "key": "VPN is stopped",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:81"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:80"
     ]
   },
   {
     "call": "VPN is stopped: add a subscription below",
     "key": "VPN is stopped: add a subscription below",
     "places": [
-      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:80"
+      "../luci-app-netshift/htdocs/luci-static/resources/view/netshift/control.js:79"
     ]
   },
   {

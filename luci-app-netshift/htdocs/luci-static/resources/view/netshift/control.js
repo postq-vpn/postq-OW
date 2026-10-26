@@ -54,7 +54,6 @@ function downloadText(name, text) {
 function renderControl() {
   const statusDot = E("span", { class: "pq-control__dot" });
   const statusText = E("span", {}, _("Checking..."));
-  const updateLine = E("div", { class: "pq-control__update" });
   const startBtn = button(_("Start"), "cbi-button-save", (b) =>
     serviceAction(b, "start"),
   );
@@ -91,54 +90,235 @@ function renderControl() {
     });
   }
 
-  async function checkUpdate(btn) {
-    const result = await busy(btn, _("Checking..."), () =>
-      main.NetShiftShellMethods.netshiftCheckUpdate(),
+  // Updates like the PostQ XKeen panel: a button per component showing its
+  // version, framed when the daily background check (update_notice) found a
+  // newer one; it opens a dialog with the versions, the release notes and the
+  // install. The core's check and install follow the flavour in place: the same
+  // actions the component manager of the full UI uses.
+  const CORE_ACTIONS = {
+    extended_lite: ["check_update_lite", "install_extended_lite"],
+    extended: ["check_update", "install_extended"],
+    stock: ["check_update_stable", "install_stable"],
+  };
+  let coreVariant = "stock";
+
+  function versionButton(label, onClick) {
+    const num = E("span", { class: "pq-version__num" }, "…");
+    const btn = E(
+      "button",
+      {
+        type: "button",
+        class: "btn cbi-button pq-version",
+        click: (ev) => {
+          ev.preventDefault();
+          onClick();
+        },
+      },
+      [E("span", {}, label), num],
     );
 
-    if (!result.success) {
-      updateLine.replaceChildren(
-        _("Could not check for updates: %s").format(result.message || "?"),
-      );
-      return;
-    }
+    btn.num = num;
 
-    if (result.status !== "outdated") {
-      updateLine.replaceChildren(
-        _("NetShift %s is the latest version").format(
-          result.current_version || "",
-        ),
-      );
-      return;
-    }
-
-    updateLine.replaceChildren(
-      E("span", {}, _("Version %s is available").format(result.latest_version)),
-      " ",
-      button(
-        _("Update to %s").format(result.latest_version),
-        "cbi-button-action",
-        (b) => installUpdate(b),
-      ),
-    );
+    return btn;
   }
 
-  async function installUpdate(btn) {
-    const result = await busy(
-      btn,
-      _("Updating, do not close the page..."),
-      () => main.NetShiftShellMethods.netshiftSelfUpdate(),
+  const appBtn = versionButton("PostQ VPN", () => openUpdate("app"));
+  const coreBtn = versionButton("sing-box", () => openUpdate("core"));
+
+  function markOutdated(btn, check) {
+    const outdated = Boolean(check && check.status === "outdated");
+
+    btn.classList.toggle("pq-version--update", outdated);
+    btn.title = outdated
+      ? _("Version %s is available").format(check.latest_version)
+      : "";
+  }
+
+  async function loadVersions() {
+    const [info, notice] = await Promise.all([
+      main.NetShiftShellMethods.getSystemInfo().catch(() => null),
+      main.NetShiftShellMethods.getUpdateNotice().catch(() => null),
+    ]);
+    const data = info && info.success && info.data ? info.data : {};
+    const core = String(data.sing_box_version || "");
+
+    appBtn.num.textContent =
+      String(data.netshift_version || "").replace(/^v/, "") || "—";
+    coreBtn.num.textContent = core.split("-")[0] || "—";
+    coreBtn.setAttribute("aria-label", `sing-box ${core}`);
+    coreVariant = data.sing_box_variant || "stock";
+
+    const checks = main.parseUpdateNotice(
+      notice && notice.success ? notice.data : {},
     );
 
-    if (!result.success) {
-      updateLine.replaceChildren(
-        _("Update failed: %s").format(result.message || "?"),
-      );
-      return;
+    markOutdated(appBtn, checks.netshift);
+    markOutdated(coreBtn, checks.sing_box);
+  }
+
+  async function checkFor(kind) {
+    if (kind === "app") {
+      return main.NetShiftShellMethods.netshiftCheckUpdate();
     }
 
-    ui.addNotification(null, E("p", _("NetShift has been updated")), "info");
-    setTimeout(() => window.location.reload(), 1500);
+    const actions = CORE_ACTIONS[coreVariant] || CORE_ACTIONS.stock;
+
+    return main.NetShiftShellMethods.singBoxCheckUpdate(actions[0]);
+  }
+
+  async function install(kind) {
+    if (kind === "app") {
+      return main.NetShiftShellMethods.netshiftSelfUpdate();
+    }
+
+    const actions = CORE_ACTIONS[coreVariant] || CORE_ACTIONS.stock;
+
+    return main.NetShiftShellMethods.singBoxComponentAction(actions[1]);
+  }
+
+  function openUpdate(kind) {
+    const body = E("div", { class: "pq-upd" }, [
+      E("p", { class: "pq-upd__wait" }, _("Checking...")),
+    ]);
+    let installing = false;
+
+    ui.showModal(
+      kind === "app"
+        ? _("Update of PostQ VPN")
+        : _("Update of the sing-box core"),
+      [body],
+      "pq-modal",
+    );
+
+    function row(label, value) {
+      return E("div", { class: "pq-upd__row" }, [
+        E("span", { class: "pq-upd__label" }, label),
+        E("b", {}, value || "—"),
+      ]);
+    }
+
+    function closeBtn() {
+      return E(
+        "button",
+        {
+          type: "button",
+          class: "btn cbi-button",
+          click: (ev) => {
+            ev.preventDefault();
+            if (!installing) {
+              ui.hideModal();
+            }
+          },
+        },
+        _("Close"),
+      );
+    }
+
+    function show(result) {
+      if (!result || !result.success) {
+        body.replaceChildren(
+          E(
+            "p",
+            { class: "pq-upd__error" },
+            _("Could not check for updates: %s").format(
+              (result && result.message) || "?",
+            ),
+          ),
+          E("div", { class: "pq-dns__actions" }, [closeBtn()]),
+        );
+        return;
+      }
+
+      const outdated = result.status === "outdated";
+      const installBtn = E(
+        "button",
+        {
+          type: "button",
+          class: "btn cbi-button pq-upd__install",
+          disabled: outdated ? null : "",
+          click: async (ev) => {
+            ev.preventDefault();
+            installing = true;
+            installBtn.disabled = true;
+            installBtn.textContent = _("Updating, do not close the page...");
+
+            const done = await install(kind).catch((e) => ({
+              success: false,
+              message: String(e),
+            }));
+
+            installing = false;
+            if (!done || !done.success) {
+              installBtn.disabled = false;
+              installBtn.textContent = _("Install %s").format(
+                result.latest_version,
+              );
+              ui.addNotification(
+                null,
+                E(
+                  "p",
+                  _("Update failed: %s").format((done && done.message) || "?"),
+                ),
+                "warning",
+              );
+              return;
+            }
+
+            ui.hideModal();
+            if (kind === "app") {
+              ui.addNotification(
+                null,
+                E("p", _("NetShift has been updated")),
+                "info",
+              );
+              setTimeout(() => window.location.reload(), 1500);
+              return;
+            }
+
+            ui.addNotification(
+              null,
+              E(
+                "p",
+                _("The sing-box core has been updated to %s").format(
+                  done.version || result.latest_version,
+                ),
+              ),
+              "info",
+            );
+            loadVersions();
+            refreshStatus();
+          },
+        },
+        outdated
+          ? _("Install %s").format(result.latest_version)
+          : _("Latest version is installed"),
+      );
+
+      body.replaceChildren(
+        E("div", { class: "pq-upd__rows" }, [
+          row(_("Installed"), result.current_version),
+          row(_("Latest"), result.latest_version),
+        ]),
+        E(
+          "p",
+          { class: `pq-upd__status${outdated ? " pq-upd__status--new" : ""}` },
+          outdated
+            ? _("A new version is available")
+            : _("The latest version is installed"),
+        ),
+        result.notes ? E("div", { class: "pq-upd__notes" }, result.notes) : "",
+        // nothing to install on the latest version: just Close
+        E(
+          "div",
+          { class: "pq-dns__actions" },
+          outdated ? [closeBtn(), installBtn] : [closeBtn()],
+        ),
+      );
+    }
+
+    checkFor(kind)
+      .then(show)
+      .catch((e) => show({ success: false, message: String(e) }));
   }
 
   async function downloadLog(btn) {
@@ -166,13 +346,13 @@ function renderControl() {
       startBtn,
       stopBtn,
       restartBtn,
-      button(_("Check update"), "cbi-button-neutral", (b) => checkUpdate(b)),
       button(_("Download log"), "cbi-button-neutral", (b) => downloadLog(b)),
     ]),
-    updateLine,
+    E("div", { class: "pq-control__versions" }, [appBtn, coreBtn]),
   ]);
 
   refreshStatus();
+  loadVersions();
   const timer = setInterval(() => {
     if (!document.body.contains(node)) {
       clearInterval(timer);

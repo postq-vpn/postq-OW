@@ -239,7 +239,29 @@ body.pq-page {
 }
 
 .pq-page .pq-control__update {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   color: var(--pq-muted-fg);
+}
+
+.pq-page .pq-control__update-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* an update on offer is the action to notice: the brand button */
+.pq-page #cbi-netshift .pq-control__update-row .cbi-button-action {
+  border-color: transparent;
+  background: var(--pq-primary-bg);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.pq-page #cbi-netshift .pq-control__update-row .cbi-button-action:hover {
+  background: var(--pq-primary-hover);
 }
 
 .pq-page .pq-control__update:empty {
@@ -1009,4 +1031,118 @@ body.pq-page {
   max-height: 60vh;
   overflow-y: auto;
   margin-bottom: 12px;
+}
+
+/* ── Updates like the PostQ XKeen panel: version buttons and a dialog ── */
+
+/* the dashboard's own "a newer version" notice: the frame on the button says it */
+.pq-page #dashboard-update-notice {
+  display: none;
+}
+
+.pq-page .pq-control__versions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pq-page #cbi-netshift .pq-version {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.pq-page .pq-version__num {
+  color: var(--pq-muted-fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* a newer version: a pink frame and dot, like the version button of XKeen UI */
+.pq-page #cbi-netshift .pq-version--update {
+  border-color: var(--pq-primary);
+  box-shadow: 0 0 0 2px var(--pq-ring);
+}
+
+.pq-page #cbi-netshift .pq-version--update::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pq-primary);
+}
+
+.pq-page .pq-upd {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: min(480px, 80vw);
+}
+
+.pq-page .pq-upd__rows {
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  overflow: hidden;
+}
+
+.pq-page .pq-upd__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--pq-border);
+  background: var(--pq-card);
+  font-size: 13px;
+}
+
+.pq-page .pq-upd__row:last-child {
+  border-bottom: none;
+}
+
+.pq-page .pq-upd__row b {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 500;
+}
+
+.pq-page .pq-upd__label,
+.pq-page .pq-upd__wait,
+.pq-page .pq-upd__status {
+  margin: 0;
+  color: var(--pq-muted-fg);
+  font-size: 13px;
+}
+
+.pq-page .pq-upd__status--new {
+  color: var(--pq-primary);
+  font-weight: 600;
+}
+
+.pq-page .pq-upd__error {
+  margin: 0;
+  color: var(--pq-red);
+}
+
+.pq-page .pq-upd__notes {
+  max-height: 40vh;
+  overflow-y: auto;
+  padding: 10px 14px;
+  border: 1px solid var(--pq-border);
+  border-radius: var(--pq-radius-sm);
+  background: var(--pq-muted);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.pq-page .pq-modal .pq-upd__install:not(:disabled) {
+  border-color: transparent;
+  background: var(--pq-primary-bg);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.pq-page .pq-modal .pq-upd__install:disabled {
+  opacity: 0.6;
+  cursor: default;
 }

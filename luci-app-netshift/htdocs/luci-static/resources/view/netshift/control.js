@@ -51,6 +51,95 @@ function downloadText(name, text) {
   setTimeout(() => URL.revokeObjectURL(link.href), 1000);
 }
 
+// The inline marks of the release notes: **bold**, `code` and [text](https://…)
+// links. Built as nodes, never as HTML, so the notes cannot inject markup.
+function inlineMarkdown(text) {
+  const parts = [];
+  const re = /\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+  let last = 0;
+  let m;
+
+  while ((m = re.exec(text))) {
+    parts.push(text.slice(last, m.index));
+    if (m[1] !== undefined) {
+      parts.push(E("b", {}, m[1]));
+    } else if (m[2] !== undefined) {
+      parts.push(E("code", {}, m[2]));
+    } else {
+      parts.push(
+        E("a", { href: m[4], target: "_blank", rel: "noopener" }, m[3]),
+      );
+    }
+    last = re.lastIndex;
+  }
+  parts.push(text.slice(last));
+
+  return parts.filter((p) => p !== "");
+}
+
+// The release notes of GitHub are Markdown: headings, lists, paragraphs and
+// ``` code blocks are shown as such instead of the raw text.
+function renderNotes(markdown) {
+  const out = [];
+  const lines = String(markdown).replace(/\r/g, "").split("\n");
+  let list = null;
+  let para = [];
+  let code = null;
+
+  function flush() {
+    if (para.length) {
+      out.push(E("p", {}, inlineMarkdown(para.join(" "))));
+      para = [];
+    }
+    list = null;
+  }
+
+  for (const line of lines) {
+    if (code) {
+      if (/^\s*```/.test(line)) {
+        out.push(E("pre", {}, code.join("\n")));
+        code = null;
+      } else {
+        code.push(line);
+      }
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,6})\s+(.*)$/);
+    const item = line.match(/^\s*[-*]\s+(.*)$/);
+
+    if (/^\s*```/.test(line)) {
+      flush();
+      code = [];
+    } else if (heading) {
+      flush();
+      out.push(E("h4", {}, inlineMarkdown(heading[2])));
+    } else if (item) {
+      if (para.length) {
+        flush();
+      }
+      if (!list) {
+        list = E("ul", {});
+        out.push(list);
+      }
+      list.appendChild(E("li", {}, inlineMarkdown(item[1])));
+    } else if (!line.trim()) {
+      flush();
+    } else if (list && /^\s+/.test(line)) {
+      list.lastChild.append(" ", ...inlineMarkdown(line.trim()));
+    } else {
+      list = null;
+      para.push(line.trim());
+    }
+  }
+  if (code) {
+    out.push(E("pre", {}, code.join("\n")));
+  }
+  flush();
+
+  return out;
+}
+
 function renderControl() {
   const statusDot = E("span", { class: "pq-control__dot" });
   const statusText = E("span", {}, _("Checking..."));
@@ -90,10 +179,10 @@ function renderControl() {
     });
   }
 
-  // Updates like the PostQ XKeen panel: a button per component showing its
-  // version, framed when the daily background check (update_notice) found a
-  // newer one; it opens a dialog with the versions, the release notes and the
-  // install. The core's check and install follow the flavour in place: the same
+  // Updates like the PostQ XKeen panel: a button per component (its name only,
+  // the versions are in the dialog), framed when the daily background check
+  // (update_notice) found a newer one; it opens a dialog with the versions, the
+  // release notes and the install. The core's check and install follow the flavour in place: the same
   // actions the component manager of the full UI uses.
   const CORE_ACTIONS = {
     extended_lite: ["check_update_lite", "install_extended_lite"],
@@ -103,8 +192,7 @@ function renderControl() {
   let coreVariant = "stock";
 
   function versionButton(label, onClick) {
-    const num = E("span", { class: "pq-version__num" }, "…");
-    const btn = E(
+    return E(
       "button",
       {
         type: "button",
@@ -114,12 +202,8 @@ function renderControl() {
           onClick();
         },
       },
-      [E("span", {}, label), num],
+      label,
     );
-
-    btn.num = num;
-
-    return btn;
   }
 
   const appBtn = versionButton("PostQ VPN", () => openUpdate("app"));
@@ -140,12 +224,7 @@ function renderControl() {
       main.NetShiftShellMethods.getUpdateNotice().catch(() => null),
     ]);
     const data = info && info.success && info.data ? info.data : {};
-    const core = String(data.sing_box_version || "");
 
-    appBtn.num.textContent =
-      String(data.netshift_version || "").replace(/^v/, "") || "—";
-    coreBtn.num.textContent = core.split("-")[0] || "—";
-    coreBtn.setAttribute("aria-label", `sing-box ${core}`);
     coreVariant = data.sing_box_variant || "stock";
 
     const checks = main.parseUpdateNotice(
@@ -250,9 +329,7 @@ function renderControl() {
             installing = false;
             if (!done || !done.success) {
               installBtn.disabled = false;
-              installBtn.textContent = _("Install %s").format(
-                result.latest_version,
-              );
+              installBtn.textContent = _("Install");
               ui.addNotification(
                 null,
                 E(
@@ -290,7 +367,7 @@ function renderControl() {
           },
         },
         outdated
-          ? _("Install %s").format(result.latest_version)
+          ? _("Install")
           : _("Latest version is installed"),
       );
 
@@ -306,7 +383,7 @@ function renderControl() {
             ? _("A new version is available")
             : _("The latest version is installed"),
         ),
-        result.notes ? E("div", { class: "pq-upd__notes" }, result.notes) : "",
+        result.notes ? E("div", { class: "pq-upd__notes" }, renderNotes(result.notes)) : "",
         // nothing to install on the latest version: just Close
         E(
           "div",

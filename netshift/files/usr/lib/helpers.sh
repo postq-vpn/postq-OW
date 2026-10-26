@@ -2030,14 +2030,18 @@ xray_json_to_uri_lines() {
             ) as $conn
           | { conn: $conn, prio: $prio, name: $name, base: $name_base }
         ]
-        # Deduplicate on $conn in first-seen order (unique_by would reorder),
-        # keeping the name with the lowest $prio.
+        # Deduplicate on $conn, keeping the name with the lowest $prio; a node
+        # stands where the entry it got the name from stands, so a panel that
+        # sends its balancer ("Europe | Auto", members in its own order) before
+        # the plain profiles keeps the order of its profile list.
+        | to_entries | map(.value + { seq: .key })
         | reduce .[] as $e ({ idx: {}, out: [] };
             .idx[$e.conn] as $i
             | if $i == null then
                 .idx[$e.conn] = (.out | length) | .out += [$e]
               elif $e.prio < .out[$i].prio then .out[$i] = $e
               else . end)
+        | .out |= sort_by(.seq)
         # Keep names unique across configs: a repeat becomes "<base> · <k>"
         # with the lowest free k >= 2 (two "Auto" balancers -> Auto · 1..4).
         | reduce .out[] as $e ({ used: {}, next: {}, out: [] };

@@ -1055,11 +1055,6 @@ body.pq-page {
   font-size: 12px;
 }
 
-.pq-page .pq-version__num {
-  color: var(--pq-muted-fg);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-
 /* a newer version: a pink frame and dot, like the version button of XKeen UI */
 .pq-page #cbi-netshift .pq-version--update {
   border-color: var(--pq-primary);
@@ -1131,8 +1126,70 @@ body.pq-page {
   border: 1px solid var(--pq-border);
   border-radius: var(--pq-radius-sm);
   background: var(--pq-muted);
+  color: var(--pq-fg);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.pq-page .pq-upd__notes h4,
+.pq-page .pq-upd__notes li,
+.pq-page .pq-upd__notes b {
+  color: var(--pq-fg);
+}
+
+.pq-page .pq-upd__notes > :first-child {
+  margin-top: 0;
+}
+
+.pq-page .pq-upd__notes > :last-child {
+  margin-bottom: 0;
+}
+
+.pq-page .pq-upd__notes h4 {
+  margin: 14px 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pq-page .pq-upd__notes p {
+  margin: 0 0 8px;
+}
+
+.pq-page .pq-upd__notes ul {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.pq-page .pq-upd__notes li {
+  margin: 0 0 4px;
+}
+
+.pq-page .pq-upd__notes code,
+.pq-page .pq-upd__notes pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 12px;
+}
+
+.pq-page .pq-upd__notes code {
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--pq-card);
+  overflow-wrap: anywhere;
+}
+
+.pq-page .pq-upd__notes pre {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--pq-border);
+  border-radius: 6px;
+  background: var(--pq-card);
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.pq-page .pq-upd__notes a {
+  color: var(--pq-primary);
 }
 
 .pq-page .pq-modal .pq-upd__install:not(:disabled) {

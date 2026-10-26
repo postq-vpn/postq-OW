@@ -5022,7 +5022,8 @@ rm -f "$caseH_in" "$caseH_out"
 # ── CASE H2: Xray JSON (Happ) names from remarks ────────────────────
 # Generic "proxy"/"proxy-N" tags give way to remarks; any other tag (fi-1,
 # nl-1, proxy-eu) is kept. Node A is listed in the balancer first but keeps
-# its own profile name. Special characters in remarks must round-trip through
+# its own profile name and the place of that profile (after the balancer's
+# ru node, which has no profile of its own). Special characters in remarks must round-trip through
 # the URI fragment; missing or blank remarks fall back to the tag.
 caseH2_in="/tmp/netshift-fb-caseH2-$$.json"
 caseH2_out="/tmp/netshift-fb-caseH2-out-$$.json"
@@ -5087,7 +5088,7 @@ else
     echo 'fb-caseH2-rc:FAIL'
 fi
 h2_tags="$(jq -c '[.outbounds[].tag]' "$caseH2_out" 2>/dev/null)"
-if [ "$h2_tags" = '["Node A","Balancer · 2","Node B","fi-1","se-1","A+B #1 %20 🇩🇪","nl-1","proxy-eu","proxy-7","proxy"]' ]; then
+if [ "$h2_tags" = '["Balancer · 2","Node A","Node B","fi-1","se-1","A+B #1 %20 🇩🇪","nl-1","proxy-eu","proxy-7","proxy"]' ]; then
     echo 'fb-caseH2-remarks-names:OK'
 else
     echo "fb-caseH2-remarks-names(got $h2_tags):FAIL"
@@ -5126,6 +5127,33 @@ else
     echo "fb-caseH3-names(got $h3_tags):FAIL"
 fi
 rm -f "$caseH3_in" "$caseH3_out"
+
+# ── CASE H4: Xray JSON order of the profiles ────────────────────────
+# A panel sends its balancer ("Europe | Auto") first, with the members in an
+# order of its own; the nodes must keep the order of the plain profiles that
+# name them (as the panel lists them), not the order of the balancer.
+caseH4_in="/tmp/netshift-fb-caseH4-$$.json"
+caseH4_out="/tmp/netshift-fb-caseH4-out-$$.json"
+cat > "$caseH4_in" << 'XRAYJSON'
+[
+  {"remarks": "Auto", "routing": {"balancers": [{"tag": "b", "selector": ["proxy"]}]}, "outbounds": [{"protocol": "trojan", "tag": "proxy-1", "settings": {"servers": [{"address": "two.example.com", "port": 443, "password": "testpass"}]}, "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "two.example.com"}}}, {"protocol": "trojan", "tag": "proxy-2", "settings": {"servers": [{"address": "one.example.com", "port": 443, "password": "testpass"}]}, "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "one.example.com"}}}]},
+  {"remarks": "One", "outbounds": [{"protocol": "trojan", "tag": "proxy", "settings": {"servers": [{"address": "one.example.com", "port": 443, "password": "testpass"}]}, "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "one.example.com"}}}]},
+  {"remarks": "Two", "outbounds": [{"protocol": "trojan", "tag": "proxy", "settings": {"servers": [{"address": "two.example.com", "port": 443, "password": "testpass"}]}, "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "two.example.com"}}}]}
+]
+XRAYJSON
+
+if normalize_subscription_to_singbox "$caseH4_in" "$caseH4_out" "testsub"; then
+    echo 'fb-caseH4-rc:OK'
+else
+    echo 'fb-caseH4-rc:FAIL'
+fi
+h4_tags="$(jq -c '[.outbounds[].tag]' "$caseH4_out" 2>/dev/null)"
+if [ "$h4_tags" = '["One","Two"]' ]; then
+    echo 'fb-caseH4-profile-order:OK'
+else
+    echo "fb-caseH4-profile-order(got $h4_tags):FAIL"
+fi
+rm -f "$caseH4_in" "$caseH4_out"
 
 # ── CASE I: subscription User-Agent candidate building ──────────────
 # Auto mode (no configured UA) must emit, in order and without duplicates:

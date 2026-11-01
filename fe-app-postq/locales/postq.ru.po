@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: POSTQ\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-01 23:29+0300\n"
-"PO-Revision-Date: 2026-11-01 23:29+0300\n"
+"POT-Creation-Date: 2026-11-01 23:45+0300\n"
+"PO-Revision-Date: 2026-11-01 23:45+0300\n"
 "Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -56,8 +56,14 @@ msgstr "Доступна новая версия"
 msgid "A path is only allowed for doh and doh3"
 msgstr "Путь допустим только для doh и doh3"
 
+msgid "A Reality server may need a newer client than the stock sing-box core: run the PostQ VPN install command again, it installs sing-box extended lite"
+msgstr "Серверу Reality может требоваться более новый клиент, чем шлёт обычное ядро sing-box: выполните команду установки PostQ VPN ещё раз, она поставит sing-box extended lite"
+
 msgid "A section cannot be chained through itself"
 msgstr "Секция не может быть подключена через саму себя"
+
+msgid "A server answered with the certificate of another site"
+msgstr "Сервер ответил сертификатом другого сайта"
 
 msgid "Active"
 msgstr "Активный"
@@ -259,6 +265,9 @@ msgstr "Проверить серверы"
 
 msgid "Check the filters"
 msgstr "Проверить фильтры"
+
+msgid "Check the public key, short id and SNI of the server"
+msgstr "Проверьте открытый ключ, short id и SNI сервера"
 
 msgid "Check update"
 msgstr "Проверить обновление"

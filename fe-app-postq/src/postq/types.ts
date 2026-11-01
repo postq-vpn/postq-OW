@@ -284,6 +284,8 @@ export namespace PostQ {
       timezone: string;
     };
     ipv6: { router_has_global: boolean; postq_enabled: boolean };
+    // absent from a backend older than this field
+    reality?: { rejected: number; stock_core: boolean };
   }
 
   export interface RouteCheckResult {

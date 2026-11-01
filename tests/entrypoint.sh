@@ -5021,7 +5021,7 @@ rm -f "$caseH_in" "$caseH_out"
 
 # ── CASE H2: Xray JSON (Happ) names from remarks ────────────────────
 # Generic "proxy"/"proxy-N" tags give way to remarks; any other tag (fi-1,
-# nl-1, proxy-eu) is kept. Node A is listed in the balancer first but keeps
+# nl-1, proxy-eu) is kept next to them ("Auto · fi-1"). Node A is listed in the balancer first but keeps
 # its own profile name and the place of that profile (after the balancer's
 # ru node, which has no profile of its own). Special characters in remarks must round-trip through
 # the URI fragment; missing or blank remarks fall back to the tag.
@@ -5078,6 +5078,12 @@ cat > "$caseH2_in" << 'XRAYJSON'
   {"remarks": "   ", "outbounds": [
     {"protocol": "trojan", "tag": "proxy", "settings": {"servers": [{"address": "cz.example.com", "port": 443, "password": "testpass"}]},
       "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "cz.example.com"}}}
+  ]},
+  {"remarks": "🇵🇱Польша", "outbounds": [
+    {"protocol": "trojan", "tag": "PL1", "settings": {"servers": [{"address": "pl1.example.com", "port": 443, "password": "testpass"}]},
+      "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "pl1.example.com"}}},
+    {"protocol": "trojan", "tag": "PL2", "settings": {"servers": [{"address": "pl2.example.com", "port": 443, "password": "testpass"}]},
+      "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "pl2.example.com"}}}
   ]}
 ]
 XRAYJSON
@@ -5088,7 +5094,7 @@ else
     echo 'fb-caseH2-rc:FAIL'
 fi
 h2_tags="$(jq -c '[.outbounds[].tag]' "$caseH2_out" 2>/dev/null)"
-if [ "$h2_tags" = '["Balancer · 2","Node A","Node B","fi-1","se-1","A+B #1 %20 🇩🇪","nl-1","proxy-eu","proxy-7","proxy"]' ]; then
+if [ "$h2_tags" = '["Balancer · 2","Node A","Node B","Auto · fi-1","Auto · se-1","A+B #1 %20 🇩🇪","Solo · nl-1","Solo EU · proxy-eu","proxy-7","proxy","🇵🇱Польша · PL1","🇵🇱Польша · PL2"]' ]; then
     echo 'fb-caseH2-remarks-names:OK'
 else
     echo "fb-caseH2-remarks-names(got $h2_tags):FAIL"
@@ -16476,6 +16482,9 @@ test_environment_check() {
             if [ "$1" = "+%s" ]; then printf '%s\n' "${ENV_NOW:-1790000000}"; else command date "$@"; fi
         }
         config_get_bool() { eval "$1=\"$ENV_IPV6_ENABLED\""; }
+        ENV_LOG="" ENV_SB_VERSION="1.14.3"
+        logread() { [ -n "$ENV_LOG" ] && printf '%s\n' "$ENV_LOG"; true; }
+        get_sing_box_version() { printf '%s' "$ENV_SB_VERSION"; }
 
         echo "epoch[$(http_date_to_epoch 'Sun, 04 Oct 2026 09:13:05 GMT')]"
         echo "epoch-bad[$(http_date_to_epoch 'garbage')]"
@@ -16501,6 +16510,13 @@ test_environment_check() {
         echo "ipv6-ula-ignored=$(j '.ipv6.router_has_global')"
         ENV_IPV6="2001:db8::5"; ENV_IPV6_ENABLED=1
         echo "ipv6-enabled=$(j '.ipv6.postq_enabled')"
+        echo "reality-none=$(j '[.reality.rejected, .reality.stock_core]')"
+        ENV_LOG='daemon.err sing-box[1]: ERROR connection: open connection to a:443 using outbound/vless[n-1]: x509: certificate is valid for *.ozon.ru, not x5club.ru
+daemon.err sing-box[1]: ERROR connection: open connection to b:443 using outbound/vless[n-2]: x509: certificate is valid for *.ozon.ru, not x5club.ru
+daemon.err sing-box[1]: ERROR connection: open connection to c:443 using outbound/trojan[t-1]: x509: certificate is valid for other.example, not t.example'
+        echo "reality-rejected=$(j '[.reality.rejected, .reality.stock_core]')"
+        ENV_SB_VERSION="1.14.3-extended-2.7.3"
+        echo "reality-extended=$(j '[.reality.rejected, .reality.stock_core]')"
     )"
 
     _ev() { expect_line "$out" "$1" "$2"; }
@@ -16518,6 +16534,9 @@ test_environment_check() {
     _ev "a global IPv6 address with IPv6 off is reported" "ipv6-global=[true,false]"
     _ev "a ULA address does not count as global" "ipv6-ula-ignored=false"
     _ev "IPv6 on is reported" "ipv6-enabled=true"
+    _ev "no refused Reality handshakes without log lines" "reality-none=[0,true]"
+    _ev "vless x509 mismatches are counted, other protocols are not" "reality-rejected=[2,true]"
+    _ev "the extended core is not reported as stock" "reality-extended=[2,false]"
 }
 
 test_mixed_proxy_auth() {

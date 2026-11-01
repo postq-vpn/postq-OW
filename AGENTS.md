@@ -1,6 +1,12 @@
-# NetShift — project context for AI agents
+# PostQ VPN — project context for AI agents
 
 Read this before working in this repository.
+
+PostQ VPN is derived from NetShift (`yandexru45/netshift`). Everything of ours is named
+`postq`: packages, paths, commands, the UCI config, the nft table. Modified versions may
+not use the NetShift name (`TRADEMARK.md`), so it appears only as a factual statement of
+origin (README, migration from NetShift in `install.sh`). Text below that says NetShift
+about the project describes the upstream it comes from.
 
 ## What NetShift is
 
@@ -12,15 +18,15 @@ everything else directly, and ships a LuCI web UI. It is a fork of
 License: GPL-2.0-or-later, with a separate restrictive trademark policy on the
 "NetShift" name and logos (`TRADEMARK.md`).
 
-Upstream is rebranded in this fork (`podkop` → `netshift`), so upstream patches
+Upstream is rebranded in this fork (`podkop` → `postq`), so upstream patches
 are ported manually — never merge or cherry-pick blindly.
 
 ## Architecture
 
-`luci-app-netshift` (LuCI UI: hand-written `.js` views + the generated
-`main.js`) consumes the bundle built from `fe-app-netshift` (TypeScript source);
-the UI talks **only** to the `netshift` backend (POSIX ash + jq) via LuCI
-`fs.exec` of `/usr/bin/netshift` and `/etc/init.d/netshift` (ACL-gated); the
+`luci-app-postq` (LuCI UI: hand-written `.js` views + the generated
+`main.js`) consumes the bundle built from `fe-app-postq` (TypeScript source);
+the UI talks **only** to the `postq` backend (POSIX ash + jq) via LuCI
+`fs.exec` of `/usr/bin/postq` and `/etc/init.d/postq` (ACL-gated); the
 backend drives **sing-box**, **nftables** (tproxy), and **dnsmasq**. No layer
 skips another.
 
@@ -28,19 +34,19 @@ skips another.
 
 TProxy inbound `127.0.0.1:1602` · DNS inbound `127.0.0.42:53` · Clash API
 `:9090` · FakeIP `198.18.0.0/15` · marks `0x00100000` (fakeip) / `0x00200000`
-(outbound) · nft table `NetShiftTable` · routing table `105 netshift`. All of
-them are defined in `netshift/files/usr/lib/constants.sh` — reference the
+(outbound) · nft table `PostQTable` · routing table `105 postq`. All of
+them are defined in `postq/files/usr/lib/constants.sh` — reference the
 constants, never hardcode.
 
 ## Layout
 
-- `netshift/` — the OpenWRT package: backend (`files/usr/bin/netshift`,
+- `postq/` — the OpenWRT package: backend (`files/usr/bin/postq`,
   `files/usr/lib/*.sh`), init script, UCI defaults, `Makefile` (version).
-- `luci-app-netshift/` — LuCI app: views, ACL, i18n, and the generated
-  `htdocs/luci-static/resources/view/netshift/main.js`. In the source tree the
-  views live in `view/netshift/`; the package build (`cache-bust.sh`) installs
-  them as `view/netshift_<hash>/` so browsers cannot serve a previous version.
-- `fe-app-netshift/` — TypeScript source of the UI bundle.
+- `luci-app-postq/` — LuCI app: views, ACL, i18n, and the generated
+  `htdocs/luci-static/resources/view/postq/main.js`. In the source tree the
+  views live in `view/postq/`; the package build (`cache-bust.sh`) installs
+  them as `view/postq_<hash>/` so browsers cannot serve a previous version.
+- `fe-app-postq/` — TypeScript source of the UI bundle.
 - `tests/` — OpenWRT rootfs smoke suite (Docker).
 - `install.sh` — one-line installer used by the README.
 - `.github/workflows/` — CI: shellcheck, smoke tests, frontend CI, package
@@ -48,13 +54,13 @@ constants, never hardcode.
 
 ## Quality gates (a change is not "done" until the relevant gate passes)
 
-- **Backend** (`netshift/files/**`) and the build script
-  `luci-app-netshift/cache-bust.sh`: ShellCheck at severity error
-  (`shellcheck -S error -s sh install.sh netshift/files/usr/bin/netshift
-  netshift/files/usr/lib/*.sh luci-app-netshift/cache-bust.sh`); smoke suite —
-  `docker compose -f tests/docker-compose.yml run --rm netshift-test all`
+- **Backend** (`postq/files/**`) and the build script
+  `luci-app-postq/cache-bust.sh`: ShellCheck at severity error
+  (`shellcheck -S error -s sh install.sh postq/files/usr/bin/postq
+  postq/files/usr/lib/*.sh luci-app-postq/cache-bust.sh`); smoke suite —
+  `docker compose -f tests/docker-compose.yml run --rm postq-test all`
   (OpenWRT rootfs container; a run passes only with zero FAILs).
-- **Frontend** (`fe-app-netshift/**`): `yarn ci`, and the committed `main.js`
+- **Frontend** (`fe-app-postq/**`): `yarn ci`, and the committed `main.js`
   must be regenerated (the build leaves no git diff).
 - **Packaging/CI**: smoke tests at minimum; verify both ipk and apk paths.
 
@@ -79,21 +85,21 @@ constants, never hardcode.
 
 ## Releases
 
-`PKG_VERSION` lives in `netshift/Makefile`. Pushing a tag (e.g. `0.9.7`)
+`PKG_VERSION` lives in `postq/Makefile`. Pushing a tag (e.g. `0.9.7`)
 triggers `.github/workflows/build.yml`: it runs the smoke suite, builds the ipk
 and apk packages and attaches them to the GitHub release. Release notes are
 written manually.
 
 The release itself, in order:
 
-1. Bump the `PKG_VERSION` fallback in `netshift/Makefile` to the new version and
-   commit it. CI passes the tag as `NETSHIFT_VERSION`, so the fallback only
+1. Bump the `PKG_VERSION` fallback in `postq/Makefile` to the new version and
+   commit it. CI passes the tag as `POSTQ_VERSION`, so the fallback only
    affects local builds — bump both so they agree.
 2. `git tag <version> && git push origin <version>`. `build.yml` then runs the
    smoke suite, builds ipk and apk, and creates the release with six assets:
-   `netshift-*`, `luci-app-netshift-*` and `luci-i18n-netshift-ru-*` in both
+   `postq-*`, `luci-app-postq-*` and `luci-i18n-postq-ru-*` in both
    formats. The i18n package carries a date-based version of its own
-   (`luci-i18n-netshift-ru-0.261004.56489`), which the release step renames to
+   (`luci-i18n-postq-ru-0.261004.56489`), which the release step renames to
    the tag — so a filename there is not a version mismatch.
 3. **CI does not set the release body** (`softprops/action-gh-release` is called
    without `body`/`body_path`). After the release appears, set the notes with
@@ -102,13 +108,13 @@ The release itself, in order:
    (from `git log <prev-tag>..<tag> --format='%an'` / the merged PRs) - keep the
    list in the README section «Участники» in sync.
 4. Verify the assets: `gh release view <version> --json assets` — six files, and
-   the `NETSHIFT_VERSION` inside the built `constants.sh` must equal the tag.
+   the `POSTQ_VERSION` inside the built `constants.sh` must equal the tag.
 
-When building locally without `--build-arg NETSHIFT_VERSION=...` to check the
+When building locally without `--build-arg POSTQ_VERSION=...` to check the
 fallback, beware: an SDK base image can carry an inherited `ENV
-NETSHIFT_VERSION`, which `ENV NETSHIFT_VERSION=${NETSHIFT_VERSION}` does not
+POSTQ_VERSION`, which `ENV POSTQ_VERSION=${POSTQ_VERSION}` does not
 clear, and `make` skips an already-built package. Force a real rebuild (remove
-`build_dir/target-*/netshift-*`, the `stamp/.netshift_installed` stamp and the
+`build_dir/target-*/postq-*`, the `stamp/.postq_installed` stamp and the
 old ipk) before trusting the result.
 
 Frontend gates (`frontend-ci.yml`, including the translation check) run on pull

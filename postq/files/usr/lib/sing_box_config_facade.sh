@@ -1,0 +1,1478 @@
+# shellcheck shell=ash
+POSTQ_LIB="/usr/lib/postq"
+. "$POSTQ_LIB/helpers.sh"
+. "$POSTQ_LIB/sing_box_config_manager.sh"
+
+# The link's own `support-x25519mlkem768` hint: "true", "false" or "" (absent or
+# unparsable). Accepts true/1 and false/0, like mihomo's share-link parser.
+_reality_mlkem_link_hint() {
+    case "$(url_get_query_param "$1" "support-x25519mlkem768")" in
+    true | 1) echo "true" ;;
+    false | 0) echo "false" ;;
+    *) echo "" ;;
+    esac
+}
+
+# Whether `support_x25519mlkem768` may be written at all: only sing-box-extended
+# SB_EXTENDED_REALITY_MLKEM_MIN+ knows the field (any other core fails
+# `sing-box check` on it). The subscription normalizer sets
+# POSTQ_REALITY_MLKEM_HINT_UNGATED: its output is a cache that must not depend
+# on the installed core, and sing_box_cf_prepare_subscription_batch gates it.
+_reality_mlkem_core_ok() {
+    [ "${POSTQ_REALITY_MLKEM_HINT_UNGATED:-0}" = "1" ] && return 0
+    is_sing_box_extended_at_least "$SB_EXTENDED_REALITY_MLKEM_MIN"
+}
+
+sing_box_cf_add_dns_server() {
+    local config="$1"
+    local type="$2"
+    local tag="$3"
+    local server="$4"
+    local domain_resolver="$5"
+    local detour="$6"
+
+    local server_address server_port
+    server_address=$(url_get_host "$server")
+    server_port=$(url_get_port "$server")
+
+    case "$type" in
+    udp)
+        [ -z "$server_port" ] && server_port=53
+        config=$(sing_box_cm_add_udp_dns_server "$config" "$tag" "$server_address" "$server_port" "$domain_resolver" \
+            "$detour")
+        ;;
+    dot)
+        [ -z "$server_port" ] && server_port=853
+        config=$(sing_box_cm_add_tls_dns_server "$config" "$tag" "$server_address" "$server_port" "$domain_resolver" \
+            "$detour")
+        ;;
+    doh)
+        [ -z "$server_port" ] && server_port=443
+        local path headers
+        path=$(url_get_path "$server")
+        headers="" # TODO(ampetelin): implement it if necessary
+        config=$(sing_box_cm_add_https_dns_server "$config" "$tag" "$server_address" "$server_port" "$path" "$headers" \
+            "$domain_resolver" "$detour")
+        ;;
+    tcp)
+        [ -z "$server_port" ] && server_port=53
+        config=$(sing_box_cm_add_other_dns_server "$config" "tcp" "$tag" "$server_address" "$server_port" "" \
+            "$domain_resolver" "$detour")
+        ;;
+    doh3)
+        [ -z "$server_port" ] && server_port=443
+        if ! core_has_tag with_quic; then
+            # the core has no QUIC: DoH over HTTP/2 goes to the same address
+            log "DNS server '$tag': this sing-box core is built without QUIC, so DoH3 is not available; using DoH instead." "warn"
+            config=$(sing_box_cm_add_https_dns_server "$config" "$tag" "$server_address" "$server_port" \
+                "$(url_get_path "$server")" "" "$domain_resolver" "$detour")
+            echo "$config"
+            return 0
+        fi
+        config=$(sing_box_cm_add_other_dns_server "$config" "h3" "$tag" "$server_address" "$server_port" \
+            "$(url_get_path "$server")" "$domain_resolver" "$detour")
+        ;;
+    doq)
+        [ -z "$server_port" ] && server_port=853
+        if ! core_has_tag with_quic; then
+            # the core has no QUIC: DNS over TLS uses the same port
+            log "DNS server '$tag': this sing-box core is built without QUIC, so DoQ is not available; using DoT instead." "warn"
+            config=$(sing_box_cm_add_tls_dns_server "$config" "$tag" "$server_address" "$server_port" "$domain_resolver" \
+                "$detour")
+            echo "$config"
+            return 0
+        fi
+        config=$(sing_box_cm_add_other_dns_server "$config" "quic" "$tag" "$server_address" "$server_port" "" \
+            "$domain_resolver" "$detour")
+        ;;
+    *)
+        log "Unsupported DNS server type: $type. Aborted." "fatal"
+        exit 1
+        ;;
+    esac
+
+    echo "$config"
+}
+
+sing_box_cf_add_mixed_inbound_and_route_rule() {
+    local config="$1"
+    local tag="$2"
+    local listen_address="$3"
+    local listen_port="$4"
+    local outbound="$5"
+    local username="${6:-}"
+    local password="${7:-}"
+
+    config=$(sing_box_cm_add_mixed_inbound "$config" "$tag" "$listen_address" "$listen_port" "$username" "$password")
+    config=$(sing_box_cm_add_route_rule "$config" "" "$tag" "$outbound")
+
+    echo "$config"
+}
+
+sing_box_cf_add_proxy_outbound() {
+    local config="$1"
+    # The input config, echoed back unchanged when a link has to be skipped
+    # after its outbound was already added (e.g. an XHTTP link on stock sing-box).
+    local config_in="$1"
+    local section="$2"
+    local url="$3"
+    local udp_over_tcp="$4"
+
+    # The link is parsed as a URI FIRST and only the individual components are
+    # decoded, each one after it has been split off the RAW link. Decoding the
+    # whole link up front (as this used to) turned an escaped '%40'/'%23' inside
+    # a password into a structural '@'/'#' — splitting the link at the wrong
+    # place or dropping the fragment and everything after it — and rewrote a
+    # literal '+' into a space. Query values are decoded by
+    # url_get_query_param(), which is handed this raw link.
+    #
+    # The RAW link is also what schemes that base64-decode the WHOLE payload
+    # (vmess) need: '+' is in the base64 alphabet and must survive verbatim.
+    local raw_url="$3"
+
+    url=$(url_strip_fragment "$raw_url")
+
+    local scheme
+    scheme="$(url_get_scheme "$url")"
+
+    # Components of the raw link, percent-decoded once here (see
+    # url_decode_component). url_get_userinfo() returns the password for
+    # trojan/hysteria2, the uuid for vless and 'user:pass' for socks.
+    local url_host url_port url_userinfo
+    url_host=$(url_decode_component "$(url_get_host "$url")")
+    url_port=$(url_decode_component "$(url_get_port "$url")")
+    url_userinfo=$(url_decode_component "$(url_get_userinfo "$url")")
+
+    # REALITY needs uTLS in the core; without it sing-box would reject the whole config
+    if [ "$(url_get_query_param "$url" "security")" = "reality" ] && ! core_has_tag with_utls; then
+        log "Section '$section': REALITY needs a sing-box core built with uTLS (with_utls); skipping the link." "error"
+        echo "$config"
+        return 1
+    fi
+
+    case "$scheme" in
+    socks4 | socks4a | socks5)
+        local tag host port version userinfo username password udp_over_tcp
+
+        tag=$(get_outbound_tag_by_section "$section")
+        host="$url_host"
+        port="$url_port"
+        version="${scheme#socks}"
+        if [ "$scheme" = "socks5" ]; then
+            userinfo="$url_userinfo"
+            if [ -n "$userinfo" ]; then
+                username="${userinfo%%:*}"
+                password="${userinfo#*:}"
+            fi
+        fi
+        config="$(sing_box_cm_add_socks_outbound \
+            "$config" \
+            "$tag" \
+            "$host" \
+            "$port" \
+            "$version" \
+            "$username" \
+            "$password" \
+            "" \
+            "$([ "$udp_over_tcp" = "1" ] && echo 2)" # if udp_over_tcp is enabled, enable version 2
+        )"
+        ;;
+    tuic)
+        # tuic://uuid:password@host:port?congestion_control=bbr&udp_relay_mode=native&alpn=h3&sni=...
+        local tag host port tuic_uuid tuic_password tuic_congestion tuic_relay
+        if ! core_has_tag with_quic; then
+            log "Section '$section': TUIC needs a sing-box core built with QUIC (with_quic); skipping the link." "error"
+            echo "$config"
+            return 1
+        fi
+        if [ -z "$url_userinfo" ]; then
+            log "Section '$section': a TUIC link needs a uuid (and a password); skipping it." "error"
+            echo "$config"
+            return 1
+        fi
+
+        tag=$(get_outbound_tag_by_section "$section")
+        host="$url_host"
+        port="${url_port:-443}"
+        tuic_uuid="${url_userinfo%%:*}"
+        tuic_password=""
+        case "$url_userinfo" in
+        *:*) tuic_password="${url_userinfo#*:}" ;;
+        esac
+        tuic_congestion=$(url_get_query_param "$url" "congestion_control")
+        [ -n "$tuic_congestion" ] || tuic_congestion=$(url_get_query_param "$url" "congestion-control")
+        case "$tuic_congestion" in
+        bbr | cubic | new_reno) ;;
+        *) tuic_congestion="" ;;
+        esac
+        tuic_relay=$(url_get_query_param "$url" "udp_relay_mode")
+        [ -n "$tuic_relay" ] || tuic_relay=$(url_get_query_param "$url" "udp-relay-mode")
+        case "$tuic_relay" in
+        native | quic) ;;
+        *) tuic_relay="" ;;
+        esac
+
+        config=$(sing_box_cm_add_tuic_outbound "$config" "$tag" "$host" "$port" "$tuic_uuid" "$tuic_password" \
+            "$tuic_congestion" "$tuic_relay")
+        config=$(_add_outbound_security "$config" "$tag" "$url")
+        ;;
+    anytls)
+        # anytls://password@host:port?sni=...&insecure=1&alpn=h2,http/1.1
+        local tag host port anytls_password
+        if ! is_sing_box_at_least "1.12.0"; then
+            log "Section '$section': AnyTLS needs sing-box 1.12 or newer (installed: $(get_sing_box_version)); skipping the link." "error"
+            echo "$config"
+            return 1
+        fi
+        if [ -z "$url_userinfo" ]; then
+            log "Section '$section': an AnyTLS link needs a password; skipping it." "error"
+            echo "$config"
+            return 1
+        fi
+
+        tag=$(get_outbound_tag_by_section "$section")
+        host="$url_host"
+        port="${url_port:-443}"
+        anytls_password="$url_userinfo"
+
+        config=$(sing_box_cm_add_anytls_outbound "$config" "$tag" "$host" "$port" "$anytls_password")
+        config=$(_add_outbound_security "$config" "$tag" "$url")
+        ;;
+    naive+https | naive+quic | naive | https)
+        # NaiveProxy. A plain https:// link counts only with a login (user:password):
+        # that is how a NaiveProxy server is written down.
+        local tag host port naive_user naive_pass naive_quic naive_scheme naive_userinfo naive_proxy_url naive_port
+
+        case "$url_userinfo" in
+        ?*:?*) ;;
+        *)
+            log "Section '$section': a $scheme:// link without a login and a password is not a NaiveProxy link; skipping it." "error"
+            echo "$config"
+            return 1
+            ;;
+        esac
+
+        tag=$(get_outbound_tag_by_section "$section")
+        host="$url_host"
+        port="${url_port:-443}"
+        naive_user="${url_userinfo%%:*}"
+        naive_pass=""
+        case "$url_userinfo" in
+        *:*) naive_pass="${url_userinfo#*:}" ;;
+        esac
+        naive_quic="false"
+        naive_scheme="https"
+        if [ "$scheme" = "naive+quic" ]; then
+            naive_quic="true"
+            naive_scheme="quic"
+        fi
+
+        if naive_core_supported; then
+            config=$(sing_box_cm_add_naive_outbound "$config" "$tag" "$host" "$port" "$naive_user" "$naive_pass" "$naive_quic")
+        elif naive_binary > /dev/null; then
+            # the client takes the link as it was written: the login stays percent-encoded
+            naive_userinfo="$(url_get_userinfo "$url")"
+            naive_proxy_url="$naive_scheme://$naive_userinfo@$host:$port"
+            naive_port="$(naive_register "$naive_proxy_url")"
+            config=$(sing_box_cm_add_socks_outbound "$config" "$tag" "127.0.0.1" "$naive_port" "5" "" "" "" "")
+        else
+            log "Section '$section': NaiveProxy needs the naive client (install it in the Component Manager, or put the binary of klzgrad/naiveproxy at /usr/bin/naive) or a sing-box core built with the naive outbound; skipping the link." "error"
+            echo "$config"
+            return 1
+        fi
+        ;;
+    vless)
+        local tag host port uuid flow packet_encoding encryption
+        tag=$(get_outbound_tag_by_section "$section")
+        host="$url_host"
+        port="$url_port"
+        uuid="$url_userinfo"
+        flow=$(url_get_query_param "$url" "flow")
+        packet_encoding=$(url_get_query_param "$url" "packetEncoding")
+        # VLESS Encryption: the mlkem768x25519plus... handshake travels in
+        # the encryption= param. Ordinary links carry "none" there, which
+        # the manager drops, so nothing changes for them. The value is a key,
+        # not form text: decode it as a URI component so a '+' is not turned
+        # into a space.
+        encryption=$(url_get_query_param_component "$url" "encryption")
+
+        # A mlkem768x25519plus... value is checked twice below; failing either
+        # skips only this link, with the same contract as the `*)` arm: config
+        # echoed UNCHANGED, non-zero return. The url/selector/urltest callers
+        # add a member tag only on success, so no group ever references an
+        # outbound that was not created. Any other value ("auto", "None", ...)
+        # is not a VLESS Encryption handshake; the param was not read at all
+        # before, so such links stay plain VLESS, with a warning.
+        case "$encryption" in
+        '' | none)
+            encryption=""
+            ;;
+        mlkem*)
+            # A value sing-box-extended rejects would make `sing-box check`
+            # fail for the WHOLE config.
+            if ! is_valid_vless_encryption "$encryption"; then
+                log "Section '$section': the VLESS Encryption key of this link is malformed or truncated (sing-box-extended would reject it); skipping the link." "error"
+                echo "$config"
+                return 1
+            fi
+            # `encryption` is a sing-box-extended field; stock sing-box and
+            # older extended builds decode configs strictly and would fail
+            # `sing-box check` for the WHOLE config as well.
+            # The fallback keeps the gate closed even if constants.sh was not
+            # sourced: an empty minimum would compare as "anything passes".
+            local encryption_min="${SB_EXTENDED_VLESS_ENCRYPTION_MIN:-2.0.0}"
+            if ! is_sing_box_extended_at_least "$encryption_min"; then
+                log "Section '$section': VLESS Encryption requires sing-box-extended $encryption_min or newer (installed: sing-box $(get_sing_box_version)); skipping the link. Install sing-box-extended in the Components manager." "error"
+                echo "$config"
+                return 1
+            fi
+            ;;
+        *)
+            # Log only the first part and the length: the value may be a key.
+            log "Section '$section': unknown VLESS encryption value '${encryption%%.*}' (${#encryption} characters); treating the link as plain VLESS." "warn"
+            encryption=""
+            ;;
+        esac
+
+        config=$(sing_box_cm_add_vless_outbound "$config" "$tag" "$host" "$port" "$uuid" "$flow" "" "$packet_encoding" "$encryption")
+        config=$(_add_outbound_security "$config" "$tag" "$url")
+        config=$(_add_outbound_transport "$config" "$tag" "$url") || {
+            echo "$config_in"
+            return 1
+        }
+        ;;
+    ss)
+        local userinfo tag host port method password udp_over_tcp
+
+        userinfo="$url_userinfo"
+        if ! is_shadowsocks_userinfo_format "$userinfo"; then
+            userinfo=$(base64_decode "$userinfo")
+            if [ $? -ne 0 ]; then
+                log "Cannot decode shadowsocks userinfo or it does not match the expected format. Aborted." "fatal"
+                exit 1
+            fi
+        fi
+
+        tag=$(get_outbound_tag_by_section "$section")
+        host="$url_host"
+        port="$url_port"
+        method="${userinfo%%:*}"
+        password="${userinfo#*:}"
+
+        config=$(
+            sing_box_cm_add_shadowsocks_outbound \
+                "$config" \
+                "$tag" \
+                "$host" \
+                "$port" \
+                "$method" \
+                "$password" \
+                "" \
+                "$([ "$udp_over_tcp" = "1" ] && echo 2)" # if udp_over_tcp is enabled, enable version 2
+        )
+        ;;
+    trojan)
+        local tag host port password
+        tag=$(get_outbound_tag_by_section "$section")
+        host="$url_host"
+        port="$url_port"
+        password="$url_userinfo"
+
+        config=$(sing_box_cm_add_trojan_outbound "$config" "$tag" "$host" "$port" "$password")
+        config=$(_add_outbound_security "$config" "$tag" "$url")
+        config=$(_add_outbound_transport "$config" "$tag" "$url") || {
+            echo "$config_in"
+            return 1
+        }
+        ;;
+    hysteria2 | hy2)
+        local tag host port password obfuscator_type obfuscator_password upload_mbps download_mbps
+        if ! core_has_tag with_quic; then
+            log "Section '$section': Hysteria2 needs a sing-box core built with QUIC (with_quic); skipping the link." "error"
+            echo "$config"
+            return 1
+        fi
+        tag=$(get_outbound_tag_by_section "$section")
+        host="$url_host"
+        port="$url_port"
+        password="$url_userinfo"
+        obfuscator_type=$(url_get_query_param "$url" "obfs")
+        obfuscator_password=$(url_get_query_param "$url" "obfs-password")
+        upload_mbps=$(url_get_query_param "$url" "upmbps")
+        download_mbps=$(url_get_query_param "$url" "downmbps")
+
+        # Port hopping: the link's mport (or ports) is a list of ports and ranges the client hops
+        # among, with the port of the link among them; hop-interval is the pause in seconds. A
+        # value that is not a port list is ignored, the link then connects to its own port.
+        local hy2_hop_ports hy2_hop_interval hy2_hop_value=""
+        hy2_hop_ports=$(url_get_query_param "$url" "mport")
+        [ -n "$hy2_hop_ports" ] || hy2_hop_ports=$(url_get_query_param "$url" "ports")
+        hy2_hop_interval=$(url_get_query_param "$url" "hop-interval")
+        [ -n "$hy2_hop_interval" ] || hy2_hop_interval=$(url_get_query_param "$url" "hop_interval")
+        if [ -n "$hy2_hop_ports" ]; then
+            # a range may be written with ":" and a list with spaces ("+" in a link): the
+            # same forms parse_port_list takes
+            hy2_hop_ports="$(printf '%s' "$hy2_hop_ports" | tr -d ' \t' | tr ':' '-')"
+            if _hy2_valid_hop_ports "$hy2_hop_ports"; then
+                # Only a port of the link that is itself valid joins the list. Anything else
+                # (abc, 70000, an IPv6 address without brackets) is left as it was: the outbound
+                # then cannot be built and the link is skipped, as without mport, instead of
+                # putting an entry into server_ports that makes the whole config fail the check.
+                case "$port" in
+                "") port="$(_hy2_dedupe_ports "$hy2_hop_ports")" ;;
+                *","* | *"-"*)
+                    if _hy2_valid_hop_ports "$port"; then
+                        log "The link for '$tag' has a port range of its own; its mport ($(_hy2_log_value "$hy2_hop_ports")) is not used" "warn"
+                    else
+                        log "The link for '$tag' has a port that is not valid ($(_hy2_log_value "$port")); its mport is not used" "warn"
+                    fi
+                    ;;
+                *)
+                    if _hy2_valid_hop_ports "$port" && [ "$port" -ge 1 ] 2> /dev/null; then
+                        port="$(_hy2_dedupe_ports "$port,$hy2_hop_ports")"
+                    else
+                        log "The link for '$tag' has a port that is not valid ($(_hy2_log_value "$port")); its mport is not used" "warn"
+                    fi
+                    ;;
+                esac
+                # leading zeros ("00010") are the same number of seconds
+                case "$hy2_hop_interval" in
+                *[!0-9]*) ;;
+                ?*)
+                    hy2_hop_interval="${hy2_hop_interval#"${hy2_hop_interval%%[!0]*}"}"
+                    [ -n "$hy2_hop_interval" ] || hy2_hop_interval=0
+                    ;;
+                esac
+                case "$hy2_hop_interval" in
+                "") ;;
+                *[!0-9]*)
+                    log "The link for '$tag' has a hop interval ($(_hy2_log_value "$hy2_hop_interval")) that is not a number of seconds; the default is used" "warn"
+                    ;;
+                ?????*)
+                    # too long to compare as a number in the shell, and far over the limit anyway
+                    log "The link for '$tag' has a hop interval of $(_hy2_log_value "$hy2_hop_interval") s; it must be 5-3600, the default is used" "warn"
+                    ;;
+                *)
+                    if [ "$hy2_hop_interval" -ge 5 ] && [ "$hy2_hop_interval" -le 3600 ]; then
+                        hy2_hop_value="${hy2_hop_interval}s"
+                    else
+                        log "The link for '$tag' has a hop interval of $hy2_hop_interval s; it must be 5-3600, the default is used" "warn"
+                    fi
+                    ;;
+                esac
+            else
+                log "The link for '$tag' has a port list for port hopping ($(_hy2_log_value "$hy2_hop_ports")) that is not valid; connecting to its own port only" "warn"
+            fi
+        fi
+
+        config=$(sing_box_cm_add_hysteria2_outbound "$config" "$tag" "$host" "$port" "$password" "$obfuscator_type" \
+            "$obfuscator_password" "$upload_mbps" "$download_mbps" "" "$hy2_hop_value")
+        config=$(_add_outbound_security "$config" "$tag" "$url")
+        ;;
+    vmess)
+        # ─── REFERENCE EXTENDED-GATING PATTERN (Tier-1 protocols copy this) ───
+        # Generation is gated behind sing-box-extended. On a stock sing-box build
+        # we log a clear message, echo the config UNCHANGED and return NON-ZERO
+        # (no exit 1, no outbound added): the same skip contract as the `*)` arm.
+        # The non-zero return matters: the selector/urltest callers add a member
+        # tag on success, and a member without its outbound passes
+        # `sing-box check` but makes sing-box fail to start
+        # ("dependency[...] not found"). A single-URL section is marked
+        # unavailable instead.
+        #
+        # Schemes this dispatcher PARSES: socks4/socks4a/socks5, vless, ss,
+        # trojan, hysteria2/hy2, tuic, anytls, naive, and vmess (vmess is
+        # extended-gated above). Any OTHER scheme (hysteria v1, shadowtls,
+        # wireguard, http, or a typo) is NOT parsed here: it hits the default `*)` arm below,
+        # which logs a WARNING and returns the config UNCHANGED (rc 1, skip) so a
+        # single bad link in a url/selector/urltest input never aborts the whole
+        # config. Such schemes are reachable only via a raw `outbound_json`
+        # connection (proxy_config_type=outbound) or a native sing-box-JSON
+        # subscription, which bypass this URL dispatcher entirely.
+        if ! is_sing_box_extended; then
+            log "Section '$section': VMess requires sing-box-extended (installed: sing-box $(get_sing_box_version)); skipping the link. Install sing-box-extended in the Components manager." "error"
+            echo "$config"
+            return 1
+        fi
+        # ─────────────────────────────────────────────────────────────────────
+
+        local tag vmess_json vm_server vm_port vm_uuid vm_security vm_alter_id
+        local vm_net vm_host vm_path vm_tls vm_sni vm_alpn vm_fp
+
+        tag=$(get_outbound_tag_by_section "$section")
+
+        # Primary format: vmess://base64(JSON) (V2RayN). The URL form
+        # (vmess://<uuid>@<host>:<port>?...) is a phase-2 follow-on; not handled here.
+        #
+        # CRITICAL: VMess base64-decodes the WHOLE payload, so it MUST use the
+        # RAW link ($raw_url, NOT the component-decoded $url): percent-decoding
+        # the payload would corrupt base64 bodies containing '+' (url_decode
+        # rewrites '+'->space, and '+' is in the base64 alphabet).
+        # Future Tier-1 copiers (tuic/etc.) that base64-decode a whole payload
+        # MUST also use $raw_url for the same reason.
+        vmess_json=$(vmess_link_to_json "$raw_url")
+        if [ -z "$vmess_json" ] || ! echo "$vmess_json" | jq -e 'type == "object"' > /dev/null 2>&1; then
+            log "Cannot decode VMess link or it does not match the expected base64(JSON) format. Aborted." "fatal"
+            exit 1
+        fi
+
+        # Numbers-as-strings are tolerated: extract every field as a string.
+        vm_server=$(echo "$vmess_json" | jq -r '.add // ""')
+        vm_port=$(echo "$vmess_json" | jq -r '.port // "" | tostring')
+        vm_uuid=$(echo "$vmess_json" | jq -r '.id // ""')
+        vm_security=$(echo "$vmess_json" | jq -r '.scy // "" | tostring')
+        vm_alter_id=$(echo "$vmess_json" | jq -r '.aid // "" | tostring')
+        vm_net=$(echo "$vmess_json" | jq -r '.net // "" | tostring')
+        vm_host=$(echo "$vmess_json" | jq -r '.host // "" | tostring')
+        vm_path=$(echo "$vmess_json" | jq -r '.path // "" | tostring')
+        vm_tls=$(echo "$vmess_json" | jq -r '.tls // "" | tostring')
+        vm_sni=$(echo "$vmess_json" | jq -r '.sni // "" | tostring')
+        vm_alpn=$(echo "$vmess_json" | jq -r '.alpn // "" | tostring')
+        vm_fp=$(echo "$vmess_json" | jq -r '.fp // "" | tostring')
+
+        config=$(sing_box_cm_add_vmess_outbound "$config" "$tag" "$vm_server" "$vm_port" "$vm_uuid" \
+            "$vm_security" "$vm_alter_id")
+        config=$(_add_vmess_transport_and_security "$config" "$tag" "$vm_net" "$vm_host" "$vm_path" \
+            "$vm_tls" "$vm_sni" "$vm_alpn" "$vm_fp" "$vm_server") || {
+            # An unknown `net` skips the whole link: roll the config back to the
+            # state before this outbound so no transportless member remains.
+            echo "$config_in"
+            return 1
+        }
+        ;;
+    *)
+        # Unsupported scheme: downgrade from fatal to a WARNING + skip. This
+        # dispatcher is shared by the single-URL, selector-loop and urltest-loop
+        # callers, so a single unsupported/typo'd link must NOT abort generation
+        # of the whole config. Echo the input config UNCHANGED (never empty — an
+        # empty echo would wipe the caller's `config=$(...)`) and return non-zero
+        # so the caller knows no outbound was added and can skip this node and
+        # continue with the remaining links. The subscription normalize caller
+        # already understands this non-zero "skip" contract.
+        log "Unsupported proxy scheme '$scheme'; skipping this link (supported: socks/vless/ss/trojan/hysteria2/vmess)" "warn"
+        echo "$config"
+        return 1
+        ;;
+    esac
+
+    echo "$config"
+}
+
+# A value of the link for the log: the first 40 characters and the length (the value comes from a
+# link of somebody else and may be anything, a key among others).
+_hy2_log_value() {
+    if [ "${#1}" -le 40 ]; then
+        printf "'%s'" "$1"
+    else
+        printf "'%.40s...' (%s characters)" "$1" "${#1}"
+    fi
+}
+
+# A list of ports and ranges for port hopping: "20000-30000" or "443,20000-30000,40000"; every
+# port 1-65535, every range ascending. No regex.
+_hy2_valid_hop_ports() {
+    local list="$1"
+    local entry from to old_ifs="$IFS" noglob=""
+
+    [ -n "$list" ] || return 1
+    # an empty element ("20000-30000," or "443,,20000-30000") would vanish in the split below
+    # and still reach the config as ":"
+    case "$list" in
+    ,* | *, | *,,*) return 1 ;;
+    esac
+    # the split must not expand a "*" or "[0-9]" into file names: the verdict may not depend
+    # on the working directory
+    case "$-" in *f*) noglob=1 ;; esac
+    set -f
+    IFS=','
+    # shellcheck disable=SC2086
+    set -- $list
+    IFS="$old_ifs"
+    [ -n "$noglob" ] || set +f
+    for entry in "$@"; do
+        case "$entry" in
+        "" | *[!0-9-]* | -* | *- | *-*-*) return 1 ;;
+        *-*)
+            from="${entry%-*}"
+            to="${entry#*-}"
+            ;;
+        *)
+            from="$entry"
+            to="$entry"
+            ;;
+        esac
+        [ "${#from}" -le 5 ] && [ "${#to}" -le 5 ] || return 1
+        [ "$from" -ge 1 ] && [ "$to" -le 65535 ] && [ "$from" -le "$to" ] || return 1
+    done
+    return 0
+}
+
+# The same list without repeated elements, in the order of first appearance
+# ("443,443,20000-30000,443" -> "443,20000-30000").
+_hy2_dedupe_ports() {
+    local list="$1"
+    local entry out="" old_ifs="$IFS" noglob=""
+
+    case "$-" in *f*) noglob=1 ;; esac
+    set -f
+    IFS=','
+    # shellcheck disable=SC2086
+    set -- $list
+    IFS="$old_ifs"
+    [ -n "$noglob" ] || set +f
+    for entry in "$@"; do
+        case ",$out," in
+        *",$entry,"*) ;;
+        *) out="${out:+$out,}$entry" ;;
+        esac
+    done
+    printf '%s' "$out"
+}
+
+_add_outbound_security() {
+    local config="$1"
+    local outbound_tag="$2"
+    local url="$3"
+
+    local security scheme
+    security=$(url_get_query_param "$url" "security")
+    scheme="$(url_get_scheme "$url")"
+
+    if [ -z "$security" ]; then
+        case "$scheme" in
+        # these have TLS unless the link says otherwise (a trojan link without
+        # security= is a TLS one, as everywhere else)
+        hysteria2 | hy2 | tuic | anytls | trojan) security="tls" ;;
+        esac
+    fi
+
+    case "$security" in
+    tls | reality)
+        local sni insecure alpn fingerprint public_key short_id transport_type
+        sni=$(url_get_query_param "$url" "sni")
+        insecure=$(_get_insecure_query_param_from_url "$url")
+        alpn=$(comma_string_to_json_array "$(url_get_query_param "$url" "alpn")")
+        fingerprint=$(url_get_query_param "$url" "fp")
+        # without uTLS in the core a fingerprint makes sing-box reject the whole config
+        if [ -n "$fingerprint" ] && ! core_has_tag with_utls; then
+            log "The link for '$outbound_tag' asks for the fingerprint '$fingerprint', but this sing-box core is built without uTLS; the fingerprint is left out." "warn"
+            fingerprint=""
+        fi
+        public_key=$(url_get_query_param "$url" "pbk")
+        short_id=$(url_get_query_param "$url" "sid")
+
+        # XHTTP transport defaults its ALPN to h2/http/1.1 when none is provided.
+        # `splithttp` is the pre-rename alias of `xhttp` (see _add_outbound_transport).
+        transport_type=$(url_get_query_param "$url" "type")
+        if { [ "$transport_type" = "xhttp" ] || [ "$transport_type" = "splithttp" ]; } && [ "$alpn" = "[]" ]; then
+            alpn='["h2","http/1.1"]'
+        fi
+
+        # uTLS does not apply over QUIC
+        case "$scheme" in
+        hysteria2 | hy2 | tuic) fingerprint="" ;;
+        esac
+
+        # POSTQ_REALITY_MLKEM is set per section by set_section_reality_mlkem
+        # (bin/postq), already gated on a core that knows the option.
+        # The link itself may carry `support-x25519mlkem768` (3x-ui share links,
+        # mihomo reality-opts): true/1 asks for the key share on its own, false/0
+        # refuses it even when the section option is on.
+        local reality_mlkem="" mlkem_hint want_mlkem=0
+        mlkem_hint=$(_reality_mlkem_link_hint "$url")
+        if [ "$security" = "reality" ]; then
+            if [ "$mlkem_hint" = "false" ]; then
+                # Written out explicitly so a subscription batch keeps the refusal
+                # when the section option is on. Only on a core that knows the field.
+                if _reality_mlkem_core_ok; then
+                    reality_mlkem="false"
+                fi
+            elif [ "${POSTQ_REALITY_MLKEM:-0}" = "1" ]; then
+                want_mlkem=1
+            elif [ "$mlkem_hint" = "true" ]; then
+                if _reality_mlkem_core_ok; then
+                    want_mlkem=1
+                else
+                    log "The link for '$outbound_tag' asks for the X25519MLKEM768 key share (support-x25519mlkem768=true; REALITY servers on Xray-core >= 26.9.8 reject clients without it), but that needs sing-box-extended $SB_EXTENDED_REALITY_MLKEM_MIN or newer; the current core cannot send it, so this server will most likely not connect" "warn"
+                fi
+            fi
+        fi
+        if [ "$want_mlkem" = 1 ]; then
+            if [ "$fingerprint" = "chrome" ]; then
+                reality_mlkem="true"
+            else
+                # The key share is only sent with the chrome fingerprint. A core that
+                # rejects the field next to another one would fail the whole config,
+                # so the field is not written at all for such a link.
+                local fp_desc="no fingerprint"
+                [ -n "$fingerprint" ] && fp_desc="fingerprint '$fingerprint'"
+                log "reality_mlkem is on, but the link for '$outbound_tag' has $fp_desc: the X25519MLKEM768 key share is only sent with fp=chrome, so it is not added for this link" "warn"
+            fi
+        fi
+
+        config=$(
+            sing_box_cm_set_tls_for_outbound \
+                "$config" \
+                "$outbound_tag" \
+                "$sni" \
+                "$([ "$insecure" = "1" ] && echo true)" \
+                "$([ "$alpn" = "[]" ] && echo null || echo "$alpn")" \
+                "$fingerprint" \
+                "$public_key" \
+                "$short_id" \
+                "$reality_mlkem"
+        )
+        ;;
+    # No security: the link says so (none), or does not say anything (a vless/vmess/ss
+    # link without security=), or writes a "no" in one of the ways collected lists have.
+    none | "" | false | 0 | off | no | disable | disabled) ;;
+    *)
+        # the link still gets its outbound (without TLS), and one odd link of a
+        # list of thousands is not an error of the service
+        log "Link for '$outbound_tag': unknown security '$security'; it is ignored." "warn"
+        ;;
+    esac
+
+    echo "$config"
+}
+
+_get_insecure_query_param_from_url() {
+    local url="$1"
+
+    local insecure
+    insecure=$(url_get_query_param "$url" "allowInsecure")
+    if [ -z "$insecure" ]; then
+        insecure=$(url_get_query_param "$url" "insecure")
+    fi
+    if [ -z "$insecure" ]; then
+        insecure=$(url_get_query_param "$url" "allow_insecure")
+    fi
+
+    echo "$insecure"
+}
+
+_add_outbound_transport() {
+    local config="$1"
+    local outbound_tag="$2"
+    local url="$3"
+
+    local transport
+    transport=$(url_get_query_param "$url" "type")
+    case "$transport" in
+    # An absent `type` means plain TCP: the link carries no transport block at
+    # all. It MUST be handled here (and not by the skip branch below), otherwise
+    # ordinary links without `type=` would be dropped entirely.
+    tcp | raw | "") ;;
+    ws)
+        local ws_path ws_host ws_early_data
+        ws_path=$(url_get_query_param "$url" "path")
+        ws_host=$(url_get_query_param "$url" "host")
+        ws_early_data=$(url_get_query_param "$url" "ed")
+
+        config=$(
+            sing_box_cm_set_ws_transport_for_outbound "$config" "$outbound_tag" "$ws_path" "$ws_host" "$ws_early_data"
+        )
+        ;;
+    grpc)
+        # TODO(ampetelin): Add handling of optional gRPC parameters; example links are needed.
+        local grpc_service_name
+        grpc_service_name=$(url_get_query_param "$url" "serviceName")
+
+        config=$(
+            sing_box_cm_set_grpc_transport_for_outbound "$config" "$outbound_tag" "$grpc_service_name"
+        )
+        ;;
+    httpupgrade)
+        # sing-box's httpupgrade transport (upstream since 1.8, no extended core
+        # required). The Host header lives in a top-level "host" field; when the
+        # link omits it we fall back to the sni so the Host matches the TLS SNI,
+        # which is how most TLS-fronted httpupgrade deployments are set up.
+        local httpupgrade_path httpupgrade_host httpupgrade_sni
+        httpupgrade_path=$(url_get_query_param "$url" "path")
+        httpupgrade_host=$(url_get_query_param "$url" "host")
+        httpupgrade_sni=$(url_get_query_param "$url" "sni")
+        [ -n "$httpupgrade_host" ] || httpupgrade_host="$httpupgrade_sni"
+        config=$(
+            sing_box_cm_set_httpupgrade_transport_for_outbound "$config" "$outbound_tag" "$httpupgrade_path" "$httpupgrade_host"
+        )
+        ;;
+    xhttp | splithttp)
+        # `splithttp` is the pre-rename name of the `xhttp` transport (sing-box
+        # renamed it). Accept it as an alias and normalize to xhttp downstream:
+        # sing_box_cm_set_xhttp_transport_for_outbound emits the modern `xhttp`
+        # key, so the config sing-box sees always uses the current name.
+        # On stock sing-box return non-zero: the caller then drops the whole
+        # link. Keeping the outbound without its transport would leave a node
+        # that validates but can never connect, still listed in its group.
+        if ! is_sing_box_extended; then
+            log "XHTTP transport requires sing-box-extended (installed: sing-box $(get_sing_box_version)); skipping the link. Install sing-box-extended in the Components manager." "error"
+            echo "$config"
+            return 1
+        fi
+        local xhttp_path xhttp_host xhttp_sni xhttp_mode xhttp_extra xhttp_padding xhttp_extra_opts xhttp_ignored
+        xhttp_path=$(url_get_query_param "$url" "path")
+        xhttp_host=$(url_get_query_param "$url" "host")
+        xhttp_sni=$(url_get_query_param "$url" "sni")
+        [ -n "$xhttp_host" ] || xhttp_host="$xhttp_sni"
+        xhttp_mode=$(url_get_query_param "$url" "mode")
+        # `extra` (padding, post sizes, xmux ...): the link carries the values the server expects. A
+        # server whose xPaddingBytes range does not contain the client's drops the requests.
+        xhttp_extra=$(url_get_query_param_component "$url" "extra")
+        xhttp_padding=$(url_get_query_param "$url" "x_padding_bytes")
+        xhttp_extra_opts="{}"
+        if [ -n "$xhttp_extra" ] || [ -n "$xhttp_padding" ]; then
+            xhttp_extra_opts=$(sing_box_cm_xhttp_extra_options "$xhttp_extra" "$xhttp_mode" "$xhttp_padding")
+            if [ -n "$xhttp_extra" ]; then
+                if ! printf '%s' "$xhttp_extra" | jq -e 'type == "object"' > /dev/null 2>&1; then
+                    log "The XHTTP 'extra' of the link for '$outbound_tag' is not a JSON object; ignoring it" "warn"
+                else
+                    xhttp_ignored=$(sing_box_cm_xhttp_extra_ignored "$xhttp_extra")
+                    [ -z "$xhttp_ignored" ] || log "The XHTTP 'extra' of the link for '$outbound_tag' has options this core does not take (left out): $xhttp_ignored" "info"
+                fi
+            fi
+        fi
+        config=$(sing_box_cm_set_xhttp_transport_for_outbound "$config" "$outbound_tag" "$xhttp_path" "$xhttp_host" "$xhttp_mode" "$xhttp_extra_opts")
+        ;;
+    *)
+        # Unknown transport: skip the WHOLE link (echo the config unchanged and
+        # return non-zero, so the caller drops it). Keeping the outbound without
+        # its transport would leave a node that validates but can never connect,
+        # still listed in its group — the same contract as the XHTTP-on-stock
+        # branch above.
+        log "Unknown transport '$transport' detected; skipping the link." "error"
+        echo "$config"
+        return 1
+        ;;
+    esac
+
+    echo "$config"
+}
+
+#######################################
+# Apply VMess TLS + transport to an already-added vmess outbound.
+# VMess (V2RayN base64-JSON) carries transport in the JSON `net` field and TLS
+# in `tls`/`sni`/`alpn`/`fp` — NOT in URL query params. So we do NOT route
+# through _add_outbound_security / _add_outbound_transport (which read
+# url_get_query_param); we set everything from the decoded-JSON values here.
+# Arguments:
+#   config: string (JSON), sing-box configuration to modify
+#   tag: string, outbound tag to mutate
+#   net: string, vmess `net` (ws|grpc|h2|tcp|"")
+#   host: string, vmess `host`
+#   path: string, vmess `path`
+#   tls: string, vmess `tls` ("tls"/"1"/"true" enables TLS)
+#   sni: string, vmess `sni`
+#   alpn: string, vmess `alpn` (comma-separated)
+#   fp: string, vmess `fp` (uTLS fingerprint)
+#   server: string, vmess `add` (TLS server_name fallback when sni is empty)
+# Outputs:
+#   Writes updated JSON configuration to stdout
+#######################################
+_add_vmess_transport_and_security() {
+    local config="$1"
+    local outbound_tag="$2"
+    local net="$3"
+    local host="$4"
+    local path="$5"
+    local tls="$6"
+    local sni="$7"
+    local alpn="$8"
+    local fp="$9"
+    local server="${10}"
+
+    # Transport from `net` (NOT a query `type`).
+    local tls_required=0
+    case "$net" in
+    ws)
+        config=$(sing_box_cm_set_ws_transport_for_outbound "$config" "$outbound_tag" "$path" "$host")
+        ;;
+    grpc)
+        # The core derives the gRPC serviceName from `path` (falls back to `host`).
+        local grpc_service_name="$path"
+        [ -n "$grpc_service_name" ] || grpc_service_name="$host"
+        config=$(sing_box_cm_set_grpc_transport_for_outbound "$config" "$outbound_tag" "$grpc_service_name")
+        ;;
+    h2)
+        # HTTP/2 transport mandates TLS.
+        config=$(sing_box_cm_set_http_transport_for_outbound "$config" "$outbound_tag" "$path" "$host")
+        tls_required=1
+        ;;
+    httpupgrade)
+        # V2RayN's `net` uses the same transport names as the URL `type`; the
+        # Host falls back to the sni (see _add_outbound_transport). Upstream
+        # sing-box feature, so no extended-core gate here.
+        local vmess_httpupgrade_host="$host"
+        [ -n "$vmess_httpupgrade_host" ] || vmess_httpupgrade_host="$sni"
+        config=$(
+            sing_box_cm_set_httpupgrade_transport_for_outbound "$config" "$outbound_tag" "$path" "$vmess_httpupgrade_host"
+        )
+        ;;
+    tcp | "") ;;
+    *)
+        # Unknown transport: skip the WHOLE link (echo the config unchanged and
+        # return non-zero, so the caller drops it) instead of leaving a node
+        # that validates but can never connect.
+        log "Unknown VMess transport '$net' detected; skipping the link." "error"
+        echo "$config"
+        return 1
+        ;;
+    esac
+
+    # TLS from `tls` (or forced by h2 transport).
+    local tls_enabled=0
+    case "$tls" in
+    tls | 1 | true) tls_enabled=1 ;;
+    esac
+    [ "$tls_required" -eq 1 ] && tls_enabled=1
+
+    if [ "$tls_enabled" -eq 1 ]; then
+        local server_name alpn_json
+        server_name="$sni"
+        [ -n "$server_name" ] || server_name="$server"
+        alpn_json=$(comma_string_to_json_array "$alpn")
+        config=$(
+            sing_box_cm_set_tls_for_outbound \
+                "$config" \
+                "$outbound_tag" \
+                "$server_name" \
+                "" \
+                "$([ "$alpn_json" = "[]" ] && echo null || echo "$alpn_json")" \
+                "$fp" \
+                "" \
+                ""
+        )
+    fi
+
+    echo "$config"
+}
+
+sing_box_cf_add_json_outbound() {
+    local config="$1"
+    local section="$2"
+    local json_outbound="$3"
+
+    local tag
+    tag=$(get_outbound_tag_by_section "$section")
+
+    config=$(sing_box_cm_add_raw_outbound "$config" "$tag" "$json_outbound")
+
+    echo "$config"
+}
+
+sing_box_cf_add_interface_outbound() {
+    local config="$1"
+    local section="$2"
+    local interface_name="$3"
+
+    local tag
+    tag=$(get_outbound_tag_by_section "$section")
+
+    config=$(sing_box_cm_add_interface_outbound "$config" "$tag" "$interface_name")
+
+    echo "$config"
+}
+
+sing_box_cf_proxy_domain() {
+    local config="$1"
+    local inbound="$2"
+    local domain="$3"
+    local outbound="$4"
+
+    tag="$(gen_id)"
+    config=$(sing_box_cm_add_route_rule "$config" "$tag" "$inbound" "$outbound")
+    config=$(sing_box_cm_patch_route_rule "$config" "$tag" "domain" "$domain")
+
+    echo "$config"
+}
+
+sing_box_cf_override_domain_port() {
+    local config="$1"
+    local domain="$2"
+    local port="$3"
+
+    tag="$(gen_id)"
+    config=$(sing_box_cm_add_options_route_rule "$config" "$tag")
+    config=$(sing_box_cm_patch_route_rule "$config" "$tag" "domain" "$domain")
+    config=$(sing_box_cm_patch_route_rule "$config" "$tag" "override_port" "$port")
+
+    echo "$config"
+}
+
+sing_box_cf_add_single_key_reject_rule() {
+    local config="$1"
+    local inbound="$2"
+    local key="$3"
+    local value="$4"
+
+    tag="$(gen_id)"
+    config=$(sing_box_cm_add_reject_route_rule "$config" "$tag" "$inbound")
+    config=$(sing_box_cm_patch_route_rule "$config" "$tag" "$key" "$value")
+
+    echo "$config"
+}
+
+#######################################
+# Build a prepared subscription batch in a SINGLE jq pass.
+# Filters out non-proxy types (selector, urltest, direct, dns, block), statically
+# drops outbounds unsupported by the current sing-box build (shadowsocks+tls and,
+# unless running sing-box-extended, xhttp transport), assigns a unique tag to each
+# outbound (deduplicating against tags already present in $config and against tags
+# chosen earlier in the same batch) and records a human-readable display name.
+# Arguments:
+#   config: string (JSON), sing-box configuration the batch will be merged into
+#   subscription_json_path: string, path to the downloaded subscription JSON file
+#   include_keywords_json: string (JSON array), keep only nodes whose display name
+#       contains at least one of these (OR). Empty array ([]) = keep all.
+#   exclude_keywords_json: string (JSON array), drop any node whose display name
+#       contains at least one of these (OR). Empty array ([]) = no exclusion.
+# Global input (not an argument):
+#   SUBSCRIPTION_PARAM_FILTER: string (JSON) {"include":{protocols,transports,security},
+#       "exclude":{...}} built by build_subscription_param_filter_json; every list that is set
+#       has to pass. Unset, empty or "{}" = no parameter filtering.
+# Outputs:
+#   Writes a JSON object to stdout:
+#     { outbounds: [ {type,...,tag} ... ], tags: [..], names: [..],
+#       feeds: [..] (feed index per tag from $SUBSCRIPTION_FEED_MARKER_KEY, or null),
+#       count: <kept>, skipped: <statically dropped> }
+#######################################
+sing_box_cf_prepare_subscription_batch() {
+    local config="$1"
+    local subscription_json_path="$2"
+    local include_keywords_json="${3:-[]}"
+    local exclude_keywords_json="${4:-[]}"
+    local sing_box_extended="false"
+    local reality_mlkem="false"
+    local reality_mlkem_core="false"
+    local param_filter="${SUBSCRIPTION_PARAM_FILTER:-}"
+
+    [ -n "$include_keywords_json" ] || include_keywords_json="[]"
+    [ -n "$exclude_keywords_json" ] || exclude_keywords_json="[]"
+    [ -n "$param_filter" ] || param_filter="{}"
+
+    if is_sing_box_extended; then
+        sing_box_extended="true"
+    fi
+    # Per-section option, set (and gated on the core) by set_section_reality_mlkem.
+    if [ "${POSTQ_REALITY_MLKEM:-0}" = "1" ]; then
+        reality_mlkem="true"
+    fi
+    # Whether the core knows the field at all: a node that already carries it
+    # (link hint kept by the normalized cache, or a provider's sing-box config)
+    # keeps it only then. The section option is already gated on the core.
+    if [ "$reality_mlkem" = "true" ] || _reality_mlkem_core_ok; then
+        reality_mlkem_core="true"
+    fi
+
+    # The working config is fed on stdin (POSIX-safe, no process substitution);
+    # the subscription JSON is slurped from its file path.
+    printf '%s' "$config" | jq -c \
+        --slurpfile sub "$subscription_json_path" \
+        --arg feed_key "$SUBSCRIPTION_FEED_MARKER_KEY" \
+        --argjson extended "$sing_box_extended" \
+        --argjson reality_mlkem "$reality_mlkem" \
+        --argjson reality_mlkem_core "$reality_mlkem_core" \
+        --argjson include_keywords "$include_keywords_json" \
+        --argjson exclude_keywords "$exclude_keywords_json" \
+        --argjson param_filter "$param_filter" '
+        # Codepoint-based case fold. OpenWrt jq has no Oniguruma and ascii_downcase
+        # only maps ASCII A-Z (leaving Cyrillic mixed-case), so define an inline
+        # fold (this jq program does NOT import helpers.jq). It lowercases ASCII
+        # AND Cyrillic (incl. the Yo letter outside the contiguous block); emoji
+        # and all other scripts pass through unchanged and thus match as exact
+        # codepoint substrings.
+        def ucfold:
+          explode
+          | map(
+              if   (. >= 65   and . <= 90)   then . + 32     # ASCII A-Z -> a-z
+              elif (. >= 1040 and . <= 1071) then . + 32     # Cyrillic А-Я -> а-я
+              elif (. == 1025)               then 1105       # Ё -> ё
+              else . end)
+          | implode;
+        # Normalise the keyword lists: drop empty items and precompute the
+        # case-folded form once. ucfold folds ASCII and Cyrillic; emoji/other
+        # scripts are matched as exact codepoint substrings.
+        # NB: "include"/"exclude" are reserved jq keywords, hence $inc/$exc.
+        ([$include_keywords[]? | tostring | select(length > 0) | ucfold]) as $inc
+        | ([$exclude_keywords[]? | tostring | select(length > 0) | ucfold]) as $exc
+        # A node "matches" a normalised keyword list when its case-folded name
+        # contains any of the keywords (substring via index, NO regex/Oniguruma).
+        # Bind each keyword to $kw so index() receives the keyword, not the name.
+        | def name_passes_keywords($lc):
+            (($inc | length) == 0 or any($inc[]; . as $kw | ($lc | index($kw)) != null))
+            and (($exc | length) == 0 or all($exc[]; . as $kw | ($lc | index($kw)) == null));
+        # Filters by how a server connects: protocol (its type), transport (none
+        # means plain TCP) and security (reality, tls, none). Every list that is set
+        # must pass: an include list keeps only its members, an exclude list drops
+        # its members.
+        def node_protocol: (.type // "" | tostring | ascii_downcase);
+        # tls may be a scalar in a malformed node: only an object is looked into
+        def node_security:
+            if ((.tls | type) != "object") then "none"
+            elif (((.tls.reality | type) == "object") and ((.tls.reality.enabled // false) == true)) then "reality"
+            elif ((.tls.enabled // false) == true) then "tls"
+            else "none" end;
+        def node_transport: (if ((.transport | type) == "object") then (.transport.type // "tcp") else "tcp" end | tostring | ascii_downcase);
+        def param_ok($kind; $value):
+            (($param_filter.include[$kind] // []) as $inc
+              | ($inc | length) == 0 or any($inc[]; . == $value))
+            and (($param_filter.exclude[$kind] // []) as $exc
+              | all($exc[]; . != $value));
+        def passes_params:
+            param_ok("protocols"; node_protocol)
+            and param_ok("transports"; node_transport)
+            and param_ok("security"; node_security);
+        # Reserved tags already used by the working config (stdin is the config).
+        ([.outbounds[]?.tag // empty]) as $existing
+        # Candidate proxy outbounds from the subscription (preserve order).
+        | [$sub[0].outbounds[]? | select(
+            .type != "selector" and
+            .type != "urltest" and
+            .type != "direct" and
+            .type != "dns" and
+            .type != "block"
+          )] as $all_candidates
+        # Keyword whitelist/blacklist filter on the display name. Runs BEFORE the
+        # static-unsupported filter and tag dedup, so dropped nodes never get
+        # tags and never reach sing-box check. Covers native + fallback-parsed
+        # subscriptions (both consume this batch).
+        | [$all_candidates[]
+            | . as $ob
+            | (($ob.remark // $ob.tag // "") | tostring) as $name
+            | select(name_passes_keywords($name | ucfold))
+            | select($ob | passes_params)
+          ] as $candidates
+        | ($candidates | length) as $total
+        # Statically reject outbounds the current sing-box build cannot load.
+        | [ $candidates[]
+            | . as $ob
+            | (($ob.remark // $ob.tag // "") | tostring) as $name
+            | if ($ob.type == "shadowsocks" and ($ob.tls.enabled == true)) then
+                empty
+              elif (($ob.transport.type // "") == "xhttp" and ($extended | not)) then
+                empty
+              else
+                {ob: $ob, name: $name}
+              end
+          ] as $kept
+        # Assign unique tags using a deterministic dedup pass. $state.used is a
+        # set (object) of tags already taken, seeded with the existing config tags.
+        | reduce range(0; ($kept | length)) as $i (
+            {used: ($existing | map({(.): true}) | add // {}), out: []};
+            . as $state
+            | $kept[$i] as $entry
+            | ($entry.ob) as $ob
+            | (($ob.tag // $ob.remark // "") | tostring) as $raw
+            | (if ($raw | length) > 0 then $raw else ("server-" + (($i + 1) | tostring)) end) as $base
+            # Pick $base if free, else the first $base-N (N>=1) that is not taken.
+            | (
+                if ($state.used[$base] | not) then $base
+                else
+                    (label $found
+                        | (range(1; 1000001)
+                            | ($base + "-" + (. | tostring)) as $cand
+                            | if ($state.used[$cand] | not) then $cand, break $found else empty end))
+                end
+              ) as $tag
+            | .used[$tag] = true
+            | .out += [{
+                tag: $tag,
+                name: (if ($entry.name | length) > 0 then $entry.name else $tag end),
+                # Feed index stamped by the multi-URL merge (null otherwise);
+                # the marker itself must never reach sing-box.
+                feed: ($ob[$feed_key] // null),
+                outbound: (
+                    $ob | del(.tag) | del(.remark) | del(.[$feed_key]) | . + {tag: $tag}
+                    # Reality nodes and the X25519MLKEM768 key share (Xray-core >= 26.9.8
+                    # servers), on a chrome-fingerprint node only:
+                    #   - an explicit `false` (link hint support-x25519mlkem768=false, or
+                    #     the provider config) is kept: the server refuses the share;
+                    #   - the section option sets `true`;
+                    #   - a `true` already on the node (link hint kept by the normalized
+                    #     cache, or the provider config) is kept;
+                    #   - any other node loses the field. A core that does not know the
+                    #     field ($reality_mlkem_core false) loses it everywhere, so a
+                    #     downgraded core never fails `sing-box check` on a cached body.
+                    | if ((.tls | type) == "object") and ((.tls.reality | type) == "object")
+                      then (if $reality_mlkem_core
+                                and ((.tls.reality.enabled // false) == true)
+                                and (((.tls.utls | type) == "object") and ((.tls.utls.fingerprint // "") == "chrome"))
+                            then (if (.tls.reality.support_x25519mlkem768 == false) then .
+                                  elif ($reality_mlkem or (.tls.reality.support_x25519mlkem768 == true))
+                                  then .tls.reality.support_x25519mlkem768 = true
+                                  else del(.tls.reality.support_x25519mlkem768) end)
+                            else del(.tls.reality.support_x25519mlkem768) end)
+                      else . end
+                )
+              }]
+          ) as $resolved
+        | {
+            outbounds: [$resolved.out[].outbound],
+            tags: [$resolved.out[].tag],
+            names: [$resolved.out[].name],
+            feeds: [$resolved.out[].feed],
+            count: ($resolved.out | length),
+            skipped: ($total - ($resolved.out | length))
+          }
+    ' 2>/dev/null
+}
+
+#######################################
+# Try to append a slice of prepared outbounds to the config and validate it once
+# with a single `sing-box check`. On success the validated config (including the
+# appended outbounds) is exposed via SING_BOX_CF_TRY_CONFIG.
+# Arguments:
+#   config: string (JSON), base configuration to append to
+#   outbounds_json: string (JSON array), outbound objects to append (already tagged)
+# Returns:
+#   0 on success (SING_BOX_CF_TRY_CONFIG set), non-zero on validation failure
+#######################################
+sing_box_cf_try_subscription_batch() {
+    local config="$1"
+    local outbounds_json="$2"
+    local updated_config validation_tmp
+
+    SING_BOX_CF_TRY_CONFIG=""
+
+    updated_config=$(printf '%s' "$config" | jq -c --argjson new "$outbounds_json" '.outbounds += $new' 2>/dev/null)
+    if [ -z "$updated_config" ]; then
+        return 1
+    fi
+
+    validation_tmp="$(mktemp)" || return 1
+    sing_box_cm_save_config_to_file "$updated_config" "$validation_tmp"
+    if ! sing_box_oneshot -c "$validation_tmp" check > /dev/null 2>&1; then
+        rm -f "$validation_tmp"
+        return 1
+    fi
+    rm -f "$validation_tmp"
+
+    SING_BOX_CF_TRY_CONFIG="$updated_config"
+    return 0
+}
+
+#######################################
+# Recursively validate a range of prepared outbounds, isolating and skipping the
+# ones the current sing-box build rejects. Mirrors podkop-plus' bisection design:
+# a clean range costs a single `sing-box check`; only ranges containing a bad
+# outbound are split further (groups <= 8 are probed one-by-one).
+# Reads/updates the SING_BOX_CF_BATCH_* globals set up by the caller.
+# Arguments:
+#   start: integer, first index (0-based) into SING_BOX_CF_BATCH_OUTBOUNDS
+#   count: integer, number of outbounds in the range
+#######################################
+sing_box_cf_apply_subscription_range() {
+    local start="$1"
+    local count="$2"
+    local slice display_name half rest index
+
+    [ "$count" -gt 0 ] || return 0
+
+    slice=$(printf '%s' "$SING_BOX_CF_BATCH_OUTBOUNDS" |
+        jq -c --argjson start "$start" --argjson count "$count" '.[$start:($start + $count)]' 2>/dev/null)
+    if [ -z "$slice" ] || [ "$slice" = "[]" ]; then
+        SING_BOX_CF_BATCH_SKIPPED=$((SING_BOX_CF_BATCH_SKIPPED + count))
+        return 0
+    fi
+
+    if sing_box_cf_try_subscription_batch "$SING_BOX_CF_BATCH_CONFIG" "$slice"; then
+        SING_BOX_CF_BATCH_CONFIG="$SING_BOX_CF_TRY_CONFIG"
+        SING_BOX_CF_BATCH_KEPT=$((SING_BOX_CF_BATCH_KEPT + count))
+        SING_BOX_CF_BATCH_KEPT_RANGES="$SING_BOX_CF_BATCH_KEPT_RANGES $start:$count"
+        return 0
+    fi
+
+    if [ "$count" -eq 1 ]; then
+        display_name=$(printf '%s' "$SING_BOX_CF_BATCH_NAMES" |
+            jq -r --argjson start "$start" '.[$start] // "unknown"' 2>/dev/null)
+        [ -n "$display_name" ] || display_name="unknown"
+        log "Skip unsupported outbound for current sing-box: '$display_name'" "warn"
+        SING_BOX_CF_BATCH_SKIPPED=$((SING_BOX_CF_BATCH_SKIPPED + 1))
+        return 0
+    fi
+
+    if [ "$count" -le 8 ]; then
+        index=0
+        while [ "$index" -lt "$count" ]; do
+            sing_box_cf_apply_subscription_range $((start + index)) 1
+            index=$((index + 1))
+        done
+        return 0
+    fi
+
+    half=$((count / 2))
+    [ "$half" -gt 0 ] || half=1
+    rest=$((count - half))
+    sing_box_cf_apply_subscription_range "$start" "$half"
+    sing_box_cf_apply_subscription_range $((start + half)) "$rest"
+}
+
+#######################################
+# Parse a sing-box subscription JSON and add all proxy outbounds to the configuration.
+# Filters out non-proxy types (selector, urltest, direct, dns, block).
+# Uses 'tag' field (or 'remark' if present) as display name for each outbound.
+#
+# Validation strategy: build every outbound in a single jq pass, then validate the
+# whole batch with one `sing-box check`. If that passes (the common case) the run
+# costs O(1) sing-box invocations instead of O(n). If it fails, recursively bisect
+# the batch to isolate and skip only the outbounds the current sing-box build
+# cannot load, preserving the previous "skip unsupported outbound" behaviour. A
+# final full-config validation still happens later in sing_box_save_config().
+# Arguments:
+#   config: string (JSON), sing-box configuration to modify
+#   section: string, the UCI section name
+#   subscription_json_path: string, path to the downloaded subscription JSON file
+#   include_keywords_json: string (JSON array, optional), keyword whitelist (OR);
+#       empty/[] keeps all nodes. Forwarded to the prepare batch.
+#   exclude_keywords_json: string (JSON array, optional), keyword blacklist (OR);
+#       empty/[] excludes nothing. Forwarded to the prepare batch.
+# Outputs:
+#   Writes updated JSON configuration to stdout
+#   Sets global variable SUBSCRIPTION_OUTBOUND_TAGS (comma-separated list of tags)
+#   Sets global variable SUBSCRIPTION_OUTBOUND_TAGS_JSON (JSON array of tags, ASCII-escaped)
+#   Sets global variable SUBSCRIPTION_OUTBOUND_FEEDS_JSON (JSON array parallel to the tags:
+#       the feed index each node was stamped with by the multi-URL merge, or null)
+#   Sets global variable SUBSCRIPTION_OUTBOUND_NAMES (newline-separated list of display names)
+#######################################
+sing_box_cf_add_subscription_outbounds() {
+    local config="$1"
+    local section="$2"
+    local subscription_json_path="$3"
+    local include_keywords_json="${4:-[]}"
+    local exclude_keywords_json="${5:-[]}"
+
+    [ -n "$include_keywords_json" ] || include_keywords_json="[]"
+    [ -n "$exclude_keywords_json" ] || exclude_keywords_json="[]"
+
+    SUBSCRIPTION_OUTBOUND_TAGS=""
+    SUBSCRIPTION_OUTBOUND_TAGS_JSON="[]"
+    SUBSCRIPTION_OUTBOUND_FEEDS_JSON="[]"
+    SUBSCRIPTION_OUTBOUND_NAMES=""
+    SING_BOX_CF_LAST_CONFIG="$config"
+
+    if [ ! -f "$subscription_json_path" ]; then
+        log "Subscription JSON file not found: $subscription_json_path" "error"
+        echo "$config"
+        return 1
+    fi
+
+    # Whether a filter is active (for distinct empty-result logging): the keyword lists and/or
+    # the parameter filter (SUBSCRIPTION_PARAM_FILTER). An empty result then comes from the
+    # filter, not from the feed.
+    local keyword_filter_active=0 filter_kind=""
+    if [ "$include_keywords_json" != "[]" ] || [ "$exclude_keywords_json" != "[]" ]; then
+        filter_kind="keyword"
+    fi
+    if [ -n "${SUBSCRIPTION_PARAM_FILTER:-}" ] && [ "$SUBSCRIPTION_PARAM_FILTER" != "{}" ]; then
+        filter_kind="${filter_kind:+$filter_kind and }parameter"
+    fi
+    [ -z "$filter_kind" ] || keyword_filter_active=1
+
+    # Build the entire batch (keyword filter + static filter + dedup tags) in one
+    # jq pass.
+    local prepared
+    prepared=$(sing_box_cf_prepare_subscription_batch "$config" "$subscription_json_path" \
+        "$include_keywords_json" "$exclude_keywords_json")
+    if [ -z "$prepared" ]; then
+        log "Failed to parse subscription outbounds JSON" "error"
+        echo "$config"
+        return 1
+    fi
+
+    local candidate_total kept_count statically_skipped
+    candidate_total=$(printf '%s' "$prepared" | jq -r '(.count // 0) + (.skipped // 0)' 2>/dev/null)
+    kept_count=$(printf '%s' "$prepared" | jq -r '.count // 0' 2>/dev/null)
+    statically_skipped=$(printf '%s' "$prepared" | jq -r '.skipped // 0' 2>/dev/null)
+
+    if [ "$keyword_filter_active" -eq 1 ]; then
+        # candidate_total here is the post-keyword-filter candidate count; report
+        # kept vs. filtered_out so an over-strict filter is diagnosable.
+        local raw_candidate_total filtered_out
+        raw_candidate_total=$(printf '%s' "$config" | jq -c \
+            --slurpfile sub "$subscription_json_path" \
+            '[$sub[0].outbounds[]? | select(.type != "selector" and .type != "urltest" and .type != "direct" and .type != "dns" and .type != "block")] | length' 2>/dev/null)
+        [ -n "$raw_candidate_total" ] || raw_candidate_total=0
+        filtered_out=$((raw_candidate_total - candidate_total))
+        [ "$filtered_out" -ge 0 ] || filtered_out=0
+        log "Subscription $filter_kind filter for section '$section': kept=$candidate_total, filtered_out=$filtered_out" "info"
+    fi
+
+    if [ -z "$candidate_total" ] || [ "$candidate_total" -eq 0 ]; then
+        if [ "$keyword_filter_active" -eq 1 ]; then
+            log "Subscription $filter_kind filter for section '$section' removed all nodes; using a temporary blocked outbound" "warn"
+        fi
+        log "No proxy outbounds found in subscription JSON" "error"
+        echo "$config"
+        return 1
+    fi
+
+    log "Found $candidate_total proxy outbounds in subscription" "info"
+
+    if [ "${statically_skipped:-0}" -gt 0 ]; then
+        log "Skip $statically_skipped subscription outbound(s) unsupported by current sing-box build" "warn"
+    fi
+
+    if [ -z "$kept_count" ] || [ "$kept_count" -eq 0 ]; then
+        log "No supported proxy outbounds remained in subscription JSON" "error"
+        echo "$config"
+        return 1
+    fi
+
+    # Set up shared state for the (possibly recursive) batch validation.
+    SING_BOX_CF_BATCH_CONFIG="$config"
+    SING_BOX_CF_BATCH_OUTBOUNDS=$(printf '%s' "$prepared" | jq -c '.outbounds' 2>/dev/null)
+    SING_BOX_CF_BATCH_NAMES=$(printf '%s' "$prepared" | jq -c '.names' 2>/dev/null)
+    SING_BOX_CF_BATCH_KEPT=0
+    SING_BOX_CF_BATCH_SKIPPED=0
+    SING_BOX_CF_BATCH_KEPT_RANGES=""
+
+    sing_box_cf_apply_subscription_range 0 "$kept_count"
+
+    if [ "$SING_BOX_CF_BATCH_KEPT" -eq 0 ]; then
+        log "No valid subscription outbounds remained after validation for section '$section'" "error"
+        echo "$config"
+        return 1
+    fi
+
+    config="$SING_BOX_CF_BATCH_CONFIG"
+
+    if [ "$SING_BOX_CF_BATCH_SKIPPED" -gt 0 ]; then
+        log "Skipped $SING_BOX_CF_BATCH_SKIPPED unsupported subscription outbound(s) during validation" "warn"
+    fi
+
+    # Derive the public tag/name globals from the outbounds that were actually
+    # added (the ranges accepted during bisection), preserving original order.
+    local kept_ranges_json
+    kept_ranges_json=$(
+        printf '%s' "$SING_BOX_CF_BATCH_KEPT_RANGES" |
+            tr ' ' '\n' |
+            jq -R 'select(length > 0) | split(":") | {start: (.[0] | tonumber), count: (.[1] | tonumber)}' |
+            jq -sc '.'
+    )
+    [ -n "$kept_ranges_json" ] || kept_ranges_json="[]"
+
+    SUBSCRIPTION_OUTBOUND_TAGS_JSON=$(
+        printf '%s' "$prepared" | jq -c --argjson ranges "$kept_ranges_json" \
+            '[.tags as $t | $ranges[] | range(.start; .start + .count) | $t[.]]' 2>/dev/null
+    )
+    [ -n "$SUBSCRIPTION_OUTBOUND_TAGS_JSON" ] || SUBSCRIPTION_OUTBOUND_TAGS_JSON="[]"
+
+    SUBSCRIPTION_OUTBOUND_FEEDS_JSON=$(
+        printf '%s' "$prepared" | jq -c --argjson ranges "$kept_ranges_json" \
+            '[.feeds as $f | $ranges[] | range(.start; .start + .count) | $f[.]]' 2>/dev/null
+    )
+    [ -n "$SUBSCRIPTION_OUTBOUND_FEEDS_JSON" ] || SUBSCRIPTION_OUTBOUND_FEEDS_JSON="[]"
+
+    SUBSCRIPTION_OUTBOUND_TAGS=$(
+        printf '%s' "$SUBSCRIPTION_OUTBOUND_TAGS_JSON" | jq -r 'join(",")' 2>/dev/null
+    )
+
+    SUBSCRIPTION_OUTBOUND_NAMES=$(
+        printf '%s' "$prepared" | jq -r --argjson ranges "$kept_ranges_json" \
+            '[.names as $n | $ranges[] | range(.start; .start + .count) | $n[.]] | join("\n")' 2>/dev/null
+    )
+
+    log "Added $SING_BOX_CF_BATCH_KEPT subscription outbounds for section '$section'" "info"
+    SING_BOX_CF_LAST_CONFIG="$config"
+
+    echo "$config"
+}

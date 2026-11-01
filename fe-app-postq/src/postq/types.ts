@@ -1,0 +1,371 @@
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace ClashAPI {
+  export interface ProxyHistoryEntry {
+    time: string;
+    delay: number;
+  }
+
+  export interface ProxyBase {
+    type: string;
+    name: string;
+    udp: boolean;
+    history: ProxyHistoryEntry[];
+    now?: string;
+    all?: string[];
+  }
+
+  export interface Proxies {
+    proxies: Record<string, ProxyBase>;
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace PostQ {
+  // Available commands:
+  // start                   Start postq service
+  // stop                    Stop postq service
+  // reload                  Reload postq configuration
+  // restart                 Restart postq service
+  // enable                  Enable postq autostart
+  // disable                 Disable postq autostart
+  // main                    Run main postq process
+  // list_update             Update domain lists
+  // check_proxy             Check proxy connectivity
+  // check_nft               Check NFT rules
+  // check_nft_rules         Check NFT rules status
+  // check_sing_box          Check sing-box installation and status
+  // check_logs              Show postq logs from system journal
+  // check_sing_box_logs     Show sing-box logs
+  // check_fakeip            Test FakeIP on router
+  // check_environment       Flow offloading, clock and IPv6 facts
+  // check_route             Which section / DNS server handles a domain or IP
+  // get_subscription_info   Traffic and expiry the subscription panels report
+  // clash_api               Clash API interface for managing proxies and groups
+  // show_config             Display current postq configuration
+  // show_version            Show postq version
+  // show_sing_box_config    Show sing-box configuration
+  // show_sing_box_version   Show sing-box version
+  // show_system_info        Show system information
+  // get_status              Get postq service status
+  // get_sing_box_status     Get sing-box service status
+  // get_geoip_flags         GeoIP country of manually added links
+  // check_dns_available     Check DNS server availability
+  // global_check            Run global system check
+
+  export enum AvailableMethods {
+    CHECK_DNS_AVAILABLE = 'check_dns_available',
+    GET_CORE_CAPABILITIES = 'get_core_capabilities',
+    AUTO_UPDATE_STATUS = 'auto_update_status',
+    FETCH_FEED_LIST = 'fetch_feed_list',
+    CHECK_FAKEIP = 'check_fakeip',
+    CHECK_ENVIRONMENT = 'check_environment',
+    CHECK_ROUTE = 'check_route',
+    PREVIEW_SUBSCRIPTION_FILTER = 'preview_subscription_filter',
+    SUPPORT_REPORT = 'support_report',
+    GET_UPDATE_NOTICE = 'get_update_notice',
+    REFRESH_UPDATE_NOTICE = 'refresh_update_notice',
+    CONFIG_SNAPSHOT = 'config_snapshot',
+    GET_PIN_GUARD_EVENTS = 'get_pin_guard_events',
+    DNS_BENCHMARK = 'dns_benchmark',
+    GET_SUBSCRIPTION_INFO = 'get_subscription_info',
+    CHECK_NFT_RULES = 'check_nft_rules',
+    GET_STATUS = 'get_status',
+    CHECK_SING_BOX = 'check_sing_box',
+    GET_SING_BOX_STATUS = 'get_sing_box_status',
+    GET_GEOIP_FLAGS = 'get_geoip_flags',
+    CLASH_API = 'clash_api',
+    RESTART = 'restart',
+    START = 'start',
+    STOP = 'stop',
+    ENABLE = 'enable',
+    DISABLE = 'disable',
+    GLOBAL_CHECK = 'global_check',
+    SHOW_SING_BOX_CONFIG = 'show_sing_box_config',
+    CHECK_LOGS = 'check_logs',
+    GET_SYSTEM_INFO = 'get_system_info',
+    SUBSCRIPTION_UPDATE = 'subscription_update',
+  }
+
+  export enum AvailableClashAPIMethods {
+    GET_PROXIES = 'get_proxies',
+    GET_PROXY_LATENCY = 'get_proxy_latency',
+    GET_GROUP_LATENCY = 'get_group_latency',
+    SET_GROUP_PROXY = 'set_group_proxy',
+    GET_CONNECTIONS = 'get_connections',
+    CLOSE_CONNECTION = 'close_connection',
+    CLOSE_CONNECTIONS = 'close_connections',
+  }
+
+  export interface Outbound {
+    code: string;
+    displayName: string;
+    latency: number;
+    type: string;
+    selected: boolean;
+    // For an Auto (URLTest) group: the server it uses right now.
+    current?: string;
+  }
+
+  // The answer of preview_subscription_filter: the counts and names, or an error.
+  export interface SubscriptionFilterPreview {
+    total?: number;
+    kept?: number;
+    unsupported?: number;
+    names?: string[];
+    error?: 'no_cache' | 'bad_input' | 'no_config';
+  }
+
+  export interface OutboundSubgroup {
+    code: string;
+    displayName: string;
+    outbounds: Outbound[];
+  }
+
+  export interface OutboundGroup {
+    withTagSelect: boolean;
+    code: string;
+    displayName: string;
+    outbounds: Outbound[];
+    // Per-subscription blocks of a subscription section with several feeds;
+    // their outbounds are chosen through the same selector (`code`).
+    subgroups?: OutboundSubgroup[];
+    // Subscription sections only: the UCI section name, so the dashboard can
+    // refresh the section (or one of its feeds) after a click.
+    isSubscription?: boolean;
+    sectionName?: string;
+  }
+
+  export interface ConfigProxyUrlTestSection {
+    connection_type: 'proxy';
+    proxy_config_type: 'urltest';
+    urltest_proxy_links: string[];
+  }
+
+  export interface ConfigProxyUrlTestTextSection {
+    connection_type: 'proxy';
+    proxy_config_type: 'urltest_text';
+    urltest_proxy_links_text: string;
+  }
+
+  export interface ConfigProxySelectorTextSection {
+    connection_type: 'proxy';
+    proxy_config_type: 'selector_text';
+    selector_proxy_links_text: string;
+  }
+
+  export interface ConfigProxySelectorSection {
+    connection_type: 'proxy';
+    proxy_config_type: 'selector';
+    selector_proxy_links: string[];
+  }
+
+  export interface ConfigProxyUrlSection {
+    connection_type: 'proxy';
+    proxy_config_type: 'url';
+    proxy_string: string;
+  }
+
+  export interface ConfigProxyOutboundSection {
+    connection_type: 'proxy';
+    proxy_config_type: 'outbound';
+    outbound_json: string;
+  }
+
+  export interface ConfigProxySubscriptionSection {
+    connection_type: 'proxy';
+    proxy_config_type: 'subscription';
+    subscription_url: string[];
+    subscription_format_preference?: 'auto' | 'xray' | 'singbox';
+    subscription_update_interval?: string;
+    subscription_update_time?: string;
+    subscription_group_mode?: 'off' | 'country' | 'prefix';
+    subscription_group_prefix_len?: string;
+    subscription_filter_include_keywords?: string[];
+    subscription_filter_exclude_keywords?: string[];
+    subscription_filter_include_countries?: string[];
+    subscription_filter_exclude_countries?: string[];
+  }
+
+  export interface ConfigVpnSection {
+    connection_type: 'vpn';
+    interface: string;
+  }
+
+  export interface ConfigBlockSection {
+    connection_type: 'block';
+  }
+
+  export interface ConfigExclusionSection {
+    connection_type: 'exclusion';
+  }
+
+  export interface ConfigDnsSection {
+    connection_type: 'dns';
+    dns_type?: string;
+    dns_server?: string;
+    dns_detour_section?: string;
+  }
+
+  export type ConfigBaseSection =
+    | ConfigProxyUrlTestSection
+    | ConfigProxyUrlTestTextSection
+    | ConfigProxySelectorTextSection
+    | ConfigProxySelectorSection
+    | ConfigProxyUrlSection
+    | ConfigProxyOutboundSection
+    | ConfigProxySubscriptionSection
+    | ConfigVpnSection
+    | ConfigBlockSection
+    | ConfigExclusionSection
+    | ConfigDnsSection;
+
+  export type ConfigSection = ConfigBaseSection & {
+    '.name': string;
+    '.type': 'settings' | 'section';
+    disabled?: '0' | '1';
+    yacd_secret_key?: string;
+  };
+
+  export interface MethodSuccessResponse<T> {
+    success: true;
+    data: T;
+  }
+
+  export interface MethodFailureResponse {
+    success: false;
+    error: string;
+  }
+
+  export type MethodResponse<T> =
+    | MethodSuccessResponse<T>
+    | MethodFailureResponse;
+
+  export interface DnsCheckResult {
+    dns_type: 'udp' | 'doh' | 'dot';
+    dns_server: string;
+    dns_status: 0 | 1;
+    dns_on_router: 0 | 1;
+    bootstrap_dns_server: string;
+    bootstrap_dns_status: 0 | 1;
+    dhcp_config_status: 0 | 1;
+    dns_via_outbound_tag?: string;
+  }
+
+  export interface NftRulesCheckResult {
+    table_exist: 0 | 1;
+    rules_mangle_exist: 0 | 1;
+    rules_mangle_counters: 0 | 1;
+    rules_mangle_output_exist: 0 | 1;
+    rules_proxy_exist: 0 | 1;
+    rules_proxy_counters: 0 | 1;
+    rules_other_mark_exist: 0 | 1;
+  }
+
+  export interface SingBoxCheckResult {
+    sing_box_installed: 0 | 1;
+    sing_box_version_ok: 0 | 1;
+    sing_box_service_exist: 0 | 1;
+    sing_box_autostart_disabled: 0 | 1;
+    sing_box_process_running: 0 | 1;
+    sing_box_ports_listening: 0 | 1;
+  }
+
+  export interface FakeIPCheckResult {
+    fakeip: boolean;
+    IP: string;
+  }
+
+  export interface EnvironmentCheckResult {
+    flow_offloading: { software: boolean; hardware: boolean; active: boolean };
+    clock: {
+      plausible: boolean;
+      skew_seconds: number | null;
+      ntp_enabled: boolean;
+      timezone: string;
+    };
+    ipv6: { router_has_global: boolean; postq_enabled: boolean };
+  }
+
+  export interface RouteCheckResult {
+    error?: string;
+    target?: string;
+    kind?: 'domain' | 'ip';
+    source?: string | null;
+    verdict?: 'section' | 'direct' | 'blocked' | 'unmatched';
+    outbound?: string | null;
+    section?: string | null;
+    rule?: string | null;
+    rule_set?: string | null;
+    by_default?: boolean;
+    dns?: {
+      server: string | null;
+      verdict: 'rule' | 'final' | 'blocked';
+    } | null;
+    incomplete?: boolean;
+    skipped_rules?: string[];
+  }
+
+  export interface GetStatus {
+    enabled: number;
+    status: string;
+  }
+
+  export interface GetSingBoxStatus {
+    running: number;
+    enabled: number;
+    status: string;
+  }
+
+  export interface GetSystemInfo {
+    postq_version: string;
+    postq_latest_version: string;
+    luci_app_version: string;
+    sing_box_version: string;
+    openwrt_version: string;
+    device_model: string;
+    sing_box_extended: 0 | 1;
+    // Active sing-box core flavour — the SINGLE source of truth for the
+    // Component Manager cards (the legacy sing_box_extended bit is kept for
+    // backward compatibility but no longer drives card activity).
+    sing_box_variant: SingBoxVariant;
+    // 1 when the installed extended-lite core is the UPX-compressed build.
+    sing_box_lite_upx: 0 | 1;
+    // 0 when the lite repo has no build for this device's architecture.
+    sing_box_lite_supported: 0 | 1;
+    // Release of the NaiveProxy client, "not installed" or "unknown" (put there by hand).
+    naive_version?: string;
+    ram_total_mb: number;
+    flash_free_mb: number;
+  }
+
+  // sing-box core flavours echoed by get_system_info (sing_box_variant).
+  export type SingBoxVariant = 'stock' | 'extended' | 'extended_lite';
+
+  export interface GetClashApiProxyLatency {
+    delay: number;
+    message?: string;
+  }
+
+  // Component Manager (task-018) — consumes the STABLE backend contract from
+  // task-017. Status union returned by the sync update-check actions.
+  export type ComponentUpdateStatus =
+    | 'latest'
+    | 'outdated'
+    | 'dev'
+    // a build other than the installed one that is LOWER (the other update source)
+    | 'switch'
+    | 'not_installed';
+
+  // Shape echoed by the sync update-check actions:
+  //   component_action sing_box check_update        (extended)
+  //   component_action sing_box check_update_stable (stock)
+  export interface ComponentCheckUpdateResult {
+    success: boolean;
+    current_version?: string;
+    latest_version?: string;
+    status?: ComponentUpdateStatus;
+    // Release notes of the offered build (PostQ self-update check only)
+    notes?: string;
+    message?: string;
+  }
+}

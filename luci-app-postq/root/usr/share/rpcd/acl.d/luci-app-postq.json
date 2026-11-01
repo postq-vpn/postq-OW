@@ -1,0 +1,31 @@
+{
+  "luci-app-postq": {
+    "description": "Grant UCI and RPC access to LuCI app PostQ VPN",
+    "read": {
+      "file": {
+        "/etc/init.d/postq": [
+          "exec"
+        ],
+        "/usr/bin/postq": [
+          "exec"
+        ]
+      },
+      "ubus": {
+        "service": [
+          "list"
+        ],
+        "luci-rpc": [
+          "getHostHints"
+        ]
+      },
+      "uci": [
+        "postq"
+      ]
+    },
+    "write": {
+      "uci": [
+        "postq"
+      ]
+    }
+  }
+}

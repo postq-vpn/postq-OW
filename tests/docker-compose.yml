@@ -1,12 +1,12 @@
 # ──────────────────────────────────────────────────────────────────
-# Netshift Evolution — Docker Compose Test Environment
+# Postq Evolution — Docker Compose Test Environment
 #
 # Launch:
 #   docker compose -f tests/docker-compose.yml build
 #   docker compose -f tests/docker-compose.yml up
 #
 # Run specific test:
-#   docker compose -f tests/docker-compose.yml run --rm netshift-test <test-name>
+#   docker compose -f tests/docker-compose.yml run --rm postq-test <test-name>
 #
 # Test names: all, the name of a test function without its test_ prefix
 #             (hy2_hop for test_hy2_hop), or one of the short names in main() of
@@ -15,16 +15,16 @@
 # ──────────────────────────────────────────────────────────────────
 
 services:
-  netshift-test:
+  postq-test:
     build:
       context: ..
       dockerfile: tests/Dockerfile
       args:
-        - NETSHIFT_VERSION=test
-    image: netshift-evolution:test
+        - POSTQ_VERSION=test
+    image: postq-evolution:test
     # The image content (OpenWrt rootfs, sing-box-extended) is x86_64.
     platform: linux/amd64
-    container_name: netshift-test
+    container_name: postq-test
     hostname: OpenWrt
 
     # ── Kernel capabilities for nftables ────────────────────────
@@ -44,16 +44,16 @@ services:
 
     # ── Volumes (source code bind mount) ─────────────────────────
     volumes:
-      - ../netshift/files:/netshift/files:ro
-      - ../netshift/Makefile:/netshift/Makefile:ro
-      - ../luci-app-netshift:/luci-app-netshift:ro
-      - ../install.sh:/netshift/install.sh:ro
+      - ../postq/files:/postq/files:ro
+      - ../postq/Makefile:/postq/Makefile:ro
+      - ../luci-app-postq:/luci-app-postq:ro
+      - ../install.sh:/postq/install.sh:ro
       - ./entrypoint.sh:/usr/local/bin/entrypoint.sh:ro
       - ./test-results:/tmp/test-results
 
     # ── Environment ──────────────────────────────────────────────
     environment:
-      - NETSHIFT_VERSION=test
+      - POSTQ_VERSION=test
       - TEST_SKIP_NETWORK=${TEST_SKIP_NETWORK:-0}
       - TEST_VERBOSE=${TEST_VERBOSE:-0}
 

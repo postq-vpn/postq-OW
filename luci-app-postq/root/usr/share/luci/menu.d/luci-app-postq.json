@@ -1,0 +1,14 @@
+{
+  "admin/services/postq": {
+    "title": "PostQvpn",
+    "order": 42,
+    "action": {
+      "type": "view",
+      "path": "postq/postq"
+    },
+    "depends": {
+			"acl": [ "luci-app-postq" ],
+			"uci": { "postq": true }
+		}
+  }
+}

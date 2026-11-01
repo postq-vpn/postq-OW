@@ -27,7 +27,7 @@ jobs:
           context: .
           # Must match `image:` in tests/docker-compose.yml: `compose run` below
           # uses this image and would silently rebuild it (uncached) otherwise.
-          tags: netshift-evolution:test
+          tags: postq-evolution:test
           # The rootfs and sing-box-extended in tests/Dockerfile are x86_64.
           platforms: linux/amd64
           load: true
@@ -38,7 +38,7 @@ jobs:
           cache-to: ${{ github.event_name != 'pull_request' && 'type=gha,mode=max,scope=smoke,ignore-error=true' || '' }}
 
       - name: Run OpenWrt smoke tests
-        run: docker compose -f tests/docker-compose.yml run --rm netshift-test all
+        run: docker compose -f tests/docker-compose.yml run --rm postq-test all
 
   preparation:
     name: Setup build version
@@ -55,7 +55,7 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   build:
-    name: Builder for ${{ matrix.package_type }} netshift and luci-app-netshift
+    name: Builder for ${{ matrix.package_type }} postq and luci-app-postq
     runs-on: ubuntu-24.04
     needs: preparation
     strategy:
@@ -76,15 +76,15 @@ jobs:
         with:
           file: ./Dockerfile-${{ matrix.package_type }}
           context: .
-          tags: netshift:ci-${{ matrix.package_type }}
+          tags: postq:ci-${{ matrix.package_type }}
           load: true
           cache-from: type=gha,scope=${{ matrix.package_type }}
           cache-to: type=gha,mode=max,scope=${{ matrix.package_type }},ignore-error=true
           build-args: |
-            NETSHIFT_VERSION=${{ needs.preparation.outputs.version }}
+            POSTQ_VERSION=${{ needs.preparation.outputs.version }}
 
       - name: Create ${{ matrix.package_type }} Docker container
-        run: docker create --name ${{ matrix.package_type }} netshift:ci-${{ matrix.package_type }}
+        run: docker create --name ${{ matrix.package_type }} postq:ci-${{ matrix.package_type }}
 
       - name: Copy files from ${{ matrix.package_type }} Docker container
         run: |
@@ -111,9 +111,9 @@ jobs:
           VERSION="${{ needs.preparation.outputs.version }}"
 
           mkdir -p ./filtered-bin/${{ matrix.package_type }}
-          cp ./bin/${{ matrix.package_type }}/luci-i18n-netshift-ru-*.${{ matrix.package_type }} "./filtered-bin/${{ matrix.package_type }}/luci-i18n-netshift-ru-${VERSION}.${{ matrix.package_type }}"
-          cp ./bin/${{ matrix.package_type }}/netshift-*.${{ matrix.package_type }} ./filtered-bin/${{ matrix.package_type }}/
-          cp ./bin/${{ matrix.package_type }}/luci-app-netshift-*.${{ matrix.package_type }} ./filtered-bin/${{ matrix.package_type }}/
+          cp ./bin/${{ matrix.package_type }}/luci-i18n-postq-ru-*.${{ matrix.package_type }} "./filtered-bin/${{ matrix.package_type }}/luci-i18n-postq-ru-${VERSION}.${{ matrix.package_type }}"
+          cp ./bin/${{ matrix.package_type }}/postq-*.${{ matrix.package_type }} ./filtered-bin/${{ matrix.package_type }}/
+          cp ./bin/${{ matrix.package_type }}/luci-app-postq-*.${{ matrix.package_type }} ./filtered-bin/${{ matrix.package_type }}/
 
       - name: Remove Docker container
         run: docker rm ${{ matrix.package_type }}

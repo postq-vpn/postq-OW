@@ -1,8 +1,8 @@
 #!/bin/sh
 # ──────────────────────────────────────────────────────────────────
-# Netshift Evolution — Smoke Test Suite Entrypoint
+# Postq Evolution — Smoke Test Suite Entrypoint
 #
-# Runs validation tests against the netshift codebase in an OpenWrt
+# Runs validation tests against the postq codebase in an OpenWrt
 # rootfs container. Designed for CI and pre-deployment verification.
 # ──────────────────────────────────────────────────────────────────
 
@@ -20,8 +20,8 @@ PASS=0
 FAIL=0
 SKIP=0
 RESULTS_DIR="${RESULTS_DIR:-/tmp/test-results}"
-NETSHIFT_SRC="${NETSHIFT_SRC:-/netshift/files}"
-NETSHIFT_LIB_DIR="${NETSHIFT_SRC}/usr/lib"
+POSTQ_SRC="${POSTQ_SRC:-/postq/files}"
+POSTQ_LIB_DIR="${POSTQ_SRC}/usr/lib"
 
 mkdir -p "$RESULTS_DIR"
 
@@ -117,7 +117,7 @@ test_deps() {
 test_syntax() {
     header "Shell Syntax & Library Loading"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
 
     # Test each library file for syntax errors
     for f in \
@@ -155,7 +155,7 @@ test_syntax() {
     done
 
     # Parse-check the CLI dispatcher itself (not just the libs).
-    local cli="${NETSHIFT_SRC}/usr/bin/netshift"
+    local cli="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$cli" ]; then
         fail "File not found: $cli"
     elif ash -n "$cli" 2>&1; then
@@ -177,18 +177,18 @@ test_syntax() {
             fi
         done
         if [ "$mojibake_found" -eq 0 ]; then
-            pass "netshift CLI free of double-encode mojibake"
+            pass "postq CLI free of double-encode mojibake"
         else
-            fail "netshift CLI contains residual mojibake (рџ/в”/вЂ)"
+            fail "postq CLI contains residual mojibake (рџ/в”/вЂ)"
         fi
     fi
 
     # Test that libraries can be sourced (requires /lib/functions stubs).
     # Use a temp script to avoid fragile shell quoting.
-    local source_test="/tmp/netshift-source-test-$$.sh"
+    local source_test="/tmp/postq-source-test-$$.sh"
     cat > "$source_test" << EOF
-NETSHIFT_LIB="$lib"
-NETSHIFT_CONFIG="/etc/config/netshift.test"
+POSTQ_LIB="$lib"
+POSTQ_CONFIG="/etc/config/postq.test"
 mkdir -p /lib/config /lib/functions
 touch /etc/config/dhcp /etc/config/sing-box
 . "$lib/logging.sh" 2>/dev/null && echo "OK"
@@ -208,7 +208,7 @@ EOF
 test_config() {
     header "UCI Config Validation"
 
-    local config="${NETSHIFT_SRC}/etc/config/netshift"
+    local config="${POSTQ_SRC}/etc/config/postq"
 
     if [ ! -r "$config" ]; then
         fail "Config file not found: $config"
@@ -251,7 +251,7 @@ test_config() {
 test_helpers() {
     header "Helper Functions"
 
-    local helpers="${NETSHIFT_LIB_DIR}/helpers.sh"
+    local helpers="${POSTQ_LIB_DIR}/helpers.sh"
 
     if [ ! -r "$helpers" ]; then
         fail "helpers.sh not found"
@@ -337,7 +337,7 @@ test_nft() {
     fi
 
     # Test basic nft operations
-    local test_table="netshift_test_$$"
+    local test_table="postq_test_$$"
     if nft add table inet "$test_table" 2>/dev/null; then
         pass "nft table creation works"
         nft delete table inet "$test_table" 2>/dev/null
@@ -389,7 +389,7 @@ test_nft_ipv6() {
         return
     fi
 
-    local constants="${NETSHIFT_LIB_DIR}/constants.sh"
+    local constants="${POSTQ_LIB_DIR}/constants.sh"
     if [ ! -f "$constants" ]; then
         fail "constants.sh not found at $constants"
         return
@@ -404,7 +404,7 @@ test_nft_ipv6() {
         return
     fi
 
-    local test_table="netshift_v6_test_$$"
+    local test_table="postq_v6_test_$$"
 
     # ── ipv6_addr interval set + v6 element (mirrors the ipv4 set test) ──
     if nft add table inet "$test_table" 2>/dev/null && \
@@ -474,7 +474,7 @@ test_nft_ipv6() {
 # sing-box -> sniff + full route-rule walk per connection -> 100% CPU on a
 # weak router, even when only selected lists were configured for proxying.
 # 0.8.5 marked SELECTIVELY: only proxied destination subnets
-# (@netshift_subnets) + the FakeIP range (proxied domains). task-034 restores
+# (@postq_subnets) + the FakeIP range (proxied domains). task-034 restores
 # that selective model, keeping mark-EVERYTHING only when a global_proxy
 # section is active.
 #
@@ -513,8 +513,8 @@ test_selective_marking() {
         return
     fi
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="${NETSHIFT_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$bin" ] || [ ! -r "$lib/constants.sh" ] || [ ! -r "$lib/nft.sh" ]; then
         skip "selective-marking (bin / constants.sh / nft.sh not found)"
         return
@@ -543,7 +543,7 @@ test_selective_marking() {
     # then dumps BOTH chains + the union set to stdout, each under a
     # ---SECTION--- label (---MANGLE---, ---MANGLE_OUTPUT---, ---SETS---) for
     # the parent to parse with sel_section.
-    local drv="/tmp/netshift-selmark-$$.sh"
+    local drv="/tmp/postq-selmark-$$.sh"
     cat > "$drv" << 'SELEOF'
 set -e
 LIB="LIB_DIR_PLACEHOLDER"
@@ -554,7 +554,7 @@ BIN="BIN_PATH_PLACEHOLDER"
 # shellcheck disable=SC1090
 . "$LIB/nft.sh"
 
-# Override the table name so we never touch the real NetShiftTable.
+# Override the table name so we never touch the real PostQTable.
 NFT_TABLE_NAME="$SCN_TABLE"
 
 # Quiet logger.
@@ -563,7 +563,7 @@ nolog() { :; }
 echolog() { :; }
 
 # ── UCI / predicate stubs driven by env ──────────────────────────
-netshift_ipv6_enabled() { [ "${SCN_IPV6:-0}" = "1" ]; }
+postq_ipv6_enabled() { [ "${SCN_IPV6:-0}" = "1" ]; }
 get_global_proxy_section() { printf '%s' "${SCN_GLOBALPROXY:-}"; }
 
 config_get() {
@@ -599,8 +599,8 @@ config_list_foreach() {
 _orig_cg=config_get
 
 # Extract the shipped functions verbatim (column-0 opener to column-0 '}').
-for fn in nft_init_interfaces_set populate_netshift_subnets_from_file \
-          populate_netshift_subnets_from_string nft_mark_fully_routed_source_ips \
+for fn in nft_init_interfaces_set populate_postq_subnets_from_file \
+          populate_postq_subnets_from_string nft_mark_fully_routed_source_ips \
           _nft_mark_fully_routed_ips_for_section _nft_mark_fully_routed_ip_handler \
           foreach_active_section _active_section_dispatch \
           nft_add_dns_hijack nft_add_port_rules port_rules_value _port_list_has disable_quic_mode nft_add_quic_block \
@@ -858,7 +858,7 @@ SELEOF
             fail "selective:ipv6-output — FakeIP v6 range mark missing in mangle_output"
         fi
     else
-        # The driver enables v6 only if netshift_ipv6_enabled() returns true,
+        # The driver enables v6 only if postq_ipv6_enabled() returns true,
         # which it forced; absence here means the kernel rejected the v6 set/rule.
         skip "selective:ipv6 — v6 set/rule not applied (kernel ip6 support?)"
         skip "selective:ipv6-output — mangle_output v6 marks not verified (kernel ip6 support?)"
@@ -881,7 +881,7 @@ SELEOF
 
     # ── Scenario 6 (THE REGRESSION REPRO): stale mark-all table + respawn ──
     # Reproduces the real on-hardware service path the original test missed: a
-    # NetShiftTable left behind by a previous global_proxy / 0.8.6 mark-all run,
+    # PostQTable left behind by a previous global_proxy / 0.8.6 mark-all run,
     # then create_nft_rules run again WITHOUT a clean stop (procd respawn /
     # in-place package upgrade). Before the fix, the stale mark-EVERYTHING rules
     # survived at the TOP of the prerouting chain and marked all traffic, making
@@ -975,7 +975,7 @@ SELEOF
     # section, global_proxy=0). It MUST return empty -> selective branch.
     if [ -r /lib/functions.sh ] && [ -r /lib/config/uci.sh ] && command -v uci > /dev/null 2>&1; then
         local rgp_drv rgp_out
-        rgp_drv="/tmp/netshift-selmark-rgp-$$.sh"
+        rgp_drv="/tmp/postq-selmark-rgp-$$.sh"
         cat > "$rgp_drv" << 'RGPEOF'
 BIN="BIN_PATH_PLACEHOLDER"
 LIB="LIB_DIR_PLACEHOLDER"
@@ -995,7 +995,7 @@ for fn in get_global_proxy_section _determine_global_proxy_section \
     eval "$(awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$BIN")"
 done
 mkdir -p /etc/config
-cat > /etc/config/netshift_selmarktest <<'CFGEOF'
+cat > /etc/config/postq_selmarktest <<'CFGEOF'
 config settings 'settings'
     option block_doh '0'
 
@@ -1005,10 +1005,10 @@ config section 'main'
     option global_proxy '0'
     list subscription_url 'https://example.com/sub'
 CFGEOF
-# Mirror exactly what bin/netshift does: config_load with the config name.
-config_load netshift_selmarktest
+# Mirror exactly what bin/postq does: config_load with the config name.
+config_load postq_selmarktest
 printf 'GP=[%s]\n' "$(get_global_proxy_section)"
-rm -f /etc/config/netshift_selmarktest
+rm -f /etc/config/postq_selmarktest
 RGPEOF
         sed -i "s|LIB_DIR_PLACEHOLDER|$lib|g; s|BIN_PATH_PLACEHOLDER|$bin|g" "$rgp_drv"
         rgp_out="$(sh "$rgp_drv" 2>/dev/null)"
@@ -1027,7 +1027,7 @@ RGPEOF
     # spec requires confirming sing-box still accepts a domain+subnet config.
     if command -v sing-box > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
             local sbtmp sbcfg sbres
-            sbtmp="/tmp/netshift-selmark-sb-$$.json"
+            sbtmp="/tmp/postq-selmark-sb-$$.json"
             sbcfg=$(jq -n \
                 --arg direct "$SB_DIRECT_OUTBOUND_TAG" \
                 --arg tproxy "$SB_TPROXY_INBOUND_TAG" \
@@ -1064,7 +1064,7 @@ RGPEOF
 # unreachable section black-hole ALL traffic to outbound/direct[direct-out]
 # with `i/o timeout` (+ DNS n/a). Root cause (confirmed on a live kernel):
 # the nft `mangle` prerouting chain marks ALL LAN tcp/udp with NFT_FAKEIP_MARK
-# and `ip rule ... fwmark NFT_FAKEIP_MARK lookup netshift` redirects it to
+# and `ip rule ... fwmark NFT_FAKEIP_MARK lookup postq` redirects it to
 # tproxy, but NOTHING stamped a mark on sing-box's OWN egress. So sing-box's
 # direct-out sockets (which now carry ALL unmatched traffic) inherited the
 # tproxy SO_MARK (NFT_FAKEIP_MARK) and the `ip rule` re-captured them into
@@ -1092,7 +1092,7 @@ test_section_isolation() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     local cm_lib="$lib/sing_box_config_manager.sh"
     local const_lib="$lib/constants.sh"
     if [ ! -r "$cm_lib" ] || [ ! -r "$const_lib" ]; then
@@ -1205,7 +1205,7 @@ SIEOF
 
     # ── (c) live-kernel fail-open mechanism (only if nft + curl + net) ──────────
     # Build the EXACT ip rule the backend installs (fwmark NFT_FAKEIP_MARK ->
-    # table netshift = local default dev lo) and prove:
+    # table postq = local default dev lo) and prove:
     #   - egress carrying NFT_FAKEIP_MARK loops/black-holes (the bug)
     #   - egress carrying NFT_OUTBOUND_MARK (the fix) reaches the internet
     if [ "${TEST_SKIP_NETWORK:-0}" = "1" ]; then
@@ -1217,21 +1217,21 @@ SIEOF
     else
         # All ip/nft mutations are best-effort and may legitimately return
         # non-zero (rule absent on first del, etc.); guard each against `set -e`.
-        grep -q "105 netshift" /etc/iproute2/rt_tables 2>/dev/null || \
-            echo "105 netshift" >> /etc/iproute2/rt_tables
-        ip -4 route replace local 0.0.0.0/0 dev lo table netshift 2>/dev/null || \
-            ip -4 route add local 0.0.0.0/0 dev lo table netshift 2>/dev/null || true
-        ip -4 rule del fwmark "$NFT_FAKEIP_MARK"/"$NFT_FAKEIP_MARK" table netshift priority 105 2>/dev/null || true
-        ip -4 rule add fwmark "$NFT_FAKEIP_MARK"/"$NFT_FAKEIP_MARK" table netshift priority 105 2>/dev/null || true
+        grep -q "105 postq" /etc/iproute2/rt_tables 2>/dev/null || \
+            echo "105 postq" >> /etc/iproute2/rt_tables
+        ip -4 route replace local 0.0.0.0/0 dev lo table postq 2>/dev/null || \
+            ip -4 route add local 0.0.0.0/0 dev lo table postq 2>/dev/null || true
+        ip -4 rule del fwmark "$NFT_FAKEIP_MARK"/"$NFT_FAKEIP_MARK" table postq priority 105 2>/dev/null || true
+        ip -4 rule add fwmark "$NFT_FAKEIP_MARK"/"$NFT_FAKEIP_MARK" table postq priority 105 2>/dev/null || true
 
-        nft delete table inet netshift_si_test 2>/dev/null || true
-        nft add table inet netshift_si_test 2>/dev/null || true
-        nft add chain inet netshift_si_test out \
+        nft delete table inet postq_si_test 2>/dev/null || true
+        nft add table inet postq_si_test 2>/dev/null || true
+        nft add chain inet postq_si_test out \
             '{ type route hook output priority -200; policy accept; }' 2>/dev/null || true
 
         # FAKEIP_MARK egress -> must loop (curl times out, rc!=0).
-        nft flush chain inet netshift_si_test out 2>/dev/null || true
-        nft add rule inet netshift_si_test out ip daddr 1.0.0.1 meta mark set "$NFT_FAKEIP_MARK" counter 2>/dev/null || true
+        nft flush chain inet postq_si_test out 2>/dev/null || true
+        nft add rule inet postq_si_test out ip daddr 1.0.0.1 meta mark set "$NFT_FAKEIP_MARK" counter 2>/dev/null || true
         if curl -s -m 6 -o /dev/null http://1.0.0.1/ 2>/dev/null; then
             fail "si-live-loop-fakeip-blackholes:FAIL (fakeip-marked egress unexpectedly escaped)"
         else
@@ -1239,17 +1239,17 @@ SIEOF
         fi
 
         # OUTBOUND_MARK egress (the fix) -> must reach the internet (rc==0).
-        nft flush chain inet netshift_si_test out 2>/dev/null || true
-        nft add rule inet netshift_si_test out ip daddr 1.0.0.1 meta mark set "$NFT_OUTBOUND_MARK" counter 2>/dev/null || true
+        nft flush chain inet postq_si_test out 2>/dev/null || true
+        nft add rule inet postq_si_test out ip daddr 1.0.0.1 meta mark set "$NFT_OUTBOUND_MARK" counter 2>/dev/null || true
         if curl -s -m 6 -o /dev/null http://1.0.0.1/ 2>/dev/null; then
             pass "si-live-loop-outbound-escapes:OK (outbound-marked egress reaches internet -> fail-open)"
         else
             fail "si-live-loop-outbound-escapes:FAIL (outbound-marked egress did NOT escape)"
         fi
 
-        nft delete table inet netshift_si_test 2>/dev/null || true
-        ip -4 rule del fwmark "$NFT_FAKEIP_MARK"/"$NFT_FAKEIP_MARK" table netshift priority 105 2>/dev/null || true
-        ip -4 route flush table netshift 2>/dev/null || true
+        nft delete table inet postq_si_test 2>/dev/null || true
+        ip -4 rule del fwmark "$NFT_FAKEIP_MARK"/"$NFT_FAKEIP_MARK" table postq priority 105 2>/dev/null || true
+        ip -4 route flush table postq 2>/dev/null || true
     fi
 
     rm -f "$drv" "$route_json"
@@ -1273,8 +1273,8 @@ test_block_leaks() {
         return
     fi
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="${NETSHIFT_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/kill_switch.sh" ] || [ ! -r "$lib/constants.sh" ] || [ ! -r "$bin" ]; then
         skip "blockleaks (kill_switch.sh / constants.sh / bin not found)"
         return
@@ -1313,7 +1313,7 @@ test_block_leaks() {
         pass "blockleaks:order — list_update relies on the incremental mirror, no rebuild"
     fi
 
-    local drv="/tmp/netshift-blockleaks-$$.sh"
+    local drv="/tmp/postq-blockleaks-$$.sh"
     cat > "$drv" << 'BLEOF'
 LIB="LIB_DIR_PLACEHOLDER"
 BIN="BIN_PATH_PLACEHOLDER"
@@ -1327,15 +1327,15 @@ BIN="BIN_PATH_PLACEHOLDER"
 # shellcheck disable=SC1090
 . "$LIB/kill_switch.sh"
 
-# Unique tables and scratch space: never touch the real NetShiftTable /
-# NetShiftGuard.
+# Unique tables and scratch space: never touch the real PostQTable /
+# PostQGuard.
 NFT_TABLE_NAME="$SCN_TABLE"
 NFT_GUARD_TABLE_NAME="$SCN_GUARD"
 TMP_SING_BOX_FOLDER="/tmp/$SCN_GUARD.tmp"
 
 log() { [ "$2" = "error" ] && echo "LOG-ERROR: $1"; return 0; }
 
-netshift_ipv6_enabled() { [ "${SCN_IPV6:-0}" = "1" ]; }
+postq_ipv6_enabled() { [ "${SCN_IPV6:-0}" = "1" ]; }
 get_global_proxy_section() { printf '%s' "${SCN_GLOBALPROXY:-}"; }
 foreach_active_section() { [ -n "${SCN_FULLROUTED:-}" ] || return 0; "$1" "frsec"; }
 config_list_foreach() {
@@ -1363,8 +1363,8 @@ config_get_bool() {
     esac
     return 0
 }
-dnsmasq_is_configured_for_netshift() { return 1; }
-uci_get() { [ "$3" = "netshift_dnsmasq_backup" ] && printf '1'; }
+dnsmasq_is_configured_for_postq() { return 1; }
+uci_get() { [ "$3" = "postq_dnsmasq_backup" ] && printf '1'; }
 
 extract() { awk -v f="$1" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$BIN"; }
 
@@ -1372,8 +1372,8 @@ extract() { awk -v f="$1" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "
 # SHIPPED functions that fill the sets (the only place they grow).
 eval "$(extract dnsmasq_has_backup)"
 eval "$(extract dnsmasq_should_be_restored)"
-eval "$(extract populate_netshift_subnets_from_file)"
-eval "$(extract populate_netshift_subnets_from_string)"
+eval "$(extract populate_postq_subnets_from_file)"
+eval "$(extract populate_postq_subnets_from_string)"
 
 # What create_nft_rules leaves behind: the sets exist and are EMPTY.
 new_main_table() {
@@ -1391,8 +1391,8 @@ start_sequence() {
     # 198.51.x / 203.0.113.x are documentation ranges (in localv4): fine as set
     # members here, the test only looks at what lands in which set. The two
     # adjacent /24 are listed back by nft as ONE range (a-b), not a CIDR.
-    populate_netshift_subnets_from_string "203.0.113.0/24 198.51.100.10 45.9.1.0/24 45.9.2.0/24"
-    NFT_SUBNET_SET="$NFT_BYPASS_SET_NAME" populate_netshift_subnets_from_string "45.77.0.0/16"
+    populate_postq_subnets_from_string "203.0.113.0/24 198.51.100.10 45.9.1.0/24 45.9.2.0/24"
+    NFT_SUBNET_SET="$NFT_BYPASS_SET_NAME" populate_postq_subnets_from_string "45.77.0.0/16"
     KILL_SWITCH_MIRROR_SUSPENDED=0
     kill_switch_apply
     echo "apply-rc=$?"
@@ -1411,7 +1411,7 @@ if [ "${SCN_LIFECYCLE:-0}" = "1" ]; then
     restart_sequence() {
         KILL_SWITCH_MIRROR_SUSPENDED=1
         new_main_table
-        populate_netshift_subnets_from_string "203.0.113.0/24 45.55.0.0/16"
+        populate_postq_subnets_from_string "203.0.113.0/24 45.55.0.0/16"
         KILL_SWITCH_MIRROR_SUSPENDED=0
         kill_switch_apply
         echo "reapply-rc=$?"
@@ -1425,8 +1425,8 @@ if [ "${SCN_LIFECYCLE:-0}" = "1" ]; then
 
     # A list update / hot reload adds to the live sets: the guard follows
     # without a rebuild.
-    populate_netshift_subnets_from_string "45.88.0.0/16"
-    NFT_SUBNET_SET="$NFT_BYPASS_SET_NAME" populate_netshift_subnets_from_string "45.99.0.0/16"
+    populate_postq_subnets_from_string "45.88.0.0/16"
+    NFT_SUBNET_SET="$NFT_BYPASS_SET_NAME" populate_postq_subnets_from_string "45.99.0.0/16"
     echo "---MIRROR---"
     nft list set inet "$SCN_GUARD" "$NFT_GUARD_SUBNET_SET_NAME" 2>&1
     echo "---MIRROR-BYPASS---"
@@ -1437,12 +1437,12 @@ if [ "${SCN_LIFECYCLE:-0}" = "1" ]; then
     # still hold every subnet.
     KILL_SWITCH_MIRROR_SUSPENDED=1
     new_main_table
-    populate_netshift_subnets_from_string "203.0.113.0/24"
+    populate_postq_subnets_from_string "203.0.113.0/24"
     echo "---RESTART-WINDOW---"
     nft list set inet "$SCN_GUARD" "$NFT_GUARD_SUBNET_SET_NAME" 2>&1
 
     # One-shot release (package removal / self-heal): option still on.
-    NETSHIFT_BLOCK_LEAKS_RELEASE=1
+    POSTQ_BLOCK_LEAKS_RELEASE=1
     kill_switch_enabled || kill_switch_delete
     echo "---RELEASE---"
     if nft list table inet "$SCN_GUARD" > /dev/null 2>&1; then echo "guard=present"; else echo "guard=gone"; fi
@@ -1600,7 +1600,7 @@ BLEOF
         fail "blockleaks:restart — the guard lost its subnets in the restart window" "$(_bl_section "$out1" RESTART-WINDOW)"
     fi
     if _bl_section "$out1" RELEASE | grep -q "guard=gone" && _bl_section "$out1" RELEASE | grep -q "restore=yes"; then
-        pass "blockleaks:release — NETSHIFT_BLOCK_LEAKS_RELEASE=1 drops the guard and hands DNS back, option untouched"
+        pass "blockleaks:release — POSTQ_BLOCK_LEAKS_RELEASE=1 drops the guard and hands DNS back, option untouched"
     else
         fail "blockleaks:release — the one-shot release did not open the kill switch" "$(_bl_section "$out1" RELEASE)"
     fi
@@ -1721,17 +1721,17 @@ BLEOF
     rm -f "$drv"
 
     # ── package prerm: release on removal, keep the option on upgrade ─
-    local mk="${NETSHIFT_SRC}/../Makefile" prerm="/tmp/netshift-blockleaks-prerm-$$.sh" stub="/tmp/netshift-blockleaks-stub-$$.sh"
+    local mk="${POSTQ_SRC}/../Makefile" prerm="/tmp/postq-blockleaks-prerm-$$.sh" stub="/tmp/postq-blockleaks-stub-$$.sh"
     if [ ! -r "$mk" ]; then
         skip "blockleaks:prerm (package Makefile not found at $mk)"
         return
     fi
-    printf '#!/bin/sh\necho "stop-release=${NETSHIFT_BLOCK_LEAKS_RELEASE:-0}"\n' > "$stub"
+    printf '#!/bin/sh\necho "stop-release=${POSTQ_BLOCK_LEAKS_RELEASE:-0}"\n' > "$stub"
     chmod +x "$stub"
     # The script as the package ships it ($$ -> $), with the two absolute paths
     # pointed at stand-ins so nothing on this system is touched.
-    awk '/^define Package\/netshift\/prerm/{p=1;next} /^endef/{if(p)exit} p' "$mk" |
-        sed -e 's/\$\$/$/g' -e "s|/etc/init.d/netshift|$stub|g" -e "s|/etc/iproute2/rt_tables|/dev/null|g" > "$prerm"
+    awk '/^define Package\/postq\/prerm/{p=1;next} /^endef/{if(p)exit} p' "$mk" |
+        sed -e 's/\$\$/$/g' -e "s|/etc/init.d/postq|$stub|g" -e "s|/etc/iproute2/rt_tables|/dev/null|g" > "$prerm"
     if [ -s "$prerm" ] && ! grep -q 'uci ' "$prerm"; then
         pass "blockleaks:prerm — the stored option is not rewritten by the package script"
     else
@@ -1755,17 +1755,17 @@ BLEOF
     # The earlier stop (option on) kept dnsmasq on sing-box and still recorded a
     # correct shutdown. The released stop must run the SHIPPED dnsmasq_restore
     # to the end, not return at the shutdown_correctly gate.
-    local rdrv="/tmp/netshift-blockleaks-restore-$$.sh" rout
+    local rdrv="/tmp/postq-blockleaks-restore-$$.sh" rout
     cat > "$rdrv" << 'BLREOF'
 BIN="BIN_PATH_PLACEHOLDER"
 extract() { awk -v f="$1" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$BIN"; }
 eval "$(extract dnsmasq_restore)"
-eval "$(extract dnsmasq_is_configured_for_netshift)"
+eval "$(extract dnsmasq_is_configured_for_postq)"
 eval "$(extract dnsmasq_has_backup)"
 eval "$(extract dnsmasq_should_be_restored)"
 eval "$(extract uci_remove_quiet)"
 
-STORE="/tmp/netshift-blockleaks-dhcp-$$"
+STORE="/tmp/postq-blockleaks-dhcp-$$"
 mkdir -p "$STORE"
 key() { echo "$STORE/$(echo "$1" | tr -c 'A-Za-z0-9_\n' '_')"; }
 log() { :; }
@@ -1781,15 +1781,15 @@ config_get_bool() {
     [ "$3" = "block_leaks" ] && eval "$1=1"
     return 0
 }
-kill_switch_enabled() { [ "${NETSHIFT_BLOCK_LEAKS_RELEASE:-0}" = "1" ] && return 1; return 0; }
+kill_switch_enabled() { [ "${POSTQ_BLOCK_LEAKS_RELEASE:-0}" = "1" ] && return 1; return 0; }
 
-# dnsmasq as NetShift leaves it: pointed at the DNS inbound, backup kept.
+# dnsmasq as PostQ leaves it: pointed at the DNS inbound, backup kept.
 if [ "${SCN_CONFIGURED:-1}" = "1" ]; then
-    uci_set dhcp x netshift_configured 1
+    uci_set dhcp x postq_configured 1
     uci_set dhcp x server "127.0.0.42"
     uci_set dhcp x noresolv 1
-    uci_set dhcp x netshift_server "192.0.2.53"
-    uci_set dhcp x netshift_noresolv 0
+    uci_set dhcp x postq_server "192.0.2.53"
+    uci_set dhcp x postq_noresolv 0
 fi
 
 if dnsmasq_should_be_restored; then
@@ -1797,13 +1797,13 @@ if dnsmasq_should_be_restored; then
 fi
 echo "server=$(uci_get dhcp x server)"
 echo "noresolv=$(uci_get dhcp x noresolv)"
-echo "configured=$(uci_get dhcp x netshift_configured)"
+echo "configured=$(uci_get dhcp x postq_configured)"
 rm -rf "$STORE"
 BLREOF
     sed -i "s|BIN_PATH_PLACEHOLDER|$bin|" "$rdrv"
     # /etc/init.d/dnsmasq restart is the last line of the function: harmless
     # when it is missing here, the checks read the values written before it.
-    rout="$(NETSHIFT_BLOCK_LEAKS_RELEASE=1 SCN_SHUTDOWN=1 sh "$rdrv" 2>&1)"
+    rout="$(POSTQ_BLOCK_LEAKS_RELEASE=1 SCN_SHUTDOWN=1 sh "$rdrv" 2>&1)"
     if echo "$rout" | grep -qx 'server=192.0.2.53' && echo "$rout" | grep -qx 'noresolv=0' &&
         echo "$rout" | grep -qx 'configured='; then
         pass "blockleaks:release — DNS is really handed back after an earlier stop (shutdown_correctly=1)"
@@ -1848,19 +1848,19 @@ test_unsupported_skip() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     local facade_lib="$lib/sing_box_config_facade.sh"
     if [ ! -r "$facade_lib" ] || [ ! -r "$bin" ]; then
         fail "facade lib / bin not found"
         return
     fi
 
-    # The facade hardcodes NETSHIFT_LIB="/usr/lib/netshift" for its own sourcing
+    # The facade hardcodes POSTQ_LIB="/usr/lib/postq" for its own sourcing
     # of helpers + manager; bind the bind-mounted sources to that path.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local drv="/tmp/test-unsupported-skip-$$.sh"
     local out="/tmp/test-unsupported-skip-out-$$.txt"
@@ -1887,7 +1887,7 @@ eval "$(awk '/^_build_proxy_member_outbounds\(\) \{/{p=1} p{print} p&&/^\}/{exit
 eval "$(awk '/^configure_outbound_handler\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
 # configure_outbound_handler calls set_section_reality_mlkem first; these sections
 # never opt into it (covered by the realitymlkem test), so the stub keeps it off.
-set_section_reality_mlkem() { NETSHIFT_REALITY_MLKEM=0; }
+set_section_reality_mlkem() { POSTQ_REALITY_MLKEM=0; }
 eval "$(awk '/^mark_section_outbound_unavailable\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
 
 # Table-driven UCI stub. Per-section options are read from US_<section>_<opt>
@@ -2121,18 +2121,18 @@ USEOF
 test_extended_gate_skip() {
     header "Extended-only links skipped on stock sing-box"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     local facade_lib="$lib/sing_box_config_facade.sh"
     if [ ! -r "$facade_lib" ] || [ ! -r "$bin" ]; then
         fail "facade lib / bin not found"
         return
     fi
 
-    # The facade sources helpers + manager from /usr/lib/netshift.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    # The facade sources helpers + manager from /usr/lib/postq.
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local drv="/tmp/test-extgate-$$.sh"
     local out="/tmp/test-extgate-out-$$.txt"
@@ -2261,17 +2261,17 @@ EGEOF
 test_httpupgrade_transport() {
     header "HTTPUpgrade transport + skip on unknown transport"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     local facade_lib="$lib/sing_box_config_facade.sh"
     if [ ! -r "$facade_lib" ]; then
         fail "facade lib not found"
         return
     fi
 
-    # The facade sources helpers + manager from /usr/lib/netshift.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    # The facade sources helpers + manager from /usr/lib/postq.
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local drv="/tmp/test-hu-$$.sh"
     local out="/tmp/test-hu-out-$$.txt"
@@ -2426,18 +2426,18 @@ HUEOF
 test_vless_encryption() {
     header "VLESS Encryption passthrough + extended gate"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     local facade_lib="$lib/sing_box_config_facade.sh"
     if [ ! -r "$facade_lib" ] || [ ! -r "$bin" ]; then
         fail "facade lib / bin not found"
         return
     fi
 
-    # The facade sources helpers + manager from /usr/lib/netshift.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    # The facade sources helpers + manager from /usr/lib/postq.
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local drv="/tmp/test-vless-enc-$$.sh"
     local out="/tmp/test-vless-enc-out-$$.txt"
@@ -2900,19 +2900,19 @@ test_text_list_outbound() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     local facade_lib="$lib/sing_box_config_facade.sh"
     if [ ! -r "$facade_lib" ] || [ ! -r "$bin" ]; then
         fail "facade lib / bin not found"
         return
     fi
 
-    # The facade hardcodes NETSHIFT_LIB="/usr/lib/netshift" for its own sourcing
+    # The facade hardcodes POSTQ_LIB="/usr/lib/postq" for its own sourcing
     # of helpers + manager; bind the bind-mounted sources to that path.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local drv="/tmp/test-text-list-$$.sh"
     local out="/tmp/test-text-list-out-$$.txt"
@@ -2933,7 +2933,7 @@ eval "$(awk '/^_build_proxy_member_outbounds\(\) \{/{p=1} p{print} p&&/^\}/{exit
 eval "$(awk '/^configure_outbound_handler\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
 # configure_outbound_handler calls set_section_reality_mlkem first; these sections
 # never opt into it (covered by the realitymlkem test), so the stub keeps it off.
-set_section_reality_mlkem() { NETSHIFT_REALITY_MLKEM=0; }
+set_section_reality_mlkem() { POSTQ_REALITY_MLKEM=0; }
 eval "$(awk '/^mark_section_outbound_unavailable\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
 
 _tl_key() { printf 'TL_%s_%s' "$(printf '%s' "$1" | tr '.-' '__')" "$2"; }
@@ -3101,13 +3101,13 @@ TLEOF
 test_ruleset_chunk_size() {
     header "Ruleset Chunk Size Default (upstream 0c99ddd)"
 
-    local lib="${NETSHIFT_LIB_DIR}/rulesets.sh"
+    local lib="${POSTQ_LIB_DIR}/rulesets.sh"
     if [ ! -r "$lib" ]; then
-        skip "rulesets.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "rulesets.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-chunkcheck-$$"
+    local work="/tmp/postq-chunkcheck-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -3249,7 +3249,7 @@ CHUNKEOF
 #
 # UPGRADE SIMULATION: the driver's config_get stub carries ONLY the pre-existing
 # UCI keys (no new option exists for this fix), i.e. exactly what an upgraded
-# router has in /etc/config/netshift. Scenario 4 runs with the domain option
+# router has in /etc/config/postq. Scenario 4 runs with the domain option
 # absent altogether, and every produced source ruleset is fed to a real
 # `sing-box check` — an upgraded config still builds a valid sing-box config.
 # ─────────────────────────────────────────────────────────────────
@@ -3261,14 +3261,14 @@ test_domain_case() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$lib/helpers.sh" ] || [ ! -r "$lib/rulesets.sh" ] || [ ! -r "$bin" ]; then
         fail "helpers.sh / rulesets.sh / bin not found"
         return
     fi
 
-    local work="/tmp/netshift-domcase-$$"
+    local work="/tmp/postq-domcase-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -3445,13 +3445,13 @@ DOMCASEEOF
 # indefinitely and settings were never re-applied.
 #
 # The fix launches the monitor via `setsid /bin/sh -c 'exec 1000>&- ...; exec
-# /usr/bin/netshift __monitor' </dev/null >/dev/null 2>&1 &` so the detached
+# /usr/bin/postq __monitor' </dev/null >/dev/null 2>&1 &` so the detached
 # monitor holds NO procd fds. This test reproduces the fd-inheritance scenario
 # deterministically:
 #   1. The parent opens fd 1000 onto a sentinel lock file and takes an exclusive
 #      flock on it (exactly how procd serializes init actions).
 #   2. We awk-extract the SHIPPED start_sing_box_monitor verbatim and run it with
-#      MONITOR_PIDFILE re-pinned to a temp path and /usr/bin/netshift replaced by
+#      MONITOR_PIDFILE re-pinned to a temp path and /usr/bin/postq replaced by
 #      a stub whose `__monitor` runs a tiny pid-writing sleep loop (so the real
 #      launch mechanism — setsid + fd-close + re-exec — is exercised end to end).
 #   3. Assert: the monitor child's /proc/<pid>/fd does NOT reference the sentinel
@@ -3473,9 +3473,9 @@ DOMCASEEOF
 test_monitor_fd_hygiene() {
     header "Monitor procd-lock fd Hygiene (task-035) + leak (task-036)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ]; then
-        skip "netshift bin not found"
+        skip "postq bin not found"
         return
     fi
     if ! command -v setsid > /dev/null 2>&1; then
@@ -3487,18 +3487,18 @@ test_monitor_fd_hygiene() {
         return
     fi
 
-    local work="/tmp/netshift-monfd-$$"
+    local work="/tmp/postq-monfd-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
 
     local pidfile="$work/monitor.pid"
     local lockfile="$work/procd_sentinel.lock"
-    local fakecli="$work/bin/netshift"
+    local fakecli="$work/bin/postq"
     local out="$work/out.txt"
     local livefile="$work/live.txt"
     : > "$lockfile"
 
-    # Stub /usr/bin/netshift: only its hidden `__monitor` path matters here. It
+    # Stub /usr/bin/postq: only its hidden `__monitor` path matters here. It
     # mimics the real monitor: write its own pid, then sleep-loop (so it is a
     # long-lived child we can inspect). It inherits MONITOR_PIDFILE via env.
     cat > "$fakecli" << 'FAKECLI'
@@ -3515,10 +3515,10 @@ esac
 FAKECLI
     chmod +x "$fakecli"
 
-    # The shipped start_sing_box_monitor hardcodes `/usr/bin/netshift __monitor`.
+    # The shipped start_sing_box_monitor hardcodes `/usr/bin/postq __monitor`.
     # Install the stub at that absolute path; back up any existing real binary
     # and restore it afterwards (the smoke container ships none, but be safe).
-    local real_cli="/usr/bin/netshift"
+    local real_cli="/usr/bin/postq"
     local real_cli_bak=""
     if [ -e "$real_cli" ]; then
         real_cli_bak="$work/real_cli.bak"
@@ -3661,7 +3661,7 @@ fi
 # selector the fix uses) into a file, then a counted loop (no pipe).
 livecount=0
 livefile="DRV_LIVEFILE"
-pgrep -f "/usr/bin/netshift __monitor" 2>/dev/null > "$livefile" || true
+pgrep -f "/usr/bin/postq __monitor" 2>/dev/null > "$livefile" || true
 while IFS= read -r lp; do
     [ -n "$lp" ] || continue
     case "$lp" in *[!0-9]*) continue ;; esac
@@ -3818,24 +3818,24 @@ test_sing_box_config() {
     # check): the test container's sing-box is the stock build, which rejects
     # the vmess type, so we assert shape only. The extended gate is exercised
     # by toggling is_sing_box_extended via a shell override.
-    local facade_lib="${NETSHIFT_LIB_DIR}/sing_box_config_facade.sh"
+    local facade_lib="${POSTQ_LIB_DIR}/sing_box_config_facade.sh"
     if [ ! -r "$facade_lib" ]; then
         fail "sing_box_config_facade.sh not found"
         return
     fi
 
-    # The facade hardcodes NETSHIFT_LIB="/usr/lib/netshift" for its own sourcing
+    # The facade hardcodes POSTQ_LIB="/usr/lib/postq" for its own sourcing
     # of helpers.sh + sing_box_config_manager.sh; bind the bind-mounted sources
     # to that runtime path so the facade resolves them in the container.
-    mkdir -p /usr/lib/netshift
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "${POSTQ_LIB_DIR}/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local vm_tmp="/tmp/test-vmess-facade-$$.sh"
     cat > "$vm_tmp" << 'VMEOF'
-# logging.sh is sourced by /usr/bin/netshift in production; the facade itself
+# logging.sh is sourced by /usr/bin/postq in production; the facade itself
 # only sources helpers + manager, so pull it in for log() here.
-. "NETSHIFT_LIB/logging.sh" 2>/dev/null || log() { :; }
+. "POSTQ_LIB/logging.sh" 2>/dev/null || log() { :; }
 . "FACADE_LIB_PATH"
 
 base_config='{"outbounds":[]}'
@@ -3923,7 +3923,7 @@ echo "$out_gate" | jq -e '.outbounds | length == 0' >/dev/null 2>&1 && echo 'vme
 
 echo 'DONE'
 VMEOF
-    sed -i "s|FACADE_LIB_PATH|$facade_lib|; s|NETSHIFT_LIB|$NETSHIFT_LIB_DIR|g" "$vm_tmp"
+    sed -i "s|FACADE_LIB_PATH|$facade_lib|; s|POSTQ_LIB|$POSTQ_LIB_DIR|g" "$vm_tmp"
 
     # Consume in the CURRENT shell (while read < file — NO pipe) so pass/fail/
     # skip mutate the real counters and gate the suite.
@@ -3956,28 +3956,28 @@ VMEOF
 # fragment stripping everything after it) and rewrote a literal '+' into a space.
 #
 # Upgrade safety: this fix adds NO new UCI option, so an existing (conffile)
-# /etc/config/netshift is untouched by design. What must not change is the
+# /etc/config/postq is untouched by design. What must not change is the
 # parsing of ordinary links, which the 'plain-link-unchanged' token pins down by
 # comparing the generated outbound with the exact pre-fix JSON.
 test_proxy_link_escaping() {
     header "Proxy Link Escaping (%40 / %23 / '+')"
 
-    local facade_lib="${NETSHIFT_LIB_DIR}/sing_box_config_facade.sh"
+    local facade_lib="${POSTQ_LIB_DIR}/sing_box_config_facade.sh"
     if [ ! -r "$facade_lib" ]; then
         fail "sing_box_config_facade.sh not found"
         return
     fi
 
-    # The facade hardcodes NETSHIFT_LIB="/usr/lib/netshift" for its own sourcing
+    # The facade hardcodes POSTQ_LIB="/usr/lib/postq" for its own sourcing
     # of helpers.sh + sing_box_config_manager.sh; bind the bind-mounted sources
     # to that runtime path so the facade resolves them in the container.
-    mkdir -p /usr/lib/netshift
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "${POSTQ_LIB_DIR}/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local drv="/tmp/test-proxy-link-$$.sh"
     cat > "$drv" << 'LINKEOF'
-. "NETSHIFT_LIB/logging.sh" 2>/dev/null || log() { :; }
+. "POSTQ_LIB/logging.sh" 2>/dev/null || log() { :; }
 . "FACADE_LIB_PATH"
 
 base='{"outbounds":[]}'
@@ -4039,7 +4039,7 @@ fi
 
 echo DONE
 LINKEOF
-    sed -i "s|FACADE_LIB_PATH|$facade_lib|; s|NETSHIFT_LIB|$NETSHIFT_LIB_DIR|g" "$drv"
+    sed -i "s|FACADE_LIB_PATH|$facade_lib|; s|POSTQ_LIB|$POSTQ_LIB_DIR|g" "$drv"
 
     # Consume in the CURRENT shell (while read < file — NO pipe) so pass/fail/
     # skip mutate the real counters and gate the suite.
@@ -4110,29 +4110,29 @@ test_diagnostics() {
 test_jq_helpers() {
     header "jq Helper Functions"
 
-    local jq_helpers="${NETSHIFT_LIB_DIR}/helpers.jq"
+    local jq_helpers="${POSTQ_LIB_DIR}/helpers.jq"
 
     if [ ! -r "$jq_helpers" ]; then
         skip "helpers.jq not found"
         return
     fi
 
-    # Production scripts import helpers.jq from /usr/lib/netshift. In the test
-    # container sources are bind-mounted under /netshift/files, so provide the
+    # Production scripts import helpers.jq from /usr/lib/postq. In the test
+    # container sources are bind-mounted under /postq/files, so provide the
     # runtime path as a symlink for jq module resolution.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$jq_helpers" /usr/lib/netshift/helpers.jq
+    mkdir -p /usr/lib/postq
+    ln -sf "$jq_helpers" /usr/lib/postq/helpers.jq
 
     # Test the extend_key_value function. Keep the jq program in a file instead
     # of a shell variable because BusyBox ash can choke on jq syntax like
     # `h::extend_key_value(.; ...)` during script parsing in some builds.
-    local jq_filter_file="/tmp/netshift-jq-filter-$$.jq"
+    local jq_filter_file="/tmp/postq-jq-filter-$$.jq"
     cat > "$jq_filter_file" << 'JQEOF'
 import "helpers" as h;
 [1,2,3] | h::extend_key_value(.; [4,5])
 JQEOF
-    local jq_error_file="/tmp/netshift-jq-error-$$.log"
-    result=$(jq -n -L "/usr/lib/netshift" -f "$jq_filter_file" 2>"$jq_error_file" || true)
+    local jq_error_file="/tmp/postq-jq-error-$$.log"
+    result=$(jq -n -L "/usr/lib/postq" -f "$jq_filter_file" 2>"$jq_error_file" || true)
     rm -f "$jq_filter_file"
     
     if echo "$result" | jq -e '. | length == 5' > /dev/null 2>&1; then
@@ -4192,7 +4192,7 @@ test_config_manager() {
     fi
 
     # ── VMess outbound primitive (sing_box_cm_add_vmess_outbound) ──────────
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
     if [ ! -r "$cm_lib" ]; then
         fail "sing_box_config_manager.sh not found"
         return
@@ -4280,7 +4280,7 @@ test_subscription() {
 
     # Count proxy outbounds (exclude selector, urltest, direct, dns, block)
     local proxy_count
-    local proxy_filter_file="/tmp/netshift-proxy-filter-$$.jq"
+    local proxy_filter_file="/tmp/postq-proxy-filter-$$.jq"
     cat > "$proxy_filter_file" << 'JQEOF'
 [.outbounds[] | select(.type != "selector" and .type != "urltest" and .type != "direct" and .type != "dns" and .type != "block")] | length
 JQEOF
@@ -4295,7 +4295,7 @@ JQEOF
 
     # Test filtering for subscription outbound tags
     local outbound_tags
-    local tags_filter_file="/tmp/netshift-tags-filter-$$.jq"
+    local tags_filter_file="/tmp/postq-tags-filter-$$.jq"
     cat > "$tags_filter_file" << 'JQEOF'
 [.outbounds[] | select(.type != "selector" and .type != "urltest" and .type != "direct" and .type != "dns" and .type != "block") | .tag]
 JQEOF
@@ -4311,7 +4311,7 @@ JQEOF
     # Test country flag extraction from tags
     # Build tags with actual Unicode regional indicator flags
     local country_test
-    local flag_filter_file="/tmp/netshift-flag-filter-$$.jq"
+    local flag_filter_file="/tmp/postq-flag-filter-$$.jq"
     cat > "$flag_filter_file" << 'JQEOF'
 def flag($l1; $l2): ([127462 + $l1, 127462 + $l2] | implode);
 [(flag(3; 4) + " Frankfurt"), (flag(20; 18) + " New York"), (flag(13; 11) + " Amsterdam"), (flag(9; 15) + " Tokyo"), "no-flag"]
@@ -4320,7 +4320,7 @@ JQEOF
     rm -f "$flag_filter_file"
 
     local grouping
-    local group_filter_file="/tmp/netshift-group-filter-$$.jq"
+    local group_filter_file="/tmp/postq-group-filter-$$.jq"
     cat > "$group_filter_file" << 'JQEOF'
 def is_regional_indicator: . >= 127462 and . <= 127487;
 def extract_country_flag:
@@ -4355,7 +4355,7 @@ JQEOF
     # Mirror the shipped sing_box_build_subscription_groups extractor in an
     # inline .jq so we exercise the exact mode-aware key logic without real
     # node names. Synthetic tags only.
-    local grouper_filter_file="/tmp/netshift-grouper-filter-$$.jq"
+    local grouper_filter_file="/tmp/postq-grouper-filter-$$.jq"
     cat > "$grouper_filter_file" << 'JQEOF'
 def is_regional_indicator: . >= 127462 and . <= 127487;
 def extract_country_flag:
@@ -4410,7 +4410,7 @@ JQEOF
     # "no-flag" element of country_test is excluded here, since under prefix
     # mode it would group by its first 2 chars instead of going ungrouped).
     local flag_only_test prefix_flag_result country_flag_result
-    local flag_only_file="/tmp/netshift-flagonly-$$.jq"
+    local flag_only_file="/tmp/postq-flagonly-$$.jq"
     cat > "$flag_only_file" << 'JQEOF'
 def flag($l1; $l2): ([127462 + $l1, 127462 + $l2] | implode);
 [(flag(3; 4) + " Frankfurt"), (flag(20; 18) + " New York"), (flag(13; 11) + " Amsterdam"), (flag(9; 15) + " Tokyo")]
@@ -4471,7 +4471,7 @@ JQEOF
 
     # ── Fallback Subscription Normalizer (helpers.sh) ───────────────
     # Exercise normalize_subscription_to_singbox end-to-end against the
-    # real libs. The facade hardcodes NETSHIFT_LIB=/usr/lib/netshift, so we
+    # real libs. The facade hardcodes POSTQ_LIB=/usr/lib/postq, so we
     # mirror test_jq_helpers and expose the bind-mounted libs there via
     # symlinks, then source constants + logging + facade (the facade pulls in
     # helpers.sh and the config manager). Tokens are emitted on stdout and
@@ -4480,28 +4480,28 @@ JQEOF
     # query-param vars, exactly like the production backend.
     printf "\n  ${BOLD}Fallback Subscription Normalizer${NC}\n"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/helpers.sh" ] || [ ! -r "$lib/sing_box_config_facade.sh" ]; then
         skip "fallback normalizer (libs not found in $lib)"
         return
     fi
 
-    local fb="/tmp/netshift-sub-fallback-$$.sh"
+    local fb="/tmp/postq-sub-fallback-$$.sh"
     cat > "$fb" << 'FBEOF'
-# Make the facade's hardcoded NETSHIFT_LIB path resolve to the bind-mounted libs.
-mkdir -p /usr/lib/netshift
+# Make the facade's hardcoded POSTQ_LIB path resolve to the bind-mounted libs.
+mkdir -p /usr/lib/postq
 for f in constants.sh helpers.sh logging.sh sing_box_config_manager.sh sing_box_config_facade.sh; do
-    ln -sf "LIB_DIR/$f" "/usr/lib/netshift/$f"
+    ln -sf "LIB_DIR/$f" "/usr/lib/postq/$f"
 done
 
-. /usr/lib/netshift/constants.sh
-. /usr/lib/netshift/logging.sh
+. /usr/lib/postq/constants.sh
+. /usr/lib/postq/logging.sh
 # The facade sources helpers.sh + sing_box_config_manager.sh itself.
-. /usr/lib/netshift/sing_box_config_facade.sh
+. /usr/lib/postq/sing_box_config_facade.sh
 
 # ── CASE A: plaintext URI list with comment/metadata lines ──────────
-caseA_in="/tmp/netshift-fb-caseA-$$.txt"
-caseA_out="/tmp/netshift-fb-caseA-out-$$.json"
+caseA_in="/tmp/postq-fb-caseA-$$.txt"
+caseA_out="/tmp/postq-fb-caseA-out-$$.json"
 cat > "$caseA_in" << 'LIST'
 #profile-title: Test
 #subscription-userinfo: upload=0
@@ -4536,8 +4536,8 @@ rm -f "$caseA_in" "$caseA_out"
 # busybox base64 may lack -w0; encode then strip newlines with tr.
 caseB_plain="vless://22222222-2222-2222-2222-222222222222@example.com:443?security=tls&sni=example.com&type=tcp#B1
 trojan://secretpw@example.com:8443?security=tls&sni=example.com#B2"
-caseB_in="/tmp/netshift-fb-caseB-$$.txt"
-caseB_out="/tmp/netshift-fb-caseB-out-$$.json"
+caseB_in="/tmp/postq-fb-caseB-$$.txt"
+caseB_out="/tmp/postq-fb-caseB-out-$$.json"
 printf '%s' "$caseB_plain" | base64 | tr -d '\n' > "$caseB_in"
 
 if normalize_subscription_to_singbox "$caseB_in" "$caseB_out" "testsub"; then
@@ -4562,8 +4562,8 @@ rm -f "$caseB_in" "$caseB_out"
 # ── CASE C: robustness — valid keys mixed with garbage ──────────────
 # Two valid known-scheme keys; an unknown scheme (vmess), a malformed line,
 # a blank line and a comment must all be skipped without aborting the parse.
-caseC_in="/tmp/netshift-fb-caseC-$$.txt"
-caseC_out="/tmp/netshift-fb-caseC-out-$$.json"
+caseC_in="/tmp/postq-fb-caseC-$$.txt"
+caseC_out="/tmp/postq-fb-caseC-out-$$.json"
 cat > "$caseC_in" << 'LIST'
 #header comment
 vless://33333333-3333-3333-3333-333333333333@example.com:443?security=tls&sni=example.com&type=tcp#C1
@@ -4592,8 +4592,8 @@ rm -f "$caseC_in" "$caseC_out"
 # a hundred megabytes, so it is never copied into a shell variable), which
 # means the loop sees the file exactly as it is: a plain `while read` would
 # drop the last link of a body that ends after it.
-caseC2_in="/tmp/netshift-fb-caseC2-$$.txt"
-caseC2_out="/tmp/netshift-fb-caseC2-out-$$.json"
+caseC2_in="/tmp/postq-fb-caseC2-$$.txt"
+caseC2_out="/tmp/postq-fb-caseC2-out-$$.json"
 printf '%s' 'vless://44444444-4444-4444-4444-444444444444@example.com:443?security=tls&sni=example.com&type=tcp#N1
 trojan://pw4@example.com:8443?security=tls&sni=example.com#N2' > "$caseC2_in"
 if normalize_subscription_to_singbox "$caseC2_in" "$caseC2_out" "testsub"; then
@@ -4612,8 +4612,8 @@ rm -f "$caseC2_in" "$caseC2_out"
 
 # ...and the same body base64-encoded (decoded to a file, so no trailing
 # newline either).
-caseC3_in="/tmp/netshift-fb-caseC3-$$.txt"
-caseC3_out="/tmp/netshift-fb-caseC3-out-$$.json"
+caseC3_in="/tmp/postq-fb-caseC3-$$.txt"
+caseC3_out="/tmp/postq-fb-caseC3-out-$$.json"
 printf '%s' 'vless://55555555-5555-5555-5555-555555555555@example.com:443?security=tls&sni=example.com&type=tcp#N3
 trojan://pw5@example.com:8443?security=tls&sni=example.com#N4' | base64 | tr -d '\n' > "$caseC3_in"
 if normalize_subscription_to_singbox "$caseC3_in" "$caseC3_out" "testsub"; then
@@ -4635,8 +4635,8 @@ rm -f "$caseC3_in" "$caseC3_out"
 # subscription_max_nodes are used (0 = all). The body is never held in a
 # variable, so a big feed costs no more memory than the file itself: this
 # test would otherwise be the one that OOM-kills a small router.
-caseC4_in="/tmp/netshift-fb-caseC4-$$.txt"
-caseC4_out="/tmp/netshift-fb-caseC4-out-$$.json"
+caseC4_in="/tmp/postq-fb-caseC4-$$.txt"
+caseC4_out="/tmp/postq-fb-caseC4-out-$$.json"
 i=0
 : > "$caseC4_in"
 while [ "$i" -lt 400 ]; do
@@ -4644,9 +4644,9 @@ while [ "$i" -lt 400 ]; do
     i=$((i + 1))
 done
 # normalize_subscription_to_singbox reads the option through uci, so a throwaway
-# /etc/config/netshift carries the section for this case and is removed after
+# /etc/config/postq carries the section for this case and is removed after
 # (the same pattern the other subscription-option cases use).
-cat > /etc/config/netshift << 'CAPCONF'
+cat > /etc/config/postq << 'CAPCONF'
 config section 'testsub'
 	option connection_type 'proxy'
 	option subscription_max_nodes '7'
@@ -4663,21 +4663,21 @@ if [ "$c4_len" -eq 7 ]; then
 else
     echo "fb-caseC4-max-nodes-cap(==7 got $c4_len):FAIL"
 fi
-uci -q delete netshift.testsub
-uci -q commit netshift
-rm -f "$caseC4_in" "$caseC4_out" /etc/config/netshift
+uci -q delete postq.testsub
+uci -q commit postq
+rm -f "$caseC4_in" "$caseC4_out" /etc/config/postq
 
 # ── CASE C4b: the "UDP over TCP" flag reaches socks and ss links ─────
 # The flag lives in the section as enable_udp_over_tcp; reading another option
 # name made it silently do nothing for subscription links (it worked for a
 # single link, a selector and an urltest).
-caseC4b_in="/tmp/netshift-fb-caseC4b-$$.txt"
-caseC4b_out="/tmp/netshift-fb-caseC4b-out-$$.json"
+caseC4b_in="/tmp/postq-fb-caseC4b-$$.txt"
+caseC4b_out="/tmp/postq-fb-caseC4b-out-$$.json"
 printf '%s\n' \
     'socks5://u:p@example.com:1080#S1' \
     'ss://YWVzLTEyOC1nY206cHc=@example.com:8388#S2' \
     'trojan://pw@example.com:8443?security=tls&sni=example.com#T1' > "$caseC4b_in"
-cat > /etc/config/netshift << 'CAPCONF'
+cat > /etc/config/postq << 'CAPCONF'
 config section 'testuot'
 	option connection_type 'proxy'
 	option enable_udp_over_tcp '1'
@@ -4696,7 +4696,7 @@ else
     echo "fb-caseC4b-flag-not-applied-to-trojan:FAIL (got $uot_trojan)"
 fi
 # ...and the flag being off leaves the outbounds without it
-cat > /etc/config/netshift << 'CAPCONF'
+cat > /etc/config/postq << 'CAPCONF'
 config section 'testuot'
 	option connection_type 'proxy'
 	option enable_udp_over_tcp '0'
@@ -4708,7 +4708,7 @@ if [ "$uot_off" = "0" ]; then
 else
     echo "fb-caseC4b-flag-off-adds-nothing:FAIL (got $uot_off)"
 fi
-rm -f "$caseC4b_in" "$caseC4b_out" /etc/config/netshift
+rm -f "$caseC4b_in" "$caseC4b_out" /etc/config/postq
 
 # ── CASE C5: a download left behind by a killed start is wiped ──────
 # The body lives in tmpfs while it is parsed; a start the OOM killer took out
@@ -4744,8 +4744,8 @@ fi
 rm -rf "$dl_dir" "$lock_dir"
 
 # ── CASE D: negative — only comments / junk, no valid keys ──────────
-caseD_in="/tmp/netshift-fb-caseD-$$.txt"
-caseD_out="/tmp/netshift-fb-caseD-out-$$.json"
+caseD_in="/tmp/postq-fb-caseD-$$.txt"
+caseD_out="/tmp/postq-fb-caseD-out-$$.json"
 cat > "$caseD_in" << 'LIST'
 #profile-title: Empty
 #subscription-userinfo: upload=0
@@ -4774,8 +4774,8 @@ rm -f "$caseD_in" "$caseD_out"
 # this, convert the directly-usable (non-dialerProxy) outbounds to share URIs
 # and produce a valid sing-box config. The chained (sockopt.dialerProxy)
 # outbound must be skipped.
-caseE_in="/tmp/netshift-fb-caseE-$$.json"
-caseE_out="/tmp/netshift-fb-caseE-out-$$.json"
+caseE_in="/tmp/postq-fb-caseE-$$.json"
+caseE_out="/tmp/postq-fb-caseE-out-$$.json"
 cat > "$caseE_in" << 'XRAYJSON'
 [
   {
@@ -4858,8 +4858,8 @@ rm -f "$caseE_in" "$caseE_out"
 # (null | tostring) would emit a literal "sid=null" query param, which
 # sing-box would then store as short_id:"null". The converter must drop the
 # absent param entirely, so the produced reality block carries NO short_id.
-caseF_in="/tmp/netshift-fb-caseF-$$.json"
-caseF_out="/tmp/netshift-fb-caseF-out-$$.json"
+caseF_in="/tmp/postq-fb-caseF-$$.json"
+caseF_out="/tmp/postq-fb-caseF-out-$$.json"
 cat > "$caseF_in" << 'XRAYJSON'
 [
   {
@@ -4906,8 +4906,8 @@ rm -f "$caseF_in" "$caseF_out"
 # converter must dedup on the connection part (ignoring the #name), so N
 # copies of the same server collapse to one. Here three configs reference the
 # same two servers (A, B) plus one extra (C) -> exactly 3 unique outbounds.
-caseG_in="/tmp/netshift-fb-caseG-$$.json"
-caseG_out="/tmp/netshift-fb-caseG-out-$$.json"
+caseG_in="/tmp/postq-fb-caseG-$$.json"
+caseG_out="/tmp/postq-fb-caseG-out-$$.json"
 cat > "$caseG_in" << 'XRAYJSON'
 [
   {"remarks": "profile-1", "outbounds": [
@@ -4965,8 +4965,8 @@ rm -f "$caseG_in" "$caseG_out"
 # The facade cannot build VMess. The converter must skip vmess but keep the
 # vless node, and xray_json_count_unsupported must report the dropped vmess so
 # the backend can warn the user instead of silently losing it.
-caseH_in="/tmp/netshift-fb-caseH-$$.json"
-caseH_out="/tmp/netshift-fb-caseH-out-$$.json"
+caseH_in="/tmp/postq-fb-caseH-$$.json"
+caseH_out="/tmp/postq-fb-caseH-out-$$.json"
 cat > "$caseH_in" << 'XRAYJSON'
 [
   {
@@ -5025,8 +5025,8 @@ rm -f "$caseH_in" "$caseH_out"
 # its own profile name and the place of that profile (after the balancer's
 # ru node, which has no profile of its own). Special characters in remarks must round-trip through
 # the URI fragment; missing or blank remarks fall back to the tag.
-caseH2_in="/tmp/netshift-fb-caseH2-$$.json"
-caseH2_out="/tmp/netshift-fb-caseH2-out-$$.json"
+caseH2_in="/tmp/postq-fb-caseH2-$$.json"
+caseH2_out="/tmp/postq-fb-caseH2-out-$$.json"
 cat > "$caseH2_in" << 'XRAYJSON'
 [
   {"remarks": "Balancer", "outbounds": [
@@ -5100,8 +5100,8 @@ rm -f "$caseH2_in" "$caseH2_out"
 # balancer members are numbered after their proxy-N tag (vmess proxy-2 is
 # dropped, so proxy-3 stays " · 3"), by position when tag numbers repeat;
 # names repeated across configs get the next free number.
-caseH3_in="/tmp/netshift-fb-caseH3-$$.json"
-caseH3_out="/tmp/netshift-fb-caseH3-out-$$.json"
+caseH3_in="/tmp/postq-fb-caseH3-$$.json"
+caseH3_out="/tmp/postq-fb-caseH3-out-$$.json"
 cat > "$caseH3_in" << 'XRAYJSON'
 [
   {"remarks": "Bal1", "routing": {"balancers": [{"tag": "b", "selector": ["proxy"]}]}, "outbounds": [{"protocol": "trojan", "tag": "proxy", "settings": {"servers": [{"address": "p1.example.com", "port": 443, "password": "testpass"}]}, "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "p1.example.com"}}}]},
@@ -5132,8 +5132,8 @@ rm -f "$caseH3_in" "$caseH3_out"
 # A panel sends its balancer ("Europe | Auto") first, with the members in an
 # order of its own; the nodes must keep the order of the plain profiles that
 # name them (as the panel lists them), not the order of the balancer.
-caseH4_in="/tmp/netshift-fb-caseH4-$$.json"
-caseH4_out="/tmp/netshift-fb-caseH4-out-$$.json"
+caseH4_in="/tmp/postq-fb-caseH4-$$.json"
+caseH4_out="/tmp/postq-fb-caseH4-out-$$.json"
 cat > "$caseH4_in" << 'XRAYJSON'
 [
   {"remarks": "Auto", "routing": {"balancers": [{"tag": "b", "selector": ["proxy"]}]}, "outbounds": [{"protocol": "trojan", "tag": "proxy-1", "settings": {"servers": [{"address": "two.example.com", "port": 443, "password": "testpass"}]}, "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "two.example.com"}}}, {"protocol": "trojan", "tag": "proxy-2", "settings": {"servers": [{"address": "one.example.com", "port": 443, "password": "testpass"}]}, "streamSettings": {"network": "tcp", "security": "tls", "tlsSettings": {"serverName": "one.example.com"}}}]},
@@ -5308,7 +5308,7 @@ fi
 # Matching: substring, OR across keywords, ASCII case-insensitive, byte-exact
 # for non-folded scripts (emoji/etc). No jq regex (index + inline ucfold only).
 caseJ_cfg='{"outbounds":[]}'
-caseJ_sub="/tmp/netshift-fb-caseJ-$$.json"
+caseJ_sub="/tmp/postq-fb-caseJ-$$.json"
 cat > "$caseJ_sub" << 'JSUB'
 {
   "outbounds": [
@@ -5366,7 +5366,7 @@ else
 fi
 
 # (5) emoji/unicode substring: a robot-emoji node kept, a plain node dropped.
-caseJ_emoji_sub="/tmp/netshift-fb-caseJ-emoji-$$.json"
+caseJ_emoji_sub="/tmp/postq-fb-caseJ-emoji-$$.json"
 cat > "$caseJ_emoji_sub" << 'JEMOJI'
 {
   "outbounds": [
@@ -5403,7 +5403,7 @@ rm -f "$caseJ_sub"
 # The keyword filter must fold ASCII AND Cyrillic (inline ucfold), so a
 # mixed-case Cyrillic keyword matches a mixed-case Cyrillic server name.
 # Emoji keywords still match by exact codepoints; ASCII is unaffected.
-caseK_sub="/tmp/netshift-fb-caseK-$$.json"
+caseK_sub="/tmp/postq-fb-caseK-$$.json"
 cat > "$caseK_sub" << 'KSUB'
 {
   "outbounds": [
@@ -5493,7 +5493,7 @@ rm -f "$caseK_sub"
 # xray_json_to_uri_lines must emit a hysteria2:// URI carrying the auth as
 # userinfo, host:port from settings, and sni/alpn/insecure query params.
 # (Synthetic placeholder values only — nothing from any real subscription.)
-caseL_in="/tmp/netshift-fb-caseL-$$.json"
+caseL_in="/tmp/postq-fb-caseL-$$.json"
 cat > "$caseL_in" << 'XRAYJSON'
 [
   {
@@ -5541,7 +5541,7 @@ rm -f "$caseL_in"
 # The facade has no Hysteria v1 parser; the converter must select out any
 # hysteria node whose hysteriaSettings.version is not 2 (and emit nothing),
 # WITHOUT aborting/fatal. A v2 node in the same doc must still be emitted.
-caseM_in="/tmp/netshift-fb-caseM-$$.json"
+caseM_in="/tmp/postq-fb-caseM-$$.json"
 cat > "$caseM_in" << 'XRAYJSON'
 [
   {
@@ -5594,7 +5594,7 @@ rm -f "$caseM_in"
 # with only the display tag/remarks differing. The existing $conn dedup must
 # collapse them to exactly the four unique connections, first-seen order
 # preserved (vless, trojan, ss, hysteria2).
-caseN_in="/tmp/netshift-fb-caseN-$$.json"
+caseN_in="/tmp/postq-fb-caseN-$$.json"
 cat > "$caseN_in" << 'XRAYJSON'
 [
   {"remarks": "p1", "outbounds": [
@@ -5661,8 +5661,8 @@ rm -f "$caseN_in"
 # with the expected server/port/password and TLS. Then wrap the produced
 # outbounds into a minimal full sing-box config and assert `sing-box check`
 # passes (whole-chain validation; project-core.md §4).
-caseO_in="/tmp/netshift-fb-caseO-$$.json"
-caseO_out="/tmp/netshift-fb-caseO-out-$$.json"
+caseO_in="/tmp/postq-fb-caseO-$$.json"
+caseO_out="/tmp/postq-fb-caseO-out-$$.json"
 cat > "$caseO_in" << 'XRAYJSON'
 [
   {
@@ -5704,7 +5704,7 @@ fi
 # Whole-chain: wrap the produced outbounds into a minimal full config and run
 # the real `sing-box check`. Skipped cleanly if the binary is unavailable.
 if command -v sing-box > /dev/null 2>&1; then
-    caseO_full="/tmp/netshift-fb-caseO-full-$$.json"
+    caseO_full="/tmp/postq-fb-caseO-full-$$.json"
     jq '{log: {level: "error"},
          inbounds: [],
          outbounds: (.outbounds + [{type: "direct", tag: "direct-out"}]),
@@ -5726,8 +5726,8 @@ rm -f "$caseO_in" "$caseO_out"
 if command -v gzip > /dev/null 2>&1; then
     # (P1) gzip -> text: gzip a tiny known-good plain body, run the helper,
     # assert the result is the original plain text (byte-equal).
-    caseP_plain="/tmp/netshift-fb-caseP-plain-$$.txt"
-    caseP_gz="/tmp/netshift-fb-caseP-gz-$$.bin"
+    caseP_plain="/tmp/postq-fb-caseP-plain-$$.txt"
+    caseP_gz="/tmp/postq-fb-caseP-gz-$$.bin"
     printf 'vless://33333333-3333-3333-3333-333333333333@example.com:443#P\n' > "$caseP_plain"
     gzip -c "$caseP_plain" > "$caseP_gz"
     maybe_gunzip_subscription_file "$caseP_gz"
@@ -5740,8 +5740,8 @@ if command -v gzip > /dev/null 2>&1; then
 
     # (P2) non-gzip passthrough: a plain-text body is UNCHANGED (no spurious
     # gunzip, no corruption).
-    caseP_pt="/tmp/netshift-fb-caseP-pt-$$.txt"
-    caseP_pt_ref="/tmp/netshift-fb-caseP-pt-ref-$$.txt"
+    caseP_pt="/tmp/postq-fb-caseP-pt-$$.txt"
+    caseP_pt_ref="/tmp/postq-fb-caseP-pt-ref-$$.txt"
     printf 'just plain text, definitely not gzip\nsecond line\n' > "$caseP_pt"
     cp "$caseP_pt" "$caseP_pt_ref"
     maybe_gunzip_subscription_file "$caseP_pt"
@@ -5754,8 +5754,8 @@ if command -v gzip > /dev/null 2>&1; then
 
     # (P3) whole-chain: gzip a small synthetic VALID sing-box JSON, run the
     # helper, then validate_subscription_file -> must now VALIDATE.
-    caseP_json="/tmp/netshift-fb-caseP-json-$$.json"
-    caseP_jgz="/tmp/netshift-fb-caseP-jgz-$$.bin"
+    caseP_json="/tmp/postq-fb-caseP-json-$$.json"
+    caseP_jgz="/tmp/postq-fb-caseP-jgz-$$.bin"
     cat > "$caseP_json" << 'PJSON'
 {"outbounds":[{"type":"shadowsocks","tag":"P-node","server":"example.com","server_port":443,"method":"aes-256-gcm","password":"p"}]}
 PJSON
@@ -5775,8 +5775,8 @@ fi
 
 # ── CASE Q: NUL-byte binary detector (task-046) ─────────────────────
 # A body with an embedded NUL is binary (true); plain text is not (false).
-caseQ_nul="/tmp/netshift-fb-caseQ-nul-$$.bin"
-caseQ_txt="/tmp/netshift-fb-caseQ-txt-$$.txt"
+caseQ_nul="/tmp/postq-fb-caseQ-nul-$$.bin"
+caseQ_txt="/tmp/postq-fb-caseQ-txt-$$.txt"
 printf 'abc\000def' > "$caseQ_nul"
 printf 'abcdef\nplain text\n' > "$caseQ_txt"
 if subscription_body_is_binary "$caseQ_nul"; then
@@ -5827,24 +5827,24 @@ FBEOF
     # branch program exactly. Tokens use the same name:OK/FAIL convention.
     printf "\n  ${BOLD}Multi-URL Subscription Merge${NC}\n"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ] || [ ! -r "$lib/sing_box_config_facade.sh" ]; then
         skip "multi-url merge (bin / facade not found)"
         return
     fi
 
-    local mu="/tmp/netshift-sub-multiurl-$$.sh"
+    local mu="/tmp/postq-sub-multiurl-$$.sh"
     cat > "$mu" << 'MUEOF'
-mkdir -p /usr/lib/netshift
+mkdir -p /usr/lib/postq
 for f in constants.sh helpers.sh logging.sh sing_box_config_manager.sh sing_box_config_facade.sh; do
-    ln -sf "LIB_DIR/$f" "/usr/lib/netshift/$f"
+    ln -sf "LIB_DIR/$f" "/usr/lib/postq/$f"
 done
-. /usr/lib/netshift/constants.sh
-. /usr/lib/netshift/logging.sh
-. /usr/lib/netshift/sing_box_config_facade.sh
+. /usr/lib/postq/constants.sh
+. /usr/lib/postq/logging.sh
+. /usr/lib/postq/sing_box_config_facade.sh
 
 # Isolated per-run cache dir for the path builders.
-SUBSCRIPTION_CACHE_FOLDER="/tmp/netshift-mu-cache-$$"
+SUBSCRIPTION_CACHE_FOLDER="/tmp/postq-mu-cache-$$"
 mkdir -p "$SUBSCRIPTION_CACHE_FOLDER"
 
 # Quiet logger + redaction stub (functions under test call these).
@@ -5862,7 +5862,7 @@ config_list_foreach() {
     # so the callback CAN mutate accumulator globals; mirror that with a temp
     # file + plain `while read` (a pipe would subshell-trap the mutation).
     [ "$2" = "subscription_url" ] || return 0
-    _clf_tmp="/tmp/netshift-mu-clf-$$"
+    _clf_tmp="/tmp/postq-mu-clf-$$"
     printf '%s\n' "$MU_URLS" > "$_clf_tmp"
     while IFS= read -r _u || [ -n "$_u" ]; do
         [ -n "$_u" ] || continue
@@ -5899,7 +5899,7 @@ write_feed() {
 # the facade once. Echoes the resulting config to stdout; sets MERGED_COUNT.
 merge_and_add() {
     _sec="$1"
-    _merged="/tmp/netshift-mu-merged-$$-$_sec.json"
+    _merged="/tmp/postq-mu-merged-$$-$_sec.json"
     printf '%s' '{"outbounds":[]}' > "$_merged"
     MU_URLS="$2"
     printf '%s\n' "$MU_URLS" | while IFS= read -r _u; do
@@ -5939,7 +5939,7 @@ else
 fi
 # Call the facade like the real bin: NO command-substitution (globals must
 # propagate to this shell); read the result from SING_BOX_CF_LAST_CONFIG.
-sing_box_cf_add_subscription_outbounds "$base_config" "$s1" "/tmp/netshift-mu-merged-$$-$s1.json" "[]" "[]" >/dev/null
+sing_box_cf_add_subscription_outbounds "$base_config" "$s1" "/tmp/postq-mu-merged-$$-$s1.json" "[]" "[]" >/dev/null
 out1="$SING_BOX_CF_LAST_CONFIG"
 if printf '%s' "$out1" | jq -e '[.outbounds[] | select(.type=="shadowsocks") | .tag] | (index("A-Tokyo") != null) and (index("A-Osaka") != null) and (index("B-Berlin") != null)' >/dev/null 2>&1; then
     echo 'mu-case1-both-feeds-present:OK'
@@ -5951,7 +5951,7 @@ if [ "$(printf '%s' "$SUBSCRIPTION_OUTBOUND_TAGS_JSON" | jq -r 'length' 2>/dev/n
 else
     echo "mu-case1-tags-json-3(got $(printf '%s' "$SUBSCRIPTION_OUTBOUND_TAGS_JSON" | jq -r 'length' 2>/dev/null)):FAIL"
 fi
-rm -f "/tmp/netshift-mu-merged-$$-$s1.json"
+rm -f "/tmp/postq-mu-merged-$$-$s1.json"
 
 # ── CASE 2: same-named nodes across feeds → dedup -2 suffix ───────────
 s2="sec2"
@@ -5966,7 +5966,7 @@ write_feed "$s2" "$url2b" '{"outbounds":[
 s2_urls="$url2a
 $url2b"
 merge_and_add "$s2" "$s2_urls"
-sing_box_cf_add_subscription_outbounds "$base_config" "$s2" "/tmp/netshift-mu-merged-$$-$s2.json" "[]" "[]" >/dev/null
+sing_box_cf_add_subscription_outbounds "$base_config" "$s2" "/tmp/postq-mu-merged-$$-$s2.json" "[]" "[]" >/dev/null
 out2="$SING_BOX_CF_LAST_CONFIG"
 # Two same-named nodes must both survive with distinct deduped tags, and the
 # resulting config must have no duplicate outbound tags (would fail sing-box).
@@ -5984,7 +5984,7 @@ if printf '%s' "$SUBSCRIPTION_OUTBOUND_TAGS_JSON" | jq -e 'any(.[]; . == "Same N
 else
     echo "mu-case2-suffix-dedup-present(tags=$SUBSCRIPTION_OUTBOUND_TAGS_JSON):FAIL"
 fi
-rm -f "/tmp/netshift-mu-merged-$$-$s2.json"
+rm -f "/tmp/postq-mu-merged-$$-$s2.json"
 
 # ── CASE 3: partial failure / best-effort — feed A usable, B invalid ──
 s3="sec3"
@@ -6000,7 +6000,7 @@ printf '%s' "$url3b" > "$(get_subscription_url_cache_path "$s3" "$_h3b")"
 s3_urls="$url3a
 $url3b"
 merge_and_add "$s3" "$s3_urls"
-sing_box_cf_add_subscription_outbounds "$base_config" "$s3" "/tmp/netshift-mu-merged-$$-$s3.json" "[]" "[]" >/dev/null
+sing_box_cf_add_subscription_outbounds "$base_config" "$s3" "/tmp/postq-mu-merged-$$-$s3.json" "[]" "[]" >/dev/null
 out3="$SING_BOX_CF_LAST_CONFIG"
 if [ "$MERGED_COUNT" = "1" ] && [ -n "$SUBSCRIPTION_OUTBOUND_TAGS" ]; then
     echo 'mu-case3-partial-best-effort:OK'
@@ -6011,7 +6011,7 @@ case " $SUBSCRIPTION_UNAVAILABLE_SECTIONS " in
 *" $s3 "*) echo 'mu-case3-not-unavailable:FAIL' ;;
 *) echo 'mu-case3-not-unavailable:OK' ;;
 esac
-rm -f "/tmp/netshift-mu-merged-$$-$s3.json"
+rm -f "/tmp/postq-mu-merged-$$-$s3.json"
 
 # ── CASE 4: all feeds fail → section marked unavailable ───────────────
 s4="sec4"
@@ -6034,7 +6034,7 @@ case " $SUBSCRIPTION_UNAVAILABLE_SECTIONS " in
 *" $s4 "*) echo 'mu-case4-all-fail-unavailable:OK' ;;
 *) echo "mu-case4-all-fail-unavailable(merged=$MERGED_COUNT list='$SUBSCRIPTION_UNAVAILABLE_SECTIONS'):FAIL" ;;
 esac
-rm -f "/tmp/netshift-mu-merged-$$-$s4.json"
+rm -f "/tmp/postq-mu-merged-$$-$s4.json"
 
 # ── CASE 5: cache-key isolation — distinct files; rejected per-URL ────
 s5="sec5"
@@ -6083,14 +6083,14 @@ else
     echo "mu-case6-single-option-1elem(got '$collected6'):FAIL"
 fi
 merge_and_add "$s6" "$url6"
-sing_box_cf_add_subscription_outbounds "$base_config" "$s6" "/tmp/netshift-mu-merged-$$-$s6.json" "[]" "[]" >/dev/null
+sing_box_cf_add_subscription_outbounds "$base_config" "$s6" "/tmp/postq-mu-merged-$$-$s6.json" "[]" "[]" >/dev/null
 out6="$SING_BOX_CF_LAST_CONFIG"
 if [ "$MERGED_COUNT" = "1" ] && printf '%s' "$out6" | jq -e 'any(.outbounds[]; .tag=="Legacy")' >/dev/null 2>&1; then
     echo 'mu-case6-backcompat-config:OK'
 else
     echo "mu-case6-backcompat-config(count=$MERGED_COUNT):FAIL"
 fi
-rm -f "/tmp/netshift-mu-merged-$$-$s6.json"
+rm -f "/tmp/postq-mu-merged-$$-$s6.json"
 
 rm -rf "$SUBSCRIPTION_CACHE_FOLDER"
 echo 'DONE'
@@ -6121,7 +6121,7 @@ MUEOF
     rm -f "$mu" "$mu_out"
 
     # ── Clear-subscription-cache worker (task-039) ───────────────────
-    # Exercises subscription_clear_cache_and_redownload (bin/netshift) which
+    # Exercises subscription_clear_cache_and_redownload (bin/postq) which
     # backs `component_action subscription clear_cache`. The worker is
     # awk-extracted VERBATIM from the shipped bin; subscription_update is STUBBED
     # to a no-op so the test is hermetic (no network/restart). The driver is
@@ -6130,17 +6130,17 @@ MUEOF
     # the JSON shape the async status layer consumes.
     printf "\n  ${BOLD}Clear Subscription Cache${NC}\n"
 
-    local ccbin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local ccupd="${NETSHIFT_LIB_DIR}/updater.sh"
+    local ccbin="${POSTQ_SRC}/usr/bin/postq"
+    local ccupd="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$ccbin" ] || [ ! -r "$ccupd" ]; then
         skip "clear-cache worker (bin / updater.sh not found)"
         return
     fi
 
-    local cc="/tmp/netshift-sub-clearcache-$$.sh"
+    local cc="/tmp/postq-sub-clearcache-$$.sh"
     cat > "$cc" << 'CCEOF'
-# Isolated synthetic cache dir — NEVER the real /etc/netshift/subscriptions.
-SUBSCRIPTION_CACHE_FOLDER="/tmp/netshift-cc-cache-$$"
+# Isolated synthetic cache dir — NEVER the real /etc/postq/subscriptions.
+SUBSCRIPTION_CACHE_FOLDER="/tmp/postq-cc-cache-$$"
 
 # Quiet logger; record subscription_update invocation count + control its rc.
 SUB_UPDATE_CALLS=0
@@ -6153,7 +6153,7 @@ nolog() { :; }
 subscription_update_unlocked() { SUB_UPDATE_CALLS=$((SUB_UPDATE_CALLS + 1)); return "$SUB_UPDATE_RC"; }
 # The worker holds the subscription update lock around the wipe + redownload;
 # the real lock helpers run against a scratch lock directory.
-SUBSCRIPTION_UPDATE_LOCK_DIR="/tmp/netshift-cc-lock-$$"
+SUBSCRIPTION_UPDATE_LOCK_DIR="/tmp/postq-cc-lock-$$"
 SUBSCRIPTION_UPDATE_LOCK_WAIT=1
 SUBSCRIPTION_UPDATE_BUSY=4
 SUBSCRIPTION_UPDATE_LOCK_FAILED=5
@@ -6164,7 +6164,7 @@ rm -rf "$SUBSCRIPTION_UPDATE_LOCK_DIR"
 config_foreach() {
     # $1=callback $2=type ; iterate sections in the CURRENT shell (no pipe) so
     # the callback can mutate accumulator globals like has_subscription.
-    _cf_tmp="/tmp/netshift-cc-cf-$$"
+    _cf_tmp="/tmp/postq-cc-cf-$$"
     printf '%s\n' "$CC_SECTIONS" > "$_cf_tmp"
     while IFS= read -r _row || [ -n "$_row" ]; do
         [ -n "$_row" ] || continue
@@ -6220,7 +6220,7 @@ SUB_UPDATE_CALLS=0
 SUB_UPDATE_RC=0
 # Run WITHOUT $()-capture so SUB_UPDATE_CALLS (set by the stub) survives — a
 # $() subshell would trap the mutation (the documented capture landmine).
-cc1_out="/tmp/netshift-cc-json1-$$"
+cc1_out="/tmp/postq-cc-json1-$$"
 subscription_clear_cache_and_redownload > "$cc1_out"
 cc1_rc=$?
 cc1_json="$(cat "$cc1_out")"
@@ -6276,7 +6276,7 @@ mkdir -p "$SUBSCRIPTION_CACHE_FOLDER"
 seed_feed "sec1" "dddddddddddddddddddddddddddddddd"
 CC_SECTIONS="sec1|proxy|url"
 SUB_UPDATE_CALLS=0
-cc3_out="/tmp/netshift-cc-json3-$$"
+cc3_out="/tmp/postq-cc-json3-$$"
 subscription_clear_cache_and_redownload > "$cc3_out"
 cc3_json="$(cat "$cc3_out")"
 rm -f "$cc3_out"
@@ -6307,7 +6307,7 @@ fi
 # the dir exists. Point the constant at a guarded sentinel tree and confirm an
 # UNRELATED file outside SUBSCRIPTION_CACHE_FOLDER survives, and that an empty
 # constant is a no-op (guard short-circuits before any glob).
-guard_root="/tmp/netshift-cc-guard-$$"
+guard_root="/tmp/postq-cc-guard-$$"
 rm -rf "$guard_root"
 mkdir -p "$guard_root/sub" "$guard_root/other"
 printf 'keep' > "$guard_root/other/sentinel"
@@ -6341,20 +6341,20 @@ else
     echo 'cc-lock-released-after-run:FAIL'
 fi
 # CASE 5 left the constant empty: point it back at a scratch cache dir.
-SUBSCRIPTION_CACHE_FOLDER="/tmp/netshift-cc-cache-$$"
+SUBSCRIPTION_CACHE_FOLDER="/tmp/postq-cc-cache-$$"
 rm -rf "$SUBSCRIPTION_CACHE_FOLDER"
 mkdir -p "$SUBSCRIPTION_CACHE_FOLDER"
 seed_feed "sec1" "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 CC_SECTIONS="sec1|proxy|subscription"
 SUB_UPDATE_CALLS=0
 SUB_UPDATE_RC=0
-cc_holder="/tmp/netshift-cc-holder-$$.sh"
+cc_holder="/tmp/postq-cc-holder-$$.sh"
 printf 'sleep 30\n:\n' > "$cc_holder"
 sh "$cc_holder" &
 cc_holder_pid=$!
 mkdir -p "$SUBSCRIPTION_UPDATE_LOCK_DIR"
 echo "$cc_holder_pid" > "$SUBSCRIPTION_UPDATE_LOCK_DIR/pid"
-cc5b_out="/tmp/netshift-cc-json5b-$$"
+cc5b_out="/tmp/postq-cc-json5b-$$"
 subscription_clear_cache_and_redownload > "$cc5b_out"
 cc5b_rc=$?
 cc5b_json="$(cat "$cc5b_out")"
@@ -6389,7 +6389,7 @@ subscription_clear_cache_and_redownload() {
 # Silence updater.sh's own logger if it defines one after sourcing.
 eval "$(awk '/^component_action\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "UPD_PATH")"
 # No $()-capture (would subshell-trap ROUTER_HIT); write JSON to a file.
-router_out="/tmp/netshift-cc-router-$$"
+router_out="/tmp/postq-cc-router-$$"
 component_action subscription clear_cache > "$router_out"
 router_json="$(cat "$router_out")"
 rm -f "$router_out"
@@ -6399,13 +6399,13 @@ else
     echo "cc-case6-router-dispatch(hit=$ROUTER_HIT json='$router_json'):FAIL"
 fi
 
-rm -rf "/tmp/netshift-cc-cache-$$"
+rm -rf "/tmp/postq-cc-cache-$$"
 echo 'DONE'
 CCEOF
 
     sed -i "s|BIN_PATH|$ccbin|g; s|UPD_PATH|$ccupd|g" "$cc"
 
-    local cc_out="/tmp/netshift-cc-out-$$"
+    local cc_out="/tmp/postq-cc-out-$$"
     sh "$cc" > "$cc_out" 2>/dev/null
     while IFS= read -r line; do
         case "$line" in
@@ -6424,7 +6424,7 @@ CCEOF
 # Test: "Fastest" cross-group urltest of urltests (task-050)
 #
 # When subscription grouping is ON (country/prefix) and there are >= 2 groups,
-# the grouped branch in bin/netshift adds a top-level urltest tagged
+# the grouped branch in bin/postq adds a top-level urltest tagged
 # $SB_SUBSCRIPTION_FASTEST_GROUP_TAG whose members are the per-group urltests
 # ("<key> Fastest"), PREPENDS it to the main selector, and makes it the selector
 # default. Groups + ungrouped stay selectable. groups==1 -> no nested layer
@@ -6447,15 +6447,15 @@ test_fastest_group() {
         return
     fi
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local constants="${NETSHIFT_LIB_DIR}/constants.sh"
-    local manager="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local constants="${POSTQ_LIB_DIR}/constants.sh"
+    local manager="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
     if [ ! -r "$bin" ] || [ ! -r "$constants" ] || [ ! -r "$manager" ]; then
-        skip "netshift bin / constants.sh / config_manager.sh not found"
+        skip "postq bin / constants.sh / config_manager.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-fastest-$$"
+    local work="/tmp/postq-fastest-$$"
     mkdir -p "$work"
     local drv="$work/driver.sh"
 
@@ -6696,25 +6696,25 @@ test_feed_groups() {
         return
     fi
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="$NETSHIFT_LIB_DIR"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="$POSTQ_LIB_DIR"
     if [ ! -r "$bin" ] || [ ! -r "$lib/sing_box_config_facade.sh" ]; then
-        skip "netshift bin / facade not found"
+        skip "postq bin / facade not found"
         return
     fi
 
-    local work="/tmp/netshift-feedgroups-$$"
+    local work="/tmp/postq-feedgroups-$$"
     mkdir -p "$work"
     local drv="$work/driver.sh"
 
     cat > "$drv" << 'FDEOF'
-mkdir -p /usr/lib/netshift
+mkdir -p /usr/lib/postq
 for f in constants.sh helpers.sh logging.sh sing_box_config_manager.sh sing_box_config_facade.sh; do
-    ln -sf "LIB_DIR/$f" "/usr/lib/netshift/$f"
+    ln -sf "LIB_DIR/$f" "/usr/lib/postq/$f"
 done
-. /usr/lib/netshift/constants.sh
-. /usr/lib/netshift/logging.sh
-. /usr/lib/netshift/sing_box_config_facade.sh
+. /usr/lib/postq/constants.sh
+. /usr/lib/postq/logging.sh
+. /usr/lib/postq/sing_box_config_facade.sh
 log() { :; }
 echolog() { :; }
 nolog() { :; }
@@ -6851,7 +6851,7 @@ fg_headers() { grep -E '^(User-Agent|X-HWID|X-Device-OS|X-Device-Model|X-Ver-OS)
 fg_device() { grep -E '^(X-HWID|X-Device-OS|X-Device-Model|X-Ver-OS):' "$FG_WGET_LOG" | tr '\n' '|'; }
 fg_uci="/tmp/fg-uci-$$"
 mkdir -p "$fg_uci"
-cat > "$fg_uci/netshift" << 'FGUEOF'
+cat > "$fg_uci/postq" << 'FGUEOF'
 config section 'fgid'
 	option subscription_hwid '270DD26E-160D-4257-B8AC-654800E12F24'
 	option subscription_device_os 'iOS'
@@ -7303,13 +7303,13 @@ FDEOF
 test_insecure_fetch() {
     header "Insecure Subscription Fetch Flag (task-021b)"
 
-    local helpers="${NETSHIFT_LIB_DIR}/helpers.sh"
+    local helpers="${POSTQ_LIB_DIR}/helpers.sh"
     if [ ! -r "$helpers" ]; then
-        skip "helpers.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "helpers.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-insecure-$$"
+    local work="/tmp/postq-insecure-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
 
@@ -7450,26 +7450,26 @@ test_jobstate() {
         return
     fi
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local stub="/tmp/netshift-jobstub-$$"
+    local stub="/tmp/postq-jobstub-$$"
     cat > "$stub" << 'STUBEOF'
 #!/bin/sh
-# Minimal stand-in for /usr/bin/netshift that exposes the async job-state API.
+# Minimal stand-in for /usr/bin/postq that exposes the async job-state API.
 log() { :; }
 echolog() { :; }
 nolog() { :; }
 # Isolate state under a per-process tmpfs dir so parallel/old runs never clash.
-UPDATES_JOB_DIR="${JOBSTUB_DIR:-/tmp/netshift-jobstub-state}"
+UPDATES_JOB_DIR="${JOBSTUB_DIR:-/tmp/postq-jobstub-state}"
 
 . "UPDATER_PATH"
 
 # Re-pin after sourcing (the source sets its own default).
-UPDATES_JOB_DIR="${JOBSTUB_DIR:-/tmp/netshift-jobstub-state}"
+UPDATES_JOB_DIR="${JOBSTUB_DIR:-/tmp/postq-jobstub-state}"
 
 case "$1" in
 component_action)
@@ -7495,7 +7495,7 @@ STUBEOF
     sed -i "s|UPDATER_PATH|$updater|g" "$stub"
     chmod 0755 "$stub"
 
-    local jdir="/tmp/netshift-jobstate-$$"
+    local jdir="/tmp/postq-jobstate-$$"
     rm -rf "$jdir"
 
     # ── 1. async returns {success:true, job_id} fast; running state appears ──
@@ -7634,9 +7634,9 @@ another stray line {not-json}
     local disp_out
     disp_out="$(
         # shellcheck disable=SC1090
-        . "$NETSHIFT_LIB_DIR/constants.sh"
+        . "$POSTQ_LIB_DIR/constants.sh"
         # shellcheck disable=SC1090
-        . "$NETSHIFT_LIB_DIR/updater.sh"
+        . "$POSTQ_LIB_DIR/updater.sh"
         subscription_update_feed_worker() { printf 'feed:%s:[%s][%s]
 ' "$#" "$1" "$2"; }
         subscription_update_all_worker() { printf 'all:%s
@@ -7693,7 +7693,7 @@ all:0" ]; then
     fi
 
     # ── 3. invalid / traversal job ids are rejected safely ──────────────────
-    local bad bad_json bad_rc bad_out="/tmp/netshift-jobstate-bad-$$"
+    local bad bad_json bad_rc bad_out="/tmp/postq-jobstate-bad-$$"
     for bad in "../foo" "../../etc/passwd" "foo/bar" "a b" "" "."; do
         bad_rc=0
         JOBSTUB_DIR="$jdir" "$stub" component_action_status "$bad" > "$bad_out" 2>/dev/null || bad_rc=$?
@@ -7707,7 +7707,7 @@ all:0" ]; then
     done
     rm -f "$bad_out"
     # The validator must never resolve a traversal id to a path.
-    local fb_jobstate="/tmp/netshift-jobstate-validate-$$.sh"
+    local fb_jobstate="/tmp/postq-jobstate-validate-$$.sh"
     cat > "$fb_jobstate" << 'VEOF'
 log() { :; }
 UPDATES_JOB_DIR="VDIR"
@@ -7728,7 +7728,7 @@ VEOF
     sed -i "s|UPDATER_PATH|$updater|g;s|VDIR|$jdir|g" "$fb_jobstate"
     # Consume in the CURRENT shell (while read < file — NO pipe) so pass/fail
     # mutate the real counters and gate the suite.
-    local js_out="/tmp/netshift-jobstate-validate-out-$$.log"
+    local js_out="/tmp/postq-jobstate-validate-out-$$.log"
     ash "$fb_jobstate" > "$js_out" 2>/dev/null || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -7749,7 +7749,7 @@ VEOF
     local stale_dir="$jdir/stale"
     mkdir -p "$stale_dir"
     local stale_state="$stale_dir/staletest.json"
-    local stale_sh="/tmp/netshift-jobstate-stale-$$.sh"
+    local stale_sh="/tmp/postq-jobstate-stale-$$.sh"
     cat > "$stale_sh" << 'SEOF'
 log() { :; }
 UPDATES_JOB_DIR="SDIR"
@@ -7778,7 +7778,7 @@ SEOF
     sed -i "s|UPDATER_PATH|$updater|g;s|SDIR|$stale_dir|g;s|SSTATE|$stale_state|g" "$stale_sh"
     # Consume in the CURRENT shell (while read < file — NO pipe) so pass/fail
     # mutate the real counters and gate the suite.
-    local stale_out="/tmp/netshift-jobstate-stale-out-$$.log"
+    local stale_out="/tmp/postq-jobstate-stale-out-$$.log"
     ash "$stale_sh" > "$stale_out" 2>/dev/null || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -7804,7 +7804,7 @@ SEOF
 # Fully mocked — no real network, no real package install, no real binary
 # touched. A generated driver sources updater.sh, points RESOLV_CONF and the
 # tmpfs backup at test files, stubs dig/nslookup/curl/opkg/apk and a fake
-# /etc/init.d/netshift via a PATH-prepended bin dir + a writable init stub, and
+# /etc/init.d/postq via a PATH-prepended bin dir + a writable init stub, and
 # drives each scenario via env flags. The driver emits `name:OK`/`name:FAIL`
 # tokens which the case parser turns into pass/fail.
 # ─────────────────────────────────────────────────────────────────
@@ -7816,13 +7816,13 @@ test_selfheal() {
         return
     fi
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-selfheal-$$"
+    local work="/tmp/postq-selfheal-$$"
     rm -rf "$work"
     mkdir -p "$work/bin" "$work/init"
 
@@ -7858,7 +7858,7 @@ install)
         printf 'stable-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
         # A package manager that reports success yet leaves no runnable core
         # (half-written binary, missing library): the updater must catch that
-        # instead of restarting NetShift onto nothing.
+        # instead of restarting PostQ onto nothing.
         [ -f "$SELFHEAL_PKG_BREAKS_CORE" ] && rm -f "$SELFHEAL_BIN"
         # Same, with a core that still prints a version line but exits non-zero
         # (a build that crashes after printing): the output alone must not pass.
@@ -7878,19 +7878,19 @@ exit 0
 OPKGEOF
     chmod 0755 "$work/bin/dig" "$work/bin/nslookup" "$work/bin/curl" "$work/bin/opkg"
 
-    # Fake /etc/init.d/netshift: records each invocation (stop/start/restart) to
+    # Fake /etc/init.d/postq: records each invocation (stop/start/restart) to
     # a log so the driver can assert teardown/bring-up happened, plus a
     # `backup-present` line when the stable path's tmpfs backup still exists at
     # that moment.
-    cat > "$work/init/netshift" << 'INITEOF'
+    cat > "$work/init/postq" << 'INITEOF'
 #!/bin/sh
 printf '%s\n' "$1" >> "$SELFHEAL_INIT_LOG"
-for d in /tmp/netshift-sbstable.*; do
+for d in /tmp/postq-sbstable.*; do
     [ -e "$d" ] && printf 'backup-present\n' >> "$SELFHEAL_INIT_LOG"
 done
 exit 0
 INITEOF
-    chmod 0755 "$work/init/netshift"
+    chmod 0755 "$work/init/postq"
 
     # ── Driver: sources updater, overrides paths/helpers, runs one scenario. ──
     local drv="$work/driver.sh"
@@ -7929,7 +7929,7 @@ is_sing_box_extended() {
     esac
 }
 # Make the post-install restart a no-op probe (the fake init records it anyway).
-updates_restart_netshift() { /etc/init.d/netshift restart >/dev/null 2>&1 || true; }
+updates_restart_postq() { /etc/init.d/postq restart >/dev/null 2>&1 || true; }
 
 case "$1" in
 run_stable)  updates_install_sing_box_stable ;;
@@ -7938,15 +7938,15 @@ DRVEOF
     sed -i "s|DRV_UPDATER|$updater|g;s|DRV_RESOLV|$work/resolv.conf|g;s|DRV_BACKUP|$work/resolv.bak|g;s|DRV_CRONET|$work/libcronet.so|g" "$drv"
 
     # Common per-run wiring: PATH-prepended stubs + fake init under /etc/init.d.
-    # We back up any real /etc/init.d/netshift and restore it at the end.
-    local init_target="/etc/init.d/netshift"
+    # We back up any real /etc/init.d/postq and restore it at the end.
+    local init_target="/etc/init.d/postq"
     local init_saved=""
     if [ -e "$init_target" ]; then
-        init_saved="$work/netshift.realinit"
+        init_saved="$work/postq.realinit"
         cp -p "$init_target" "$init_saved" 2>/dev/null || init_saved=""
     fi
     mkdir -p /etc/init.d 2>/dev/null || true
-    cp -p "$work/init/netshift" "$init_target" 2>/dev/null
+    cp -p "$work/init/postq" "$init_target" 2>/dev/null
     chmod 0755 "$init_target" 2>/dev/null || true
 
     # Marker/state files shared with the stubs via env.
@@ -7963,7 +7963,7 @@ DRVEOF
     mkdir -p "$work/fetch"
     export SELFHEAL_APK_FETCH_DIR="$work/fetch/apk-fetch"
 
-    # The "NetShift was not restarted" assertions below read init.log, and they
+    # The "PostQ was not restarted" assertions below read init.log, and they
     # mean something only if the init stub installed above really logs there.
     : > "$SELFHEAL_INIT_LOG"
     "$init_target" selfcheck > /dev/null 2>&1 || true
@@ -8023,7 +8023,7 @@ COREEOF
         fail "selfheal-preflight-pass-resolv-untouched:FAIL" "$(cat "$work/resolv.conf" 2>/dev/null)"
     fi
     # Restart ordering on the opkg path too (the move is shared by both package
-    # managers): NetShift comes back only once the tmpfs backup — a full copy of
+    # managers): PostQ comes back only once the tmpfs backup — a full copy of
     # the extended core — has been freed.
     if grep -qx 'restart' "$work/init.log" 2>/dev/null && \
             ! grep -q 'backup-present' "$work/init.log" 2>/dev/null; then
@@ -8259,13 +8259,13 @@ add)
     ;;
 del)
     # Removing a world entry also drops reverse dependencies that are not world
-    # members themselves, so the package (and NetShift with it) can disappear.
-    # The marker models an apk that takes the core even though netshift IS a
+    # members themselves, so the package (and PostQ with it) can disappear.
+    # The marker models an apk that takes the core even though postq IS a
     # world member — the caller must not trust the dependency blindly.
-    if [ -f "$SELFHEAL_APK_DEL_PURGES" ] || ! grep -q '^netshift' "$SELFHEAL_APK_WORLD" 2>/dev/null; then
+    if [ -f "$SELFHEAL_APK_DEL_PURGES" ] || ! grep -q '^postq' "$SELFHEAL_APK_WORLD" 2>/dev/null; then
         rm -f "$SELFHEAL_BIN" 2>/dev/null
     fi
-    [ -f "$SELFHEAL_APK_DEL_PURGES_NETSHIFT" ] && rm -f /etc/init.d/netshift
+    [ -f "$SELFHEAL_APK_DEL_PURGES_POSTQ" ] && rm -f /etc/init.d/postq
     set_world_entry ""
     exit 0
     ;;
@@ -8278,17 +8278,17 @@ APKEOF
     export SELFHEAL_APK_WORLD="$work/apk-world"
     export SELFHEAL_APK_FEED_VERSION="$work/apk_feed_version"
     export SELFHEAL_APK_DEL_PURGES="$work/apk_del_purges"
-    export SELFHEAL_APK_DEL_PURGES_NETSHIFT="$work/apk_del_purges_netshift"
+    export SELFHEAL_APK_DEL_PURGES_POSTQ="$work/apk_del_purges_postq"
     printf '1.12.0-r1\n' > "$SELFHEAL_APK_FEED_VERSION"
     rm -f "$SELFHEAL_APK_DEL_PURGES"
 
     # ── Scenario 6 (apk): installed build still in the feed index → in-place
-    # reinstall lands; NetShift restarts only once the tmpfs backup is gone.
+    # reinstall lands; PostQ restarts only once the tmpfs backup is gone.
     : > "$SELFHEAL_DNS_OK"; : > "$SELFHEAL_HTTP_OK"; rm -f "$SELFHEAL_PKG_OK"
     : > "$SELFHEAL_APK_INDEXED"; : > "$SELFHEAL_APK_FETCH_OK"
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if jq -e '.success == true' "$out" > /dev/null 2>&1 && \
             [ "$(cat "$SELFHEAL_CORE_VERSION" 2>/dev/null)" = "stable-1.12.0" ]; then
@@ -8296,7 +8296,7 @@ APKEOF
     else
         fail "selfheal-apk-indexed-stable-installed:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
-    if [ "$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "netshift" ]; then
+    if [ "$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "postq" ]; then
         pass "selfheal-apk-indexed-world-untouched:OK"
     else
         fail "selfheal-apk-indexed-world-untouched:FAIL" "world=$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)"
@@ -8314,7 +8314,7 @@ APKEOF
     rm -f "$SELFHEAL_APK_INDEXED"; : > "$SELFHEAL_APK_FETCH_OK"
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\n' > "$SELFHEAL_APK_WORLD"
     # Download directory left on flash by a run that was killed mid-fetch.
     mkdir -p "$SELFHEAL_APK_FETCH_DIR.stale1"
     : > "$SELFHEAL_APK_FETCH_DIR.stale1/sing-box-1.11.0-r1.apk"
@@ -8328,7 +8328,7 @@ APKEOF
     # The package is downloaded next to the binary, not into the tmpfs
     # directory that holds the backup of the extended core.
     case "$(cat "$SELFHEAL_APK_FETCHED_TO" 2>/dev/null)" in
-    /tmp/netshift-sbstable.*)
+    /tmp/postq-sbstable.*)
         fail "selfheal-apk-fetch-not-in-backup-tmpfs:FAIL" "fetched to $(cat "$SELFHEAL_APK_FETCHED_TO")"
         ;;
     "$SELFHEAL_APK_FETCH_DIR".*)
@@ -8344,7 +8344,7 @@ APKEOF
         fail "selfheal-apk-fetch-dirs-cleaned:FAIL" "$(ls -d "$SELFHEAL_APK_FETCH_DIR".* 2>/dev/null)"
     fi
     if jq -e '.success == true' "$out" > /dev/null 2>&1 && \
-            [ "$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "netshift" ]; then
+            [ "$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "postq" ]; then
         pass "selfheal-apk-unindexed-world-pin-dropped:OK"
     else
         fail "selfheal-apk-unindexed-world-pin-dropped:FAIL" "world=$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)"
@@ -8352,7 +8352,7 @@ APKEOF
     # Same, but sing-box was an explicit world entry → that entry is kept.
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\nsing-box\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\nsing-box\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if jq -e '.success == true' "$out" > /dev/null 2>&1 && \
             [ "$(grep '^sing-box' "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "sing-box" ]; then
@@ -8362,11 +8362,11 @@ APKEOF
     fi
 
     # ── Scenario 8 (apk): the switch does not land (not in the index and the
-    # fetch fails) → success:false, core intact, and NetShift is NOT restarted.
+    # fetch fails) → success:false, core intact, and PostQ is NOT restarted.
     rm -f "$SELFHEAL_APK_INDEXED"; rm -f "$SELFHEAL_APK_FETCH_OK"
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if jq -e '.success == false' "$out" > /dev/null 2>&1; then
         pass "selfheal-apk-not-landed-successfalse:OK"
@@ -8392,7 +8392,7 @@ APKEOF
     rm -f "$SELFHEAL_APK_INDEXED"; : > "$SELFHEAL_APK_FETCH_OK"
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\nsing-box=1.11.0-r1\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\nsing-box=1.11.0-r1\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if jq -e '.success == true' "$out" > /dev/null 2>&1 && \
             ! grep -q '^sing-box><' "$SELFHEAL_APK_WORLD" 2>/dev/null; then
@@ -8410,7 +8410,7 @@ APKEOF
     # legal entry too — it must be recognised and put back, not silently lost.
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\nsing-box@custom\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\nsing-box@custom\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if [ "$(grep '^sing-box' "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "sing-box@custom" ] && \
             jq -e 'has("warning") | not' "$out" > /dev/null 2>&1; then
@@ -8419,22 +8419,22 @@ APKEOF
         fail "selfheal-apk-tagged-world-entry-kept:FAIL" "world=$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null) out=$(cat "$out" 2>/dev/null)"
     fi
 
-    # ── Scenario 11 (apk): NetShift is not a world member. `apk del sing-box`
-    # would purge NetShift along with the package, so the pin is left in place
+    # ── Scenario 11 (apk): PostQ is not a world member. `apk del sing-box`
+    # would purge PostQ along with the package, so the pin is left in place
     # and reported instead — a blocked upgrade beats a purged application.
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
     printf 'sing-box\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
-    if ! grep -qx 'del' "$SELFHEAL_APK_LOG" 2>/dev/null && [ -x /etc/init.d/netshift ]; then
-        pass "selfheal-apk-no-netshift-in-world-no-del:OK"
+    if ! grep -qx 'del' "$SELFHEAL_APK_LOG" 2>/dev/null && [ -x /etc/init.d/postq ]; then
+        pass "selfheal-apk-no-postq-in-world-no-del:OK"
     else
-        fail "selfheal-apk-no-netshift-in-world-no-del:FAIL" "apk.log=$(cat "$SELFHEAL_APK_LOG" 2>/dev/null)"
+        fail "selfheal-apk-no-postq-in-world-no-del:FAIL" "apk.log=$(cat "$SELFHEAL_APK_LOG" 2>/dev/null)"
     fi
     if jq -e '.success == true and ((.warning // "") | length > 0)' "$out" > /dev/null 2>&1; then
-        pass "selfheal-apk-no-netshift-in-world-reported:OK"
+        pass "selfheal-apk-no-postq-in-world-reported:OK"
     else
-        fail "selfheal-apk-no-netshift-in-world-reported:FAIL" "$(cat "$out" 2>/dev/null)"
+        fail "selfheal-apk-no-postq-in-world-reported:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
 
     # ── Scenario 12 (apk): `apk del` takes the core with it after all. The
@@ -8443,7 +8443,7 @@ APKEOF
     : > "$SELFHEAL_APK_DEL_PURGES"
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if jq -e '.success == false' "$out" > /dev/null 2>&1 && \
             grep -q 'core-marker: EXTENDED-CORE-BYTES' "$SELFHEAL_BIN" 2>/dev/null && \
@@ -8462,10 +8462,10 @@ APKEOF
     : > "$SELFHEAL_APK_INDEXED"; : > "$SELFHEAL_APK_FETCH_OK"
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\nsing-box><Q1FAKEHASH=\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\nsing-box><Q1FAKEHASH=\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if jq -e '.success == true and (has("warning") | not)' "$out" > /dev/null 2>&1 && \
-            [ "$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "netshift" ]; then
+            [ "$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "postq" ]; then
         pass "selfheal-apk-leftover-pin-dropped-fix-route:OK"
     else
         fail "selfheal-apk-leftover-pin-dropped-fix-route:FAIL" "world=$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null) out=$(cat "$out" 2>/dev/null)"
@@ -8473,16 +8473,16 @@ APKEOF
     rm -f "$SELFHEAL_APK_INDEXED"
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\nsing-box><Q1FAKEHASH=\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\nsing-box><Q1FAKEHASH=\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if jq -e '.success == true and (has("warning") | not)' "$out" > /dev/null 2>&1 && \
-            [ "$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "netshift" ]; then
+            [ "$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null)" = "postq" ]; then
         pass "selfheal-apk-leftover-pin-dropped-file-route:OK"
     else
         fail "selfheal-apk-leftover-pin-dropped-file-route:FAIL" "world=$(cat "$SELFHEAL_APK_WORLD" 2>/dev/null) out=$(cat "$out" 2>/dev/null)"
     fi
 
-    # ── Scenario 15 (apk): the same leftover pin on a router where NetShift is
+    # ── Scenario 15 (apk): the same leftover pin on a router where PostQ is
     # not a world member — scenario 11 run a second time with the same feed.
     # The pin cannot be dropped safely, and that must be reported every time,
     # not only on the run that wrote it.
@@ -8492,21 +8492,21 @@ APKEOF
     run_scenario
     if jq -e '.success == true and ((.warning // "") | contains("sing-box><Q1FAKEHASH="))' "$out" > /dev/null 2>&1 && \
             ! grep -qx 'del' "$SELFHEAL_APK_LOG" 2>/dev/null; then
-        pass "selfheal-apk-leftover-pin-no-netshift-reported:OK"
+        pass "selfheal-apk-leftover-pin-no-postq-reported:OK"
     else
-        fail "selfheal-apk-leftover-pin-no-netshift-reported:FAIL" "apk.log=$(cat "$SELFHEAL_APK_LOG" 2>/dev/null) out=$(cat "$out" 2>/dev/null)"
+        fail "selfheal-apk-leftover-pin-no-postq-reported:FAIL" "apk.log=$(cat "$SELFHEAL_APK_LOG" 2>/dev/null) out=$(cat "$out" 2>/dev/null)"
     fi
-    # "!netshift" excludes NetShift instead of keeping it installed, so it does
+    # "!postq" excludes PostQ instead of keeping it installed, so it does
     # not make `apk del sing-box` safe.
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf '!netshift\n' > "$SELFHEAL_APK_WORLD"
+    printf '!postq\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
     if jq -e '.success == true and ((.warning // "") | length > 0)' "$out" > /dev/null 2>&1 && \
             ! grep -qx 'del' "$SELFHEAL_APK_LOG" 2>/dev/null; then
-        pass "selfheal-apk-excluded-netshift-no-del:OK"
+        pass "selfheal-apk-excluded-postq-no-del:OK"
     else
-        fail "selfheal-apk-excluded-netshift-no-del:FAIL" "apk.log=$(cat "$SELFHEAL_APK_LOG" 2>/dev/null) out=$(cat "$out" 2>/dev/null)"
+        fail "selfheal-apk-excluded-postq-no-del:FAIL" "apk.log=$(cat "$SELFHEAL_APK_LOG" 2>/dev/null) out=$(cat "$out" 2>/dev/null)"
     fi
 
     # ── Scenario 16 (apk): the switch fails (fetch fails) while the world holds
@@ -8525,27 +8525,27 @@ APKEOF
     fi
     : > "$SELFHEAL_APK_FETCH_OK"
 
-    # ── Scenario 17 (apk): `apk del sing-box` removes NetShift although it is a
+    # ── Scenario 17 (apk): `apk del sing-box` removes PostQ although it is a
     # world member. The core switch stands, and the user is told in the result.
-    : > "$SELFHEAL_APK_DEL_PURGES_NETSHIFT"
+    : > "$SELFHEAL_APK_DEL_PURGES_POSTQ"
     printf 'extended-1.12.0\n' > "$SELFHEAL_CORE_VERSION"
     make_fake_core EXTENDED-CORE-BYTES
-    printf 'netshift\n' > "$SELFHEAL_APK_WORLD"
+    printf 'postq\n' > "$SELFHEAL_APK_WORLD"
     run_scenario
-    if jq -e '.success == true and ((.warning // "") | contains("NetShift"))' "$out" > /dev/null 2>&1; then
-        pass "selfheal-apk-del-took-netshift-reported:OK"
+    if jq -e '.success == true and ((.warning // "") | contains("PostQ VPN"))' "$out" > /dev/null 2>&1; then
+        pass "selfheal-apk-del-took-postq-reported:OK"
     else
-        fail "selfheal-apk-del-took-netshift-reported:FAIL" "out=$(cat "$out" 2>/dev/null)"
+        fail "selfheal-apk-del-took-postq-reported:FAIL" "out=$(cat "$out" 2>/dev/null)"
     fi
-    rm -f "$SELFHEAL_APK_DEL_PURGES_NETSHIFT"
-    cp -p "$work/init/netshift" "$init_target" 2>/dev/null
+    rm -f "$SELFHEAL_APK_DEL_PURGES_POSTQ"
+    cp -p "$work/init/postq" "$init_target" 2>/dev/null
     chmod 0755 "$init_target" 2>/dev/null || true
     rm -f "$work/bin/apk"
 
     # ── Scenario 13 (opkg): the package manager exits 0 and reports a stable
     # version, but leaves no runnable core. The version gate must read the
     # binary itself — get_sing_box_version()'s "1.0" fallback is not extended
-    # either, so trusting it would restart NetShift onto a missing core and call
+    # either, so trusting it would restart PostQ onto a missing core and call
     # that a success.
     : > "$SELFHEAL_DNS_OK"; : > "$SELFHEAL_HTTP_OK"; : > "$SELFHEAL_PKG_OK"
     : > "$SELFHEAL_PKG_BREAKS_CORE"
@@ -8589,7 +8589,7 @@ APKEOF
         SELFHEAL_APK_FETCH_OK SELFHEAL_APK_WORLD SELFHEAL_APK_FEED_VERSION \
         SELFHEAL_APK_DEL_PURGES SELFHEAL_APK_LOG SELFHEAL_APK_FETCH_DIR \
         SELFHEAL_PKG_BREAKS_CORE SELFHEAL_PKG_CORE_FAILS \
-        SELFHEAL_APK_FETCHED_TO SELFHEAL_APK_DEL_PURGES_NETSHIFT
+        SELFHEAL_APK_FETCHED_TO SELFHEAL_APK_DEL_PURGES_POSTQ
     rm -rf "$work"
 }
 
@@ -8601,7 +8601,7 @@ APKEOF
 # a stale rejected-hash, while a genuinely outbound-less body still is. The
 # functions under test (mark_subscription_outbound_unavailable,
 # subscription_cache_is_usable) and the per-URL cache path/hash builders live in
-# /usr/bin/netshift, not a sourceable lib, so a tiny driver extracts them
+# /usr/bin/postq, not a sourceable lib, so a tiny driver extracts them
 # VERBATIM from the live bin (awk between the `name() {` line and the matching
 # column-0 `}`), stubs only the UCI-facing subscription-URL provider (plus the
 # logger), sources helpers.sh for the real validate_subscription_file, and
@@ -8615,17 +8615,17 @@ test_rejected_hash() {
         return
     fi
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local helpers="${NETSHIFT_LIB_DIR}/helpers.sh"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local helpers="${POSTQ_LIB_DIR}/helpers.sh"
     if [ ! -r "$bin" ] || [ ! -r "$helpers" ]; then
-        skip "netshift bin / helpers.sh not found"
+        skip "postq bin / helpers.sh not found"
         return
     fi
 
-    local drv="/tmp/netshift-rejected-$$.sh"
+    local drv="/tmp/postq-rejected-$$.sh"
     cat > "$drv" << 'RHEOF'
 # Isolated cache dir for this run (the path builders read SUBSCRIPTION_CACHE_FOLDER).
-SUBSCRIPTION_CACHE_FOLDER="${RH_CACHE_DIR:-/tmp/netshift-rejected-cache}"
+SUBSCRIPTION_CACHE_FOLDER="${RH_CACHE_DIR:-/tmp/postq-rejected-cache}"
 mkdir -p "$SUBSCRIPTION_CACHE_FOLDER"
 
 # Quiet stubs for the logger used by the functions under test.
@@ -8777,15 +8777,15 @@ RHEOF
 
     sed -i "s|HELPERS_PATH|$helpers|g; s|BIN_PATH|$bin|g" "$drv"
 
-    local rhcache="/tmp/netshift-rejected-cache-$$"
+    local rhcache="/tmp/postq-rejected-cache-$$"
     rm -rf "$rhcache"
 
     # Parse in the CURRENT shell (temp file + `while read < "$rh_out"`, NO pipe)
     # so pass/fail update the global counters and an rh-case*:FAIL actually gates
     # the suite (a pipe would run the while-body in a subshell - non-gating).
-    local rh_out="/tmp/netshift-rejected-out-$$.txt"
+    local rh_out="/tmp/postq-rejected-out-$$.txt"
     if ! RH_CACHE_DIR="$rhcache" ash "$drv" > "$rh_out" 2>/dev/null; then
-        fail "netshift-rejected driver exited non-zero"
+        fail "postq-rejected driver exited non-zero"
     fi
     while IFS= read -r line; do
         case "$line" in
@@ -8812,21 +8812,21 @@ test_dns_via_outbound() {
         return
     fi
 
-    local facade_lib="${NETSHIFT_LIB_DIR}/sing_box_config_facade.sh"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local facade_lib="${POSTQ_LIB_DIR}/sing_box_config_facade.sh"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$facade_lib" ] || [ ! -r "$bin" ]; then
-        skip "facade lib / netshift bin not found"
+        skip "facade lib / postq bin not found"
         return
     fi
 
     # Bind bind-mounted sources to the runtime path the facade hardcodes.
-    mkdir -p /usr/lib/netshift
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "${POSTQ_LIB_DIR}/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
-    local drv="/tmp/netshift-dnsdetour-$$.sh"
+    local drv="/tmp/postq-dnsdetour-$$.sh"
     cat > "$drv" << 'DDEOF'
-. "NETSHIFT_LIB/logging.sh" 2>/dev/null || log() { :; }
+. "POSTQ_LIB/logging.sh" 2>/dev/null || log() { :; }
 . "FACADE_LIB_PATH"
 
 # Minimal DNS skeleton like sing_box_cm_configure_dns produces.
@@ -8971,11 +8971,11 @@ r=$(_get_dns_detour_tag)
 
 echo 'DONE'
 DDEOF
-    sed -i "s|FACADE_LIB_PATH|$facade_lib|; s|NETSHIFT_LIB|$NETSHIFT_LIB_DIR|g; s|BIN_PATH|$bin|g" "$drv"
+    sed -i "s|FACADE_LIB_PATH|$facade_lib|; s|POSTQ_LIB|$POSTQ_LIB_DIR|g; s|BIN_PATH|$bin|g" "$drv"
 
     # Consume in the CURRENT shell (while read < file — NO pipe) so pass/fail/
     # skip mutate the real counters and gate the suite.
-    local dd_out="/tmp/netshift-dnsdetour-out-$$.log"
+    local dd_out="/tmp/postq-dnsdetour-out-$$.log"
     ash "$drv" > "$dd_out" 2>/dev/null || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -9001,7 +9001,7 @@ DDEOF
 # Exercises the REAL DNS-section generator (sing_box_configure_dns extracted
 # verbatim from the CLI) with the REAL libraries, stubbing only UCI, and covers
 # the upgrade path explicitly: `dns_client_subnet` is a NEW option, and an
-# existing /etc/config/netshift is preserved as a conffile on upgrade, so the
+# existing /etc/config/postq is preserved as a conffile on upgrade, so the
 # option is simply MISSING for every upgraded user. That case must produce a
 # DNS section with no client_subnet field at all (byte-identical to the
 # pre-#36 output) and must still pass `sing-box check`. The option being set
@@ -9016,9 +9016,9 @@ test_dns_client_subnet() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local config_file="${NETSHIFT_SRC}/etc/config/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local config_file="${POSTQ_SRC}/etc/config/postq"
     if [ ! -r "$bin" ] || [ ! -r "$lib/helpers.sh" ]; then
         skip "ecssubnet — libs / bin not found"
         return
@@ -9033,18 +9033,18 @@ test_dns_client_subnet() {
     fi
 
     # Bind bind-mounted sources to the runtime path the libs hardcode.
-    mkdir -p /usr/lib/netshift
-    ln -sf "${lib}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "${lib}/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "${lib}/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
-    ln -sf "${lib}/constants.sh" /usr/lib/netshift/constants.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "${lib}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "${lib}/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "${lib}/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
+    ln -sf "${lib}/constants.sh" /usr/lib/postq/constants.sh
 
-    local drv="/tmp/netshift-ecssubnet-$$.sh"
+    local drv="/tmp/postq-ecssubnet-$$.sh"
     cat > "$drv" << 'ECSEOF'
-. "NETSHIFT_LIB/constants.sh"
-. "NETSHIFT_LIB/helpers.sh"
-. "NETSHIFT_LIB/sing_box_config_manager.sh"
-. "NETSHIFT_LIB/sing_box_config_facade.sh"
+. "POSTQ_LIB/constants.sh"
+. "POSTQ_LIB/helpers.sh"
+. "POSTQ_LIB/sing_box_config_manager.sh"
+. "POSTQ_LIB/sing_box_config_facade.sh"
 
 if command -v sing-box > /dev/null 2>&1; then
     ECS_SB=1
@@ -9067,13 +9067,13 @@ log() {
 # REAL functions, extracted verbatim from the shipped CLI (same awk trick the
 # other tests use): the DNS-section generator plus the helpers it calls.
 eval "$(awk '/^sing_box_configure_dns\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
-eval "$(awk '/^netshift_ipv6_enabled\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
+eval "$(awk '/^postq_ipv6_enabled\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
 eval "$(awk '/^_resolve_dns_outbound_tag\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
 # the older helper is gone from the product (the routes made it unused): the test keeps its meaning
 _get_dns_detour_tag() { local _v; config_get_bool _v "settings" "dns_via_outbound" 0; [ "$_v" -eq 1 ] || return 0; _resolve_dns_outbound_tag; }
 
 # UCI stubs: option values live in UCI_<section>_<option>; an UNSET variable
-# reproduces an option missing from /etc/config/netshift (the upgrade case).
+# reproduces an option missing from /etc/config/postq (the upgrade case).
 # The fallback mirrors config_get's ${CONFIG_x:-default} semantics.
 config_get() {
     local _var="$1" _sec="$2" _opt="$3" _def="${4-}"
@@ -9263,13 +9263,13 @@ fi
 
 echo 'DONE'
 ECSEOF
-    sed -i "s|NETSHIFT_LIB|$lib|g; s|BIN_PATH|$bin|g" "$drv"
+    sed -i "s|POSTQ_LIB|$lib|g; s|BIN_PATH|$bin|g" "$drv"
 
     # Consume in the CURRENT shell (while read < file — NO pipe) so pass/fail/
     # skip mutate the real counters and gate the suite. FAIL/SKIP tokens may
     # carry a trailing " [diagnostic]" suffix, hence the trailing globs (a bare
     # "*:FAIL)" would silently drop them and the failure would not gate).
-    local ecs_out="/tmp/netshift-ecssubnet-out-$$.log"
+    local ecs_out="/tmp/postq-ecssubnet-out-$$.log"
     ash "$drv" > "$ecs_out" 2>/dev/null || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -9303,9 +9303,9 @@ ECSEOF
 test_sub_url_option() {
     header "Scalar option subscription_url read-fallback + migration (task-048)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ]; then
-        skip "suburlopt — bin/netshift not found"
+        skip "suburlopt — bin/postq not found"
         return
     fi
     if [ ! -r /lib/functions.sh ] || [ ! -r /lib/config/uci.sh ] || ! command -v uci > /dev/null 2>&1; then
@@ -9313,8 +9313,8 @@ test_sub_url_option() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local drv="/tmp/netshift-suburlopt-$$.sh"
+    local lib="${POSTQ_LIB_DIR}"
+    local drv="/tmp/postq-suburlopt-$$.sh"
     cat > "$drv" << 'SUBOPTEOF'
 BIN="BIN_PATH_PLACEHOLDER"
 LIB="LIB_DIR_PLACEHOLDER"
@@ -9340,13 +9340,13 @@ done
 mkdir -p /etc/config
 
 # ── Fixture A: SCALAR option subscription_url (the exact broken shape) ──
-cat > /etc/config/netshift_suboptscalar <<'CFGEOF'
+cat > /etc/config/postq_suboptscalar <<'CFGEOF'
 config section 'main'
     option connection_type 'proxy'
     option proxy_config_type 'subscription'
     option subscription_url 'https://example.com/sub'
 CFGEOF
-config_load netshift_suboptscalar
+config_load postq_suboptscalar
 urls="$(get_subscription_urls_for_section main)"
 [ "$urls" = "https://example.com/sub" ] && echo 'suburlopt:scalar-read:OK' || echo "suburlopt:scalar-read:FAIL [$urls]"
 if section_has_configured_outbound main; then
@@ -9354,29 +9354,29 @@ if section_has_configured_outbound main; then
 else
     echo 'suburlopt:scalar-hasoutbound:FAIL'
 fi
-rm -f /etc/config/netshift_suboptscalar
+rm -f /etc/config/postq_suboptscalar
 
 # ── Fixture B: LIST subscription_url (must still work — no regression) ──
-cat > /etc/config/netshift_suboptlist <<'CFGEOF'
+cat > /etc/config/postq_suboptlist <<'CFGEOF'
 config section 'main'
     option connection_type 'proxy'
     option proxy_config_type 'subscription'
     list subscription_url 'https://example.com/sub'
 CFGEOF
-config_load netshift_suboptlist
+config_load postq_suboptlist
 urls="$(get_subscription_urls_for_section main)"
 [ "$urls" = "https://example.com/sub" ] && echo 'suburlopt:list-read:OK' || echo "suburlopt:list-read:FAIL [$urls]"
-rm -f /etc/config/netshift_suboptlist
+rm -f /etc/config/postq_suboptlist
 
 # ── Migration: option -> list, idempotent. The migration function hardcodes
-# the `netshift` config name, so write a throwaway /etc/config/netshift (the
+# the `postq` config name, so write a throwaway /etc/config/postq (the
 # caller backs up + restores any real one). Two sections: a plain URL AND a URL
 # with a query string containing `=`/`&`/`?` — the latter is the [B1] regression
 # guard: the old `uci add_list "key=value"` CLI form splits on the first `=` and
 # LOSES the value, while uci_add_list preserves it byte-for-byte. ──
-NETSHIFT_CONFIG="netshift"
+POSTQ_CONFIG="postq"
 EQ_URL='https://example.com/sub?token=abc&x=1'
-cat > /etc/config/netshift <<CFGEOF
+cat > /etc/config/postq <<CFGEOF
 config section 'main'
     option connection_type 'proxy'
     option proxy_config_type 'subscription'
@@ -9387,7 +9387,7 @@ config section 'query'
     option proxy_config_type 'subscription'
     option subscription_url '$EQ_URL'
 CFGEOF
-config_load netshift
+config_load postq
 
 # First run: must migrate both scalar options -> lists and flip the flag.
 migrate_legacy_subscription_url_option
@@ -9397,16 +9397,16 @@ else
     echo "suburlopt:migrate-flag:FAIL [$SUBSCRIPTION_URL_OPTION_MIGRATED]"
 fi
 # The stored values must be preserved.
-migrated_val="$(uci -q get netshift.main.subscription_url)"
+migrated_val="$(uci -q get postq.main.subscription_url)"
 [ "$migrated_val" = "https://example.com/sub" ] && echo 'suburlopt:migrate-value:OK' || echo "suburlopt:migrate-value:FAIL [$migrated_val]"
 # [B1] regression guard: the `=`/`&` URL survives byte-for-byte.
-migrated_eq="$(uci -q get netshift.query.subscription_url)"
+migrated_eq="$(uci -q get postq.query.subscription_url)"
 [ "$migrated_eq" = "$EQ_URL" ] && echo 'suburlopt:migrate-equrl-preserved:OK' || echo "suburlopt:migrate-equrl-preserved:FAIL [$migrated_eq]"
 
 # After a fresh config_load the LIST path (config_list_foreach) returns each URL,
 # and the committed state must be a CLEAN single-element list (no leftover scalar
 # option and no duplicate element).
-config_load netshift
+config_load postq
 SUBSCRIPTION_URLS_COLLECTED=""
 config_list_foreach main subscription_url _collect_subscription_url_handler
 [ "$SUBSCRIPTION_URLS_COLLECTED" = "https://example.com/sub" ] && echo 'suburlopt:migrate-islist:OK' || echo "suburlopt:migrate-islist:FAIL [$SUBSCRIPTION_URLS_COLLECTED]"
@@ -9416,7 +9416,7 @@ config_list_foreach query subscription_url _collect_subscription_url_handler
 # Clean single element: `uci show` must render exactly one list value per section
 # (no leftover scalar option, no duplicate). uci renders a list element with the
 # index-bearing `[0]` syntax; assert exactly one line each.
-eq_lines="$(uci -q show netshift.query.subscription_url | grep -c "subscription_url")"
+eq_lines="$(uci -q show postq.query.subscription_url | grep -c "subscription_url")"
 [ "$eq_lines" = "1" ] && echo 'suburlopt:migrate-equrl-single:OK' || echo "suburlopt:migrate-equrl-single:FAIL [$eq_lines]"
 
 # Second run: idempotent no-op (already a list -> flag stays 0, no churn).
@@ -9426,28 +9426,28 @@ if [ "$SUBSCRIPTION_URL_OPTION_MIGRATED" = "0" ]; then
 else
     echo "suburlopt:migrate-idempotent:FAIL [$SUBSCRIPTION_URL_OPTION_MIGRATED]"
 fi
-idem_val="$(uci -q get netshift.main.subscription_url)"
+idem_val="$(uci -q get postq.main.subscription_url)"
 [ "$idem_val" = "https://example.com/sub" ] && echo 'suburlopt:migrate-idempotent-value:OK' || echo "suburlopt:migrate-idempotent-value:FAIL [$idem_val]"
-idem_eq="$(uci -q get netshift.query.subscription_url)"
+idem_eq="$(uci -q get postq.query.subscription_url)"
 [ "$idem_eq" = "$EQ_URL" ] && echo 'suburlopt:migrate-idempotent-equrl:OK' || echo "suburlopt:migrate-idempotent-equrl:FAIL [$idem_eq]"
 
-rm -f /etc/config/netshift
+rm -f /etc/config/postq
 echo 'DONE'
 SUBOPTEOF
     sed -i "s|LIB_DIR_PLACEHOLDER|$lib|g; s|BIN_PATH_PLACEHOLDER|$bin|g" "$drv"
 
-    # Protect any real /etc/config/netshift the container may carry: the
+    # Protect any real /etc/config/postq the container may carry: the
     # migration path writes a throwaway one under that exact name.
-    local netshift_cfg_backup=""
-    if [ -f /etc/config/netshift ]; then
-        netshift_cfg_backup="/tmp/netshift-cfg-backup-$$"
-        cp /etc/config/netshift "$netshift_cfg_backup"
+    local postq_cfg_backup=""
+    if [ -f /etc/config/postq ]; then
+        postq_cfg_backup="/tmp/postq-cfg-backup-$$"
+        cp /etc/config/postq "$postq_cfg_backup"
     fi
 
     # Parse in the CURRENT shell (temp file + `while read < "$out"`, NO pipe) so
     # pass/fail update the global counters and a suburlopt:*:FAIL actually gates
     # the suite (a pipe would run the while-body in a subshell — non-gating).
-    local sub_out="/tmp/netshift-suburlopt-out-$$"
+    local sub_out="/tmp/postq-suburlopt-out-$$"
     sh "$drv" > "$sub_out" 2>/dev/null
     # FAIL/SKIP tokens carry a trailing " [diagnostic]" suffix, so match with a
     # trailing glob (*:FAIL*) — a bare "*:FAIL)" would miss them and silently
@@ -9463,10 +9463,10 @@ SUBOPTEOF
     done < "$sub_out"
     rm -f "$drv" "$sub_out"
 
-    if [ -n "$netshift_cfg_backup" ]; then
-        mv "$netshift_cfg_backup" /etc/config/netshift
+    if [ -n "$postq_cfg_backup" ]; then
+        mv "$postq_cfg_backup" /etc/config/postq
     else
-        rm -f /etc/config/netshift
+        rm -f /etc/config/postq
     fi
 }
 
@@ -9481,9 +9481,9 @@ SUBOPTEOF
 test_sub_cron() {
     header "Per-section subscription update interval (issue #51)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ]; then
-        skip "subcron — bin/netshift not found"
+        skip "subcron — bin/postq not found"
         return
     fi
     if [ ! -r /lib/functions.sh ]; then
@@ -9491,8 +9491,8 @@ test_sub_cron() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local drv="/tmp/netshift-subcron-$$.sh"
+    local lib="${POSTQ_LIB_DIR}"
+    local drv="/tmp/postq-subcron-$$.sh"
     cat > "$drv" << 'SUBCRONEOF'
 BIN="BIN_PATH_PLACEHOLDER"
 LIB="LIB_DIR_PLACEHOLDER"
@@ -9504,7 +9504,7 @@ extract() {
     awk -v f="$1" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$BIN"
 }
 
-WORK="/tmp/netshift-subcron-work-$$"
+WORK="/tmp/postq-subcron-work-$$"
 rm -rf "$WORK"
 mkdir -p "$WORK"
 CRONTAB_FILE="$WORK/crontab"
@@ -9559,7 +9559,7 @@ SUBSCRIPTION_UPDATE_LOCK_DIR="$WORK/subscription-update.lock"
 SUBSCRIPTION_FEED_TAGS_FILE="$WORK/subscription-feed-tags.jsonl"
 
 has_line() { grep -qxF "$1" "$CRONTAB_FILE"; }
-job_count() { grep -c "/usr/bin/netshift subscription_update" "$CRONTAB_FILE"; }
+job_count() { grep -c "/usr/bin/postq subscription_update" "$CRONTAB_FILE"; }
 # $1 = fixture, $2 = "keep" to keep the crontab as it is (upgrade simulation).
 sync() {
     cp "$1" /etc/config/nsfixture
@@ -9577,7 +9577,7 @@ for spec in "30m|*/30 * * * *" "1h|17 * * * *" "3h|7 */3 * * *" "6h|24 */6 * * *
     # The daily job also names its time ("1d HH:MM"), default 09:52.
     sfx=""
     [ "$iv" = "1d" ] && sfx=" 09:52"
-    if [ "$got" = "$want /usr/bin/netshift subscription_update $iv$sfx" ]; then
+    if [ "$got" = "$want /usr/bin/postq subscription_update $iv$sfx" ]; then
         echo "subcron:schedule-$iv:OK"
     else
         echo "subcron:schedule-$iv:FAIL [got '$got']"
@@ -9716,12 +9716,12 @@ CFGEOF
 
 # ── Two sections, two intervals, independent of the UCI order ───
 sync "$WORK/fast_slow"
-if has_line "*/30 * * * * /usr/bin/netshift subscription_update 30m"; then
+if has_line "*/30 * * * * /usr/bin/postq subscription_update 30m"; then
     echo 'subcron:fast-keeps-30m:OK'
 else
     echo "subcron:fast-keeps-30m:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
 fi
-if has_line "52 9 * * * /usr/bin/netshift subscription_update 1d 09:52"; then
+if has_line "52 9 * * * /usr/bin/postq subscription_update 1d 09:52"; then
     echo 'subcron:slow-keeps-1d:OK'
 else
     echo "subcron:slow-keeps-1d:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -9741,7 +9741,7 @@ else
 fi
 # No job may be left without an interval: a bare one updates every section on
 # one interval, which is the bug being fixed.
-if has_line "17 * * * * /usr/bin/netshift subscription_update"; then
+if has_line "17 * * * * /usr/bin/postq subscription_update"; then
     echo 'subcron:no-interval-less-job:FAIL [bare job present]'
 else
     echo 'subcron:no-interval-less-job:OK'
@@ -9749,16 +9749,16 @@ fi
 
 # ── Upgrade: the legacy interval-less job is replaced, list_update survives ──
 cat > "$CRONTAB_FILE" <<'CRONEOF'
-13 9 * * * /usr/bin/netshift list_update
-17 9 * * * /usr/bin/netshift subscription_update
+13 9 * * * /usr/bin/postq list_update
+17 9 * * * /usr/bin/postq subscription_update
 CRONEOF
 sync "$WORK/fast_slow" keep
-if grep -qxF "17 9 * * * /usr/bin/netshift subscription_update" "$CRONTAB_FILE"; then
+if grep -qxF "17 9 * * * /usr/bin/postq subscription_update" "$CRONTAB_FILE"; then
     echo 'subcron:legacy-job-dropped:FAIL [bare job still there]'
 else
     echo 'subcron:legacy-job-dropped:OK'
 fi
-if has_line "13 9 * * * /usr/bin/netshift list_update"; then
+if has_line "13 9 * * * /usr/bin/postq list_update"; then
     echo 'subcron:list-update-job-kept:OK'
 else
     echo 'subcron:list-update-job-kept:FAIL'
@@ -9771,7 +9771,7 @@ fi
 
 # ── Upgrade simulation: the option is absent (old conffile) ─────
 sync "$WORK/no_interval"
-if has_line "17 * * * * /usr/bin/netshift subscription_update 1h"; then
+if has_line "17 * * * * /usr/bin/postq subscription_update 1h"; then
     echo 'subcron:missing-option-uses-default:OK'
 else
     echo "subcron:missing-option-uses-default:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -9784,7 +9784,7 @@ fi
 
 # ── Two sections sharing an interval share one job ──────────────
 sync "$WORK/same_interval"
-if [ "$(job_count)" = "1" ] && has_line "17 * * * * /usr/bin/netshift subscription_update 1h"; then
+if [ "$(job_count)" = "1" ] && has_line "17 * * * * /usr/bin/postq subscription_update 1h"; then
     echo 'subcron:shared-interval-deduped:OK'
 else
     echo "subcron:shared-interval-deduped:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -9806,7 +9806,7 @@ fi
 # default interval now, i.e. the section lands in the 1h job.
 : > "$LOG_FILE"
 sync "$WORK/invalid_only"
-if has_line "17 * * * * /usr/bin/netshift subscription_update 1h"; then
+if has_line "17 * * * * /usr/bin/postq subscription_update 1h"; then
     echo 'subcron:unknown-interval-falls-back-to-default:OK'
 else
     echo "subcron:unknown-interval-falls-back-to-default:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -9841,8 +9841,8 @@ fi
 # one job, and the section on another interval keeps its own: the unknown value
 # must neither add a schedule of its own nor swallow the other one.
 sync "$WORK/invalid_and_known"
-if [ "$(job_count)" = "2" ] && has_line "17 * * * * /usr/bin/netshift subscription_update 1h" &&
-    has_line "*/30 * * * * /usr/bin/netshift subscription_update 30m"; then
+if [ "$(job_count)" = "2" ] && has_line "17 * * * * /usr/bin/postq subscription_update 1h" &&
+    has_line "*/30 * * * * /usr/bin/postq subscription_update 30m"; then
     echo 'subcron:unknown-interval-shares-default-job:OK'
 else
     echo "subcron:unknown-interval-shares-default-job:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -9876,7 +9876,7 @@ fi
 time_ok=1
 for spec in "04:30|30 4" "00:00|0 0" "08:09|9 8" "09:08|8 9" "23:59|59 23" "10:10|10 10" "00:05|5 0"; do
     t="${spec%%|*}"
-    want="${spec#*|} * * * /usr/bin/netshift subscription_update 1d $t"
+    want="${spec#*|} * * * /usr/bin/postq subscription_update 1d $t"
     got="$(get_subscription_cron_line_for_interval 1d "$t")"
     [ "$got" = "$want" ] || { time_ok=0; echo "# time-detail $t: got [$got] want [$want]"; }
 done
@@ -9892,7 +9892,7 @@ if get_subscription_cron_line_for_interval 1d 25:00 > /dev/null 2>&1; then
 else
     echo 'subcron:daily-time-invalid-rejected:OK'
 fi
-if [ "$(get_subscription_cron_line_for_interval 1h 04:30)" = "17 * * * * /usr/bin/netshift subscription_update 1h" ]; then
+if [ "$(get_subscription_cron_line_for_interval 1h 04:30)" = "17 * * * * /usr/bin/postq subscription_update 1h" ]; then
     echo 'subcron:time-ignored-for-other-intervals:OK'
 else
     echo 'subcron:time-ignored-for-other-intervals:FAIL'
@@ -9921,8 +9921,8 @@ config section 'legacy'
 CFGEOF
 : > "$LOG_FILE"
 sync "$WORK/daily_times"
-if has_line "30 4 * * * /usr/bin/netshift subscription_update 1d 04:30" &&
-    has_line "52 9 * * * /usr/bin/netshift subscription_update 1d 09:52"; then
+if has_line "30 4 * * * /usr/bin/postq subscription_update 1d 04:30" &&
+    has_line "52 9 * * * /usr/bin/postq subscription_update 1d 09:52"; then
     echo 'subcron:daily-time-own-job:OK'
 else
     echo "subcron:daily-time-own-job:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -9954,7 +9954,7 @@ config section 'oops'
 CFGEOF
 : > "$LOG_FILE"
 sync "$WORK/bad_time"
-if has_line "52 9 * * * /usr/bin/netshift subscription_update 1d 09:52" && [ "$(job_count)" = "1" ]; then
+if has_line "52 9 * * * /usr/bin/postq subscription_update 1d 09:52" && [ "$(job_count)" = "1" ]; then
     echo 'subcron:bad-time-falls-back-to-default:OK'
 else
     echo "subcron:bad-time-falls-back-to-default:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -9976,7 +9976,7 @@ config section 'hourly'
 CFGEOF
 : > "$LOG_FILE"
 sync "$WORK/time_on_hourly"
-if has_line "17 * * * * /usr/bin/netshift subscription_update 1h" && [ "$(job_count)" = "1" ]; then
+if has_line "17 * * * * /usr/bin/postq subscription_update 1h" && [ "$(job_count)" = "1" ]; then
     echo 'subcron:time-on-hourly-ignored:OK'
 else
     echo "subcron:time-on-hourly-ignored:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -10007,7 +10007,7 @@ CFGEOF
 : > "$LOG_FILE"
 sync "$WORK/clash"
 if grep -q "^\[warn\] The daily subscription update at 04:30 runs at the same time as the subscription update 30m cron job" "$LOG_FILE" &&
-    has_line "30 4 * * * /usr/bin/netshift subscription_update 1d 04:30"; then
+    has_line "30 4 * * * /usr/bin/postq subscription_update 1d 04:30"; then
     echo 'subcron:daily-minute-clash-warned:OK'
 else
     echo "subcron:daily-minute-clash-warned:FAIL [$(tr '\n' ';' < "$LOG_FILE")]"
@@ -10072,7 +10072,7 @@ config section 'daily'
         option subscription_update_interval '1d'
         option subscription_update_time '09:13'
 CFGEOF
-printf '%s\n' '13 */3 * * * /usr/bin/netshift list_update' > "$CRONTAB_FILE"
+printf '%s\n' '13 */3 * * * /usr/bin/postq list_update' > "$CRONTAB_FILE"
 : > "$LOG_FILE"
 sync "$WORK/clash_lists" keep
 if grep -q "^\[warn\] The daily subscription update at 09:13 runs at the same time as the lists update cron job" "$LOG_FILE"; then
@@ -10081,7 +10081,7 @@ else
     echo "subcron:clash-list-update-warned:FAIL [$(tr '\n' ';' < "$LOG_FILE")]"
 fi
 sed -i "s/'09:13'/'10:13'/" "$WORK/clash_lists"
-printf '%s\n' '13 */3 * * * /usr/bin/netshift list_update' > "$CRONTAB_FILE"
+printf '%s\n' '13 */3 * * * /usr/bin/postq list_update' > "$CRONTAB_FILE"
 : > "$LOG_FILE"
 sync "$WORK/clash_lists" keep
 if grep -q "runs at the same time as" "$LOG_FILE"; then
@@ -10089,7 +10089,7 @@ if grep -q "runs at the same time as" "$LOG_FILE"; then
 else
     echo 'subcron:clash-list-update-other-hour-silent:OK'
 fi
-printf '%s\n' '13 * * * * /usr/bin/netshift list_update' > "$CRONTAB_FILE"
+printf '%s\n' '13 * * * * /usr/bin/postq list_update' > "$CRONTAB_FILE"
 : > "$LOG_FILE"
 sync "$WORK/clash_lists" keep
 if grep -q "^\[warn\] The daily subscription update at 10:13 runs at the same time as the lists update cron job" "$LOG_FILE"; then
@@ -10123,7 +10123,7 @@ else
 fi
 # A hint minute that another job fires at is skipped: with :35 taken by a
 # list_update job the hint moves on to :40.
-printf '%s\n' '35 * * * * /usr/bin/netshift list_update' > "$CRONTAB_FILE"
+printf '%s\n' '35 * * * * /usr/bin/postq list_update' > "$CRONTAB_FILE"
 : > "$LOG_FILE"
 sync "$WORK/clash_hint" keep
 if grep -q "for example :40" "$LOG_FILE" && ! grep -q "for example :35" "$LOG_FILE"; then
@@ -10179,7 +10179,7 @@ config section 'dailydef'
         option subscription_url 'https://example.com/f'
         option subscription_update_interval '1d'
 CFGEOF
-printf '%s\n' '13 */3 * * * /usr/bin/netshift list_update' > "$CRONTAB_FILE"
+printf '%s\n' '13 */3 * * * /usr/bin/postq list_update' > "$CRONTAB_FILE"
 : > "$LOG_FILE"
 sync "$WORK/clash_default" keep
 if grep -q "runs at the same time as" "$LOG_FILE"; then
@@ -10240,18 +10240,18 @@ fi
 
 # ── remove_cron_job clears the legacy bare job and the interval jobs ──
 # stop_main calls it, and the interval jobs are matched by the same
-# `/usr/bin/netshift subscription_update` substring as the old interval-less one.
+# `/usr/bin/postq subscription_update` substring as the old interval-less one.
 cat > "$CRONTAB_FILE" <<'CRONEOF'
-13 9 * * * /usr/bin/netshift list_update
-17 9 * * * /usr/bin/netshift subscription_update
-17 * * * * /usr/bin/netshift subscription_update 1h
-52 9 * * * /usr/bin/netshift subscription_update 1d
-4 4 * * * /usr/bin/netshift check_proxy
+13 9 * * * /usr/bin/postq list_update
+17 9 * * * /usr/bin/postq subscription_update
+17 * * * * /usr/bin/postq subscription_update 1h
+52 9 * * * /usr/bin/postq subscription_update 1d
+4 4 * * * /usr/bin/postq check_proxy
 CRONEOF
 remove_cron_job
 if [ "$(job_count)" = "0" ] &&
-    ! grep -q "/usr/bin/netshift list_update" "$CRONTAB_FILE" &&
-    has_line "4 4 * * * /usr/bin/netshift check_proxy"; then
+    ! grep -q "/usr/bin/postq list_update" "$CRONTAB_FILE" &&
+    has_line "4 4 * * * /usr/bin/postq check_proxy"; then
     echo 'subcron:remove-cron-job-clears-all:OK'
 else
     echo "subcron:remove-cron-job-clears-all:FAIL [$(tr '\n' ';' < "$CRONTAB_FILE")]"
@@ -10265,7 +10265,7 @@ eval "$(extract start_main | sed \
     -e 's|/usr/sbin/ntpd|: ntpd|' \
     -e 's|/etc/init.d/sing-box start|subcron_sing_box_start|' \
     -e 's|^    sleep 1$|    :|' \
-    -e 's|/var/run/netshift_list_update.pid|$WORK/list_update.pid|')"
+    -e 's|/var/run/postq_list_update.pid|$WORK/list_update.pid|')"
 subcron_sing_box_start() { :; }
 migrate_legacy_subscription_url_option() { :; }
 check_requirements() { :; }
@@ -10297,8 +10297,8 @@ mkdir -p "$(dirname "$SUBSCRIPTION_PENDING_APPLY_FLAG")"
 rc=$?
 rm -f /etc/config/nsfixture
 if [ "$rc" -eq 0 ] && [ "$(job_count)" = "2" ] &&
-    has_line "52 9 * * * /usr/bin/netshift subscription_update 1d 09:52" &&
-    has_line "*/30 * * * * /usr/bin/netshift subscription_update 30m"; then
+    has_line "52 9 * * * /usr/bin/postq subscription_update 1d 09:52" &&
+    has_line "*/30 * * * * /usr/bin/postq subscription_update 30m"; then
     echo 'subcron:start-main-builds-jobs:OK'
 else
     echo "subcron:start-main-builds-jobs(rc=$rc jobs=$(job_count) crontab=$(tr '\n' ';' < "$CRONTAB_FILE")):FAIL"
@@ -10523,9 +10523,9 @@ else
 fi
 
 # ── the update lock: one subscription update at a time ──
-# A live owner is a process whose command line names netshift (every real run
-# is `/usr/bin/netshift ...`); the holder script's name provides that here.
-LOCK_HOLDER="$WORK/netshift-lock-holder.sh"
+# A live owner is a process whose command line names postq (every real run
+# is `/usr/bin/postq ...`); the holder script's name provides that here.
+LOCK_HOLDER="$WORK/postq-lock-holder.sh"
 printf 'sleep 60\n:\n' > "$LOCK_HOLDER"
 hold_lock() {
     sh "$LOCK_HOLDER" &
@@ -10605,7 +10605,7 @@ else
     echo "subcron:lock-stale-owner-taken-over:FAIL [rc=$rc]"
 fi
 
-# The owner pid now belongs to something that is not a netshift run.
+# The owner pid now belongs to something that is not a postq run.
 sleep 60 &
 foreign_pid=$!
 mkdir -p "$SUBSCRIPTION_UPDATE_LOCK_DIR"
@@ -10691,7 +10691,7 @@ fi
 rm -rf "$SUBSCRIPTION_UPDATE_LOCK_DIR"
 eval "$(extract subscription_update_lock_take_over)"
 
-# The owner records its start time: a live netshift process that merely got the
+# The owner records its start time: a live postq process that merely got the
 # dead owner's pid does not keep the lock.
 hold_lock
 echo "1" > "$SUBSCRIPTION_UPDATE_LOCK_DIR/start"
@@ -10703,9 +10703,9 @@ rc=$?
 unset SUBSCRIPTION_UPDATE_LOCK_MODE
 drop_lock_holder
 if [ "$rc" -eq 0 ] && [ -s "$WORK/updated.log" ]; then
-    echo 'subcron:lock-reused-pid-by-netshift-taken-over:OK'
+    echo 'subcron:lock-reused-pid-by-postq-taken-over:OK'
 else
-    echo "subcron:lock-reused-pid-by-netshift-taken-over:FAIL [rc=$rc]"
+    echo "subcron:lock-reused-pid-by-postq-taken-over:FAIL [rc=$rc]"
 fi
 # ...and the matching start time keeps it.
 hold_lock
@@ -10957,7 +10957,7 @@ echo 'DONE'
 SUBCRONEOF
     sed -i "s|LIB_DIR_PLACEHOLDER|$lib|g; s|BIN_PATH_PLACEHOLDER|$bin|g" "$drv"
 
-    local sub_out="/tmp/netshift-subcron-out-$$"
+    local sub_out="/tmp/postq-subcron-out-$$"
     sh "$drv" > "$sub_out" 2>/dev/null || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -10991,20 +10991,20 @@ test_global_proxy() {
         return
     fi
 
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
-    local constants_lib="${NETSHIFT_LIB_DIR}/constants.sh"
-    local jq_helpers="${NETSHIFT_LIB_DIR}/helpers.jq"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
+    local constants_lib="${POSTQ_LIB_DIR}/constants.sh"
+    local jq_helpers="${POSTQ_LIB_DIR}/helpers.jq"
     if [ ! -r "$cm_lib" ] || [ ! -r "$constants_lib" ] || [ ! -r "$jq_helpers" ]; then
         skip "config manager / constants / helpers.jq not found"
         return
     fi
 
     # sing_box_cm_patch_route_rule imports helpers.jq from the runtime path.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$jq_helpers" /usr/lib/netshift/helpers.jq
+    mkdir -p /usr/lib/postq
+    ln -sf "$jq_helpers" /usr/lib/postq/helpers.jq
 
     local cfg tmp
-    tmp="/tmp/netshift-global-proxy-$$.json"
+    tmp="/tmp/postq-global-proxy-$$.json"
 
     . "$constants_lib"
     . "$cm_lib"
@@ -11093,11 +11093,11 @@ test_global_proxy() {
 # ─────────────────────────────────────────────────────────────────
 # LuCI requests view modules as .../view/<name>.js?v=<LuCI core version>, which
 # does not change when this app is updated, so a browser kept serving the
-# previous version's JS. luci-app-netshift/cache-bust.sh (run from the package
-# Makefile) installs the views in a content-hashed view/netshift_<hash>/ and
+# previous version's JS. luci-app-postq/cache-bust.sh (run from the package
+# Makefile) installs the views in a content-hashed view/postq_<hash>/ and
 # points the requires and the menu at it, so every new build has new URLs.
 # Runs the REAL script on a copy of the source tree and checks:
-#   - directory renamed, every `require view.netshift.<x>` and the menu path
+#   - directory renamed, every `require view.postq.<x>` and the menu path
 #     rewritten, nothing left pointing at the old directory;
 #   - the tag follows the content (and the stamped version), and is stable;
 #   - a broken tree fails instead of producing a package that cannot load;
@@ -11106,18 +11106,18 @@ test_global_proxy() {
 test_luci_cache_bust() {
     header "LuCI views cache busting"
 
-    local src="${NETSHIFT_LUCI_SRC:-/luci-app-netshift}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local src="${POSTQ_LUCI_SRC:-/luci-app-postq}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$src/cache-bust.sh" ] || [ ! -d "$src/htdocs" ]; then
-        fail "cachebust" "luci-app-netshift source not mounted at $src (mount ../luci-app-netshift at /luci-app-netshift)"
+        fail "cachebust" "luci-app-postq source not mounted at $src (mount ../luci-app-postq at /luci-app-postq)"
         return
     fi
     if [ ! -r "$bin" ] || ! command -v jq > /dev/null 2>&1; then
-        skip "cachebust - bin/netshift or jq not found"
+        skip "cachebust - bin/postq or jq not found"
         return
     fi
 
-    local work="/tmp/netshift-cachebust-$$"
+    local work="/tmp/postq-cachebust-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -11130,25 +11130,25 @@ test_luci_cache_bust() {
             rm -rf "$W/$1"
             mkdir -p "$W/$1"
             cp -R "$src/htdocs" "$src/root" "$W/$1/"
-            sed -i -e "s/__COMPILED_VERSION_VARIABLE__/${2:-0.9.9}/g" "$W/$1/$view_rel/netshift/main.js"
+            sed -i -e "s/__COMPILED_VERSION_VARIABLE__/${2:-0.9.9}/g" "$W/$1/$view_rel/postq/main.js"
         }
         run() { sh "$src/cache-bust.sh" "$W/$1/htdocs" "$W/$1/root" > "$W/$1.out" 2>&1; }
-        tag_of() { ls "$W/$1/$view_rel" | grep '^netshift_' | head -1; }
+        tag_of() { ls "$W/$1/$view_rel" | grep '^postq_' | head -1; }
 
         fresh a
         run a && echo "script-ok:yes" || echo "script-ok:no"
         tag="$(tag_of a)"
-        echo "tag-shape:$(printf '%s' "$tag" | grep -Eq '^netshift_[0-9a-f]{8}$' && echo yes || echo no)"
-        echo "old-dir-gone:$([ -d "$W/a/$view_rel/netshift" ] && echo no || echo yes)"
+        echo "tag-shape:$(printf '%s' "$tag" | grep -Eq '^postq_[0-9a-f]{8}$' && echo yes || echo no)"
+        echo "old-dir-gone:$([ -d "$W/a/$view_rel/postq" ] && echo no || echo yes)"
 
         # Same files as in the source tree, just moved.
         moved=yes
-        for f in "$src/htdocs/luci-static/resources/view/netshift"/*.js; do
+        for f in "$src/htdocs/luci-static/resources/view/postq"/*.js; do
             [ -f "$W/a/$view_rel/$tag/$(basename "$f")" ] || moved=no
         done
         echo "all-views-moved:$moved"
 
-        echo "no-old-requires:$(grep -l 'view\.netshift\.' "$W/a/$view_rel/$tag"/*.js > /dev/null 2>&1 && echo no || echo yes)"
+        echo "no-old-requires:$(grep -l 'view\.postq\.' "$W/a/$view_rel/$tag"/*.js > /dev/null 2>&1 && echo no || echo yes)"
         echo "requires-new-dir:$(grep -h 'require view\.' "$W/a/$view_rel/$tag"/*.js | grep -vc "require view\.$tag\." | grep -qx 0 && echo yes || echo no)"
         deps=yes
         for ref in $(grep -ho "require view\.$tag\.[A-Za-z0-9_]*" "$W/a/$view_rel/$tag"/*.js | sort -u | sed "s/.*\.//"); do
@@ -11157,10 +11157,10 @@ test_luci_cache_bust() {
         echo "every-require-resolves:$deps"
         echo "has-requires:$(grep -hc "require view\.$tag\." "$W/a/$view_rel/$tag"/*.js | awk '{n+=$1} END{print (n>0)?"yes":"no"}')"
 
-        menu="$W/a/root/usr/share/luci/menu.d/luci-app-netshift.json"
+        menu="$W/a/root/usr/share/luci/menu.d/luci-app-postq.json"
         echo "menu-path:$(jq -r '."admin/services/postq".action.path' "$menu")"
-        echo "menu-only-path-changed:$([ "$(jq -S 'del(."admin/services/postq".action.path)' "$menu")" = "$(jq -S 'del(."admin/services/postq".action.path)' "$src/root/usr/share/luci/menu.d/luci-app-netshift.json")" ] && echo yes || echo no)"
-        echo "menu-target-exists:$([ -f "$W/a/$view_rel/$(jq -r '."admin/services/postq".action.path' "$menu" | cut -d/ -f1)/netshift.js" ] && echo yes || echo no)"
+        echo "menu-only-path-changed:$([ "$(jq -S 'del(."admin/services/postq".action.path)' "$menu")" = "$(jq -S 'del(."admin/services/postq".action.path)' "$src/root/usr/share/luci/menu.d/luci-app-postq.json")" ] && echo yes || echo no)"
+        echo "menu-target-exists:$([ -f "$W/a/$view_rel/$(jq -r '."admin/services/postq".action.path' "$menu" | cut -d/ -f1)/postq.js" ] && echo yes || echo no)"
 
         # Deterministic: the same build gives the same directory.
         fresh b
@@ -11172,55 +11172,55 @@ test_luci_cache_bust() {
         echo "changes-with-version:$([ "$(tag_of c)" != "$tag" ] && echo yes || echo no)"
         # ... and the content.
         fresh d
-        printf '\n// edit\n' >> "$W/d/$view_rel/netshift/section.js"
+        printf '\n// edit\n' >> "$W/d/$view_rel/postq/section.js"
         run d || echo "run-d:failed"
         echo "changes-with-content:$([ "$(tag_of d)" != "$tag" ] && echo yes || echo no)"
 
         # The tag is the md5 of the stamped views concatenated in byte order,
-        # then the page's own assets (resources/netshift/, PostQ) when there are any.
+        # then the page's own assets (resources/postq/, PostQ) when there are any.
         fresh m
-        want_tag="netshift_$( (
-            cd "$W/m/$view_rel/netshift" && LC_ALL=C cat ./*.js
-            if [ -d ../../netshift ]; then LC_ALL=C cat ../../netshift/*; fi
+        want_tag="postq_$( (
+            cd "$W/m/$view_rel/postq" && LC_ALL=C cat ./*.js
+            if [ -d ../../postq ]; then LC_ALL=C cat ../../postq/*; fi
         ) | LC_ALL=C md5sum | cut -c1-8)"
         run m || echo "run-m:failed"
         echo "tag-is-content-md5:$([ "$(tag_of m)" = "$want_tag" ] && echo yes || echo no)"
 
         # A broken tree must fail the build.
         fresh e
-        rm -rf "$W/e/$view_rel/netshift"
+        rm -rf "$W/e/$view_rel/postq"
         run e && echo "missing-views-fails:no" || echo "missing-views-fails:yes"
-        echo "missing-views-message:$(grep -c 'view/netshift not found' "$W/e.out")"
+        echo "missing-views-message:$(grep -c 'view/postq not found' "$W/e.out")"
         fresh f
-        rm -f "$W/f/root/usr/share/luci/menu.d/luci-app-netshift.json"
+        rm -f "$W/f/root/usr/share/luci/menu.d/luci-app-postq.json"
         run f && echo "missing-menu-fails:no" || echo "missing-menu-fails:yes"
-        echo "missing-menu-message:$(grep -c 'luci-app-netshift.json not found' "$W/f.out")"
+        echo "missing-menu-message:$(grep -c 'luci-app-postq.json not found' "$W/f.out")"
         # A require that points at a view that does not exist is caught.
         fresh g
-        sed -i 's/require view\.netshift\.main as main/require view.netshift.nosuchview as main/' "$W/g/$view_rel/netshift/diagnostic.js"
+        sed -i 's/require view\.postq\.main as main/require view.postq.nosuchview as main/' "$W/g/$view_rel/postq/diagnostic.js"
         run g && echo "dangling-require-fails:no" || echo "dangling-require-fails:yes"
         # A leftover path-form reference and a reference to another hash are caught too.
         fresh h
-        printf '\nL.resource("view/netshift/main.js");\n' >> "$W/h/$view_rel/netshift/diagnostic.js"
+        printf '\nL.resource("view/postq/main.js");\n' >> "$W/h/$view_rel/postq/diagnostic.js"
         run h && echo "path-form-reference-fails:no" || echo "path-form-reference-fails:yes"
         fresh i
-        printf '\n// require view.netshift_deadbeef.main\n' >> "$W/i/$view_rel/netshift/diagnostic.js"
+        printf '\n// require view.postq_deadbeef.main\n' >> "$W/i/$view_rel/postq/diagnostic.js"
         run i && echo "foreign-hash-reference-fails:no" || echo "foreign-hash-reference-fails:yes"
         # No .js views at all, and a second run over a processed tree, fail with a clear error.
         fresh j
-        rm -f "$W/j/$view_rel/netshift"/*.js
+        rm -f "$W/j/$view_rel/postq"/*.js
         run j && echo "empty-views-fails:no" || echo "empty-views-fails:yes"
         echo "empty-views-message:$(grep -c 'no .js views' "$W/j.out")"
         fresh k
         run k || echo "run-k:failed"
         run k && echo "rerun-fails:no" || echo "rerun-fails:yes"
-        echo "rerun-message:$(grep -c 'view/netshift not found' "$W/k.out")"
-        # The target directory already there next to a plain view/netshift: refused.
+        echo "rerun-message:$(grep -c 'view/postq not found' "$W/k.out")"
+        # The target directory already there next to a plain view/postq: refused.
         fresh x
         run x || echo "run-x:failed"
-        mkdir -p "$W/x/$view_rel/netshift"
-        cp "$src/htdocs/luci-static/resources/view/netshift"/*.js "$W/x/$view_rel/netshift/"
-        sed -i -e "s/__COMPILED_VERSION_VARIABLE__/0.9.9/g" "$W/x/$view_rel/netshift/main.js"
+        mkdir -p "$W/x/$view_rel/postq"
+        cp "$src/htdocs/luci-static/resources/view/postq"/*.js "$W/x/$view_rel/postq/"
+        sed -i -e "s/__COMPILED_VERSION_VARIABLE__/0.9.9/g" "$W/x/$view_rel/postq/main.js"
         run x && echo "already-exists-fails:no" || echo "already-exists-fails:yes"
         echo "already-exists-message:$(grep -c 'already exists' "$W/x.out")"
         # A version placeholder that was never stamped fails the build instead of
@@ -11232,9 +11232,9 @@ test_luci_cache_bust() {
 
         # ── backend: version of the installed LuCI app ──────────────────
         log() { :; }
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
+        . "${POSTQ_LIB_DIR}/constants.sh"
         eval "$(awk -v f="get_luci_app_version" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
-        mkver() { mkdir -p "$LUCI_VIEW_DIR/$1"; printf 'var NETSHIFT_LUCI_APP_VERSION = "%s";\n' "$2" > "$LUCI_VIEW_DIR/$1/main.js"; }
+        mkver() { mkdir -p "$LUCI_VIEW_DIR/$1"; printf 'var POSTQ_LUCI_APP_VERSION = "%s";\n' "$2" > "$LUCI_VIEW_DIR/$1/main.js"; }
         # The version line of the REAL bundle, as built and stamped, is understood.
         LUCI_VIEW_DIR="$W/a/$view_rel"
         echo "version-real-bundle:$(get_luci_app_version)"
@@ -11242,39 +11242,39 @@ test_luci_cache_bust() {
         LUCI_MENU_FILE="$W/no-such-menu.json"
         rm -rf "$LUCI_VIEW_DIR"; mkdir -p "$LUCI_VIEW_DIR"
         echo "version-none:$(get_luci_app_version)"
-        mkver netshift 0.8.0
+        mkver postq 0.8.0
         echo "version-legacy-dir:$(get_luci_app_version)"
         # Dates are made by creation order (a one-second gap), never by fixed dates.
         sleep 1
-        mkver netshift_1a2b3c4d 0.9.9.5
+        mkver postq_1a2b3c4d 0.9.9.5
         echo "version-hashed-dir-wins:$(get_luci_app_version)"
-        rm -rf "$LUCI_VIEW_DIR/netshift"
+        rm -rf "$LUCI_VIEW_DIR/postq"
         echo "version-hashed-dir:$(get_luci_app_version)"
         # Without a menu entry the newest main.js is the installed one, whichever way
         # the hash of a leftover directory sorts.
         rm -rf "$LUCI_VIEW_DIR"; mkdir -p "$LUCI_VIEW_DIR"
-        mkver netshift_ffffffff 0.9.9.4; mkver netshift_00000000 0.9.9.4
+        mkver postq_ffffffff 0.9.9.4; mkver postq_00000000 0.9.9.4
         sleep 1
-        mkver netshift_1a2b3c4d 0.9.9.5
+        mkver postq_1a2b3c4d 0.9.9.5
         echo "version-old-dirs-lose:$(get_luci_app_version)"
         # With the menu entry, the directory it opens is the installed one even when a
         # leftover (a downgrade, a manual copy) is newer.
-        printf '{"admin/services/netshift":{"action":{"type":"view","path":"netshift_1a2b3c4d/netshift"}}}\n' > "$LUCI_MENU_FILE"
+        printf '{"admin/services/postq":{"action":{"type":"view","path":"postq_1a2b3c4d/postq"}}}\n' > "$LUCI_MENU_FILE"
         sleep 1
-        mkver netshift_22222222 0.9.9.6
+        mkver postq_22222222 0.9.9.6
         echo "version-menu-wins-over-newer-leftover:$(get_luci_app_version)"
         # A menu entry that points to a directory that is not there is ignored.
-        printf '{"admin/services/netshift":{"action":{"type":"view","path":"netshift_99999999/netshift"}}}\n' > "$LUCI_MENU_FILE"
+        printf '{"admin/services/postq":{"action":{"type":"view","path":"postq_99999999/postq"}}}\n' > "$LUCI_MENU_FILE"
         echo "version-menu-dangling-falls-back:$(get_luci_app_version)"
         rm -f "$LUCI_MENU_FILE"
         # A main.js without the version line is skipped, never reported as an empty
         # string; with nothing usable left the app is installed but of unknown version.
         rm -rf "$LUCI_VIEW_DIR"; mkdir -p "$LUCI_VIEW_DIR"
-        mkver netshift_1a2b3c4d 0.9.9.5
-        mkdir -p "$LUCI_VIEW_DIR/netshift_00000001"
-        printf 'var SOMETHING_ELSE = 1;\n' > "$LUCI_VIEW_DIR/netshift_00000001/main.js"
+        mkver postq_1a2b3c4d 0.9.9.5
+        mkdir -p "$LUCI_VIEW_DIR/postq_00000001"
+        printf 'var SOMETHING_ELSE = 1;\n' > "$LUCI_VIEW_DIR/postq_00000001/main.js"
         echo "version-missing-line-skipped:$(get_luci_app_version)"
-        rm -rf "$LUCI_VIEW_DIR/netshift_1a2b3c4d"
+        rm -rf "$LUCI_VIEW_DIR/postq_1a2b3c4d"
         echo "version-missing-line:$(get_luci_app_version)"
 
         # ── package postinst: earlier view directories are removed, the installed one stays
@@ -11282,18 +11282,18 @@ test_luci_cache_bust() {
         awk '/^define Package\/\$\(PKG_NAME\)\/postinst/{p=1;next} /^endef/{if(p)exit} p' "$mk" | sed 's/\$\$/$/g' > "$W/postinst.sh"
         echo "postinst-extracted:$([ -s "$W/postinst.sh" ] && echo yes || echo no)"
         PV="$W/pi/view"; PM="$W/pi/menu.json"
-        rm -rf "$W/pi"; mkdir -p "$PV/netshift_aaaaaaaa" "$PV/netshift_bbbbbbbb" "$PV/netshift_cccccccc" "$PV/netshift" "$PV/other"
-        printf '{"admin/services/netshift":{"action":{"type":"view","path":"netshift_bbbbbbbb/netshift"}}}\n' > "$PM"
+        rm -rf "$W/pi"; mkdir -p "$PV/postq_aaaaaaaa" "$PV/postq_bbbbbbbb" "$PV/postq_cccccccc" "$PV/postq" "$PV/other"
+        printf '{"admin/services/postq":{"action":{"type":"view","path":"postq_bbbbbbbb/postq"}}}\n' > "$PM"
         ( LUCI_VIEW_DIR="$PV" LUCI_MENU_FILE="$PM" sh "$W/postinst.sh" ) > /dev/null 2>&1
         echo "postinst-keeps-active:$(ls "$PV" | tr '\n' ',')"
         # Image build (IPKG_INSTROOT set): nothing is touched.
-        mkdir -p "$PV/netshift_aaaaaaaa"
+        mkdir -p "$PV/postq_aaaaaaaa"
         ( IPKG_INSTROOT=/x LUCI_VIEW_DIR="$PV" LUCI_MENU_FILE="$PM" sh "$W/postinst.sh" ) > /dev/null 2>&1
-        echo "postinst-image-build-untouched:$([ -d "$PV/netshift_aaaaaaaa" ] && echo yes || echo no)"
+        echo "postinst-image-build-untouched:$([ -d "$PV/postq_aaaaaaaa" ] && echo yes || echo no)"
         # No usable menu entry: nothing is removed.
         printf '{}\n' > "$PM"
         ( LUCI_VIEW_DIR="$PV" LUCI_MENU_FILE="$PM" sh "$W/postinst.sh" ) > /dev/null 2>&1
-        echo "postinst-no-menu-removes-nothing:$([ -d "$PV/netshift_aaaaaaaa" ] && [ -d "$PV/netshift_bbbbbbbb" ] && echo yes || echo no)"
+        echo "postinst-no-menu-removes-nothing:$([ -d "$PV/postq_aaaaaaaa" ] && [ -d "$PV/postq_bbbbbbbb" ] && echo yes || echo no)"
     )"
     rm -rf "$work"
 
@@ -11306,8 +11306,8 @@ test_luci_cache_bust() {
     }
 
     _cb_check "the script succeeds on the source tree" "script-ok:yes"
-    _cb_check "the views directory is named netshift_<8 hex>" "tag-shape:yes"
-    _cb_check "the old view/netshift directory is gone" "old-dir-gone:yes"
+    _cb_check "the views directory is named postq_<8 hex>" "tag-shape:yes"
+    _cb_check "the old view/postq directory is gone" "old-dir-gone:yes"
     _cb_check "every view file is kept, only moved" "all-views-moved:yes"
     _cb_check "no require points at the old directory" "no-old-requires:yes"
     _cb_check "every require uses the new directory" "requires-new-dir:yes"
@@ -11322,7 +11322,7 @@ test_luci_cache_bust() {
     _cb_check "a missing menu file fails the build" "missing-menu-fails:yes"
     _cb_check "a require of a missing view fails the build" "dangling-require-fails:yes"
     _cb_check "no LuCI app: not installed" "version-none:not installed"
-    _cb_check "version is read from a legacy view/netshift directory" "version-legacy-dir:0.8.0"
+    _cb_check "version is read from a legacy view/postq directory" "version-legacy-dir:0.8.0"
     _cb_check "the hashed directory wins over a legacy one" "version-hashed-dir-wins:0.9.9.5"
     _cb_check "version is read from the hashed directory" "version-hashed-dir:0.9.9.5"
     _cb_check "the real bundle's version line is understood" "version-real-bundle:0.9.9"
@@ -11330,7 +11330,7 @@ test_luci_cache_bust() {
     _cb_check "the menu entry names the installed directory, even when a leftover is newer" "version-menu-wins-over-newer-leftover:0.9.9.5"
     _cb_check "a menu entry to a missing directory is ignored" "version-menu-dangling-falls-back:0.9.9.6"
     _cb_check "postinst is found in the Makefile" "postinst-extracted:yes"
-    _cb_check "postinst removes earlier view directories and keeps the installed one" "postinst-keeps-active:netshift_bbbbbbbb,other,"
+    _cb_check "postinst removes earlier view directories and keeps the installed one" "postinst-keeps-active:other,postq_bbbbbbbb,"
     _cb_check "postinst does nothing during an image build" "postinst-image-build-untouched:yes"
     _cb_check "postinst removes nothing without a usable menu entry" "postinst-no-menu-removes-nothing:yes"
     _cb_check "a main.js without a version line is skipped for one that has it" "version-missing-line-skipped:0.9.9.5"
@@ -11343,15 +11343,15 @@ test_luci_cache_bust() {
     _cb_check "an unstamped version placeholder fails the build" "unstamped-version-fails:yes"
     _cb_check "...and says so" "unstamped-version-message:1"
     _cb_check "the tag is the md5 of the stamped views" "tag-is-content-md5:yes"
-    _cb_check "a leftover view/netshift path reference fails the build" "path-form-reference-fails:yes"
+    _cb_check "a leftover view/postq path reference fails the build" "path-form-reference-fails:yes"
     _cb_check "a reference to another hash fails the build" "foreign-hash-reference-fails:yes"
     _cb_check "no .js views fails the build" "empty-views-fails:yes"
     _cb_check "no .js views: the error says so" "empty-views-message:1"
     _cb_check "a second run over a processed tree fails" "rerun-fails:yes"
-    if echo "$out" | grep -q '^menu-path:netshift_[0-9a-f]\{8\}/netshift$'; then
-        pass "the menu path is netshift_<hash>/netshift"
+    if echo "$out" | grep -q '^menu-path:postq_[0-9a-f]\{8\}/postq$'; then
+        pass "the menu path is postq_<hash>/postq"
     else
-        fail "the menu path is netshift_<hash>/netshift" "$(echo "$out" | grep '^menu-path' )"
+        fail "the menu path is postq_<hash>/postq" "$(echo "$out" | grep '^menu-path' )"
     fi
 }
 
@@ -11371,8 +11371,8 @@ test_luci_cache_bust() {
 test_reality_mlkem() {
     header "Reality X25519MLKEM768 option"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     local f
     for f in constants.sh helpers.sh sing_box_config_manager.sh sing_box_config_facade.sh helpers.jq; do
         if [ ! -r "$lib/$f" ]; then
@@ -11381,26 +11381,26 @@ test_reality_mlkem() {
         fi
     done
     if [ ! -r "$bin" ] || ! command -v jq > /dev/null 2>&1; then
-        skip "reality_mlkem - bin/netshift or jq not found"
+        skip "reality_mlkem - bin/postq or jq not found"
         return
     fi
 
     # The facade sources its siblings from the runtime path.
-    mkdir -p /usr/lib/netshift
+    mkdir -p /usr/lib/postq
     for f in constants.sh helpers.sh sing_box_config_manager.sh sing_box_config_facade.sh helpers.jq; do
-        ln -sf "$lib/$f" "/usr/lib/netshift/$f"
+        ln -sf "$lib/$f" "/usr/lib/postq/$f"
     done
 
     local out
     out="$(
-        RM_LOG="/tmp/netshift-realitymlkem-$$.log"
+        RM_LOG="/tmp/postq-realitymlkem-$$.log"
         : > "$RM_LOG"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$RM_LOG"; }
         echolog() { log "$1" "${2:-info}"; }
         nolog() { :; }
         . "$lib/constants.sh"
         . "$lib/helpers.sh"
-        NETSHIFT_LIB="$lib"
+        POSTQ_LIB="$lib"
         . "$lib/sing_box_config_manager.sh"
         . "$lib/sing_box_config_facade.sh"
         eval "$(awk -v f="set_section_reality_mlkem" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
@@ -11425,12 +11425,12 @@ test_reality_mlkem() {
         }
 
         gate() { # $1=core version, $2=option value ("" = option absent)
-            NETSHIFT_SING_BOX_VERSION="$1"
-            export NETSHIFT_SING_BOX_VERSION
+            POSTQ_SING_BOX_VERSION="$1"
+            export POSTQ_SING_BOX_VERSION
             RM_s_reality_mlkem="$2"
             : > "$RM_LOG"
             set_section_reality_mlkem s
-            printf '%s' "$NETSHIFT_REALITY_MLKEM"
+            printf '%s' "$POSTQ_REALITY_MLKEM"
         }
         echo "gate-default-off:$(gate 1.14.1-extended-2.7.2-lite '')"
         echo "gate-off-explicit:$(gate 1.14.1-extended-2.7.2-lite 0)"
@@ -11457,23 +11457,23 @@ test_reality_mlkem() {
         LINK_T='vless://11111111-2222-3333-4444-555555555555@t.example.com:443?encryption=none&security=tls&sni=t.example.com&type=tcp'
         base='{"outbounds":[]}'
 
-        unset NETSHIFT_REALITY_MLKEM
+        unset POSTQ_REALITY_MLKEM
         echo "link-default:$(mlk "$(sing_box_cf_add_proxy_outbound "$base" r "$LINK_R" 0)")"
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_REALITY_MLKEM=0
         echo "link-off:$(mlk "$(sing_box_cf_add_proxy_outbound "$base" r "$LINK_R" 0)")"
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         echo "link-on:$(mlk "$(sing_box_cf_add_proxy_outbound "$base" r "$LINK_R" 0)")"
         echo "link-on-tls-untouched:$(mlk "$(sing_box_cf_add_proxy_outbound "$base" t "$LINK_T" 0)")"
         # Everything else about the Reality block is unchanged by the flag.
         on="$(sing_box_cf_add_proxy_outbound "$base" r "$LINK_R" 0)"
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_REALITY_MLKEM=0
         off="$(sing_box_cf_add_proxy_outbound "$base" r "$LINK_R" 0)"
         same="no"
         [ "$(printf '%s' "$on" | jq -S 'del(.outbounds[0].tls.reality.support_x25519mlkem768)')" = "$(printf '%s' "$off" | jq -S .)" ] && same="yes"
         echo "link-on-otherwise-identical:$same"
 
         # Subscription batch: only Reality nodes get the field.
-        SUBJ="/tmp/netshift-realitymlkem-sub-$$.json"
+        SUBJ="/tmp/postq-realitymlkem-sub-$$.json"
         cat > "$SUBJ" << 'SUBEOF'
 {"outbounds":[
  {"type":"vless","tag":"reality-node","server":"r.example.com","server_port":443,"uuid":"11111111-2222-3333-4444-555555555555","flow":"xtls-rprx-vision","tls":{"enabled":true,"server_name":"r.example.com","utls":{"enabled":true,"fingerprint":"chrome"},"reality":{"enabled":true,"public_key":"jNXHt1yRo0vDuchQlIP6Z0ZvjT3KtzVI-T4E7RoLJS0","short_id":"0123abcd"}}},
@@ -11484,10 +11484,10 @@ SUBEOF
         batch_field() { # $1=tag
             printf '%s' "$BATCH" | jq -r --arg t "$1" '.outbounds[] | select(.tag==$t) | .tls.reality as $r | $r | if . == null then "no-reality" elif has("support_x25519mlkem768") then (.support_x25519mlkem768 | tostring) else "absent" end'
         }
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_REALITY_MLKEM=0
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$SUBJ" '[]' '[]')"
         echo "batch-off:$(batch_field reality-node)"
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$SUBJ" '[]' '[]')"
         echo "batch-on-reality:$(batch_field reality-node)"
         echo "batch-on-tls-untouched:$(batch_field tls-node)"
@@ -11498,41 +11498,41 @@ SUBEOF
         # kept by the normalized cache) stays on a core that knows it, option on
         # or off, and goes away on a core that does not (stock sing-box would fail
         # `sing-box check` on it).
-        SUBJ2="/tmp/netshift-realitymlkem-sub2-$$.json"
+        SUBJ2="/tmp/postq-realitymlkem-sub2-$$.json"
         jq '.outbounds[0].tls.reality.support_x25519mlkem768 = true' "$SUBJ" > "$SUBJ2"
-        NETSHIFT_SING_BOX_VERSION="1.14.1-extended-2.7.2-lite"
-        export NETSHIFT_SING_BOX_VERSION
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_SING_BOX_VERSION="1.14.1-extended-2.7.2-lite"
+        export POSTQ_SING_BOX_VERSION
+        POSTQ_REALITY_MLKEM=0
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$SUBJ2" '[]' '[]')"
         echo "batch-off-keeps-cached-field:$(batch_field reality-node)"
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$SUBJ2" '[]' '[]')"
         echo "batch-on-keeps-cached-field:$(batch_field reality-node)"
-        NETSHIFT_SING_BOX_VERSION="1.13.14"
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_SING_BOX_VERSION="1.13.14"
+        POSTQ_REALITY_MLKEM=0
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$SUBJ2" '[]' '[]')"
         echo "batch-stock-strips-cached-field:$(batch_field reality-node)"
-        NETSHIFT_SING_BOX_VERSION="1.14.1-extended-2.7.2-lite"
+        POSTQ_SING_BOX_VERSION="1.14.1-extended-2.7.2-lite"
         rm -f "$SUBJ2"
 
         # The normalized subscription cache never depends on the option: a URI
         # body parsed with the flag ON comes out without the field.
-        NSRC="/tmp/netshift-realitymlkem-norm-$$.txt"
-        NOUT="/tmp/netshift-realitymlkem-norm-$$.json"
+        NSRC="/tmp/postq-realitymlkem-norm-$$.txt"
+        NOUT="/tmp/postq-realitymlkem-norm-$$.json"
         printf '%s\n' "$LINK_R" > "$NSRC"
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         if normalize_subscription_to_singbox "$NSRC" "$NOUT" s; then
             echo "normalize-ignores-flag:$(jq -r '[.outbounds[] | .tls.reality // {} | if has("support_x25519mlkem768") then (.support_x25519mlkem768 | tostring) else "absent" end] | unique | join(",")' "$NOUT")"
         else
             echo "normalize-ignores-flag:normalize-failed"
         fi
-        echo "normalize-restores-flag:$NETSHIFT_REALITY_MLKEM"
+        echo "normalize-restores-flag:$POSTQ_REALITY_MLKEM"
         rm -f "$NSRC" "$NOUT"
 
         # The user's own outbound JSON is never touched, flag on or not.
         RAW='{"type":"vless","server":"r.example.com","server_port":443,"uuid":"11111111-2222-3333-4444-555555555555","tls":{"enabled":true,"reality":{"enabled":true,"public_key":"jNXHt1yRo0vDuchQlIP6Z0ZvjT3KtzVI-T4E7RoLJS0","short_id":"0123abcd"}}}'
         get_outbound_tag_by_section() { echo "$1-out"; }
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         got="$(sing_box_cf_add_json_outbound "$base" raw "$RAW" | jq -cS '.outbounds[0] | del(.tag)')"
         want="$(printf '%s' "$RAW" | jq -cS .)"
         [ "$got" = "$want" ] && echo "raw-outbound-json-untouched:yes" || echo "raw-outbound-json-untouched:no [$got]"
@@ -11540,8 +11540,8 @@ SUBEOF
         # Seam: the option goes through the REAL set_section_reality_mlkem from
         # the bin and the result reaches the facade, end to end (no hand-set flag).
         seam() { # $1=core version, $2=option
-            NETSHIFT_SING_BOX_VERSION="$1"
-            export NETSHIFT_SING_BOX_VERSION
+            POSTQ_SING_BOX_VERSION="$1"
+            export POSTQ_SING_BOX_VERSION
             RM_s_reality_mlkem="$2"
             : > "$RM_LOG"
             set_section_reality_mlkem s
@@ -11555,21 +11555,21 @@ SUBEOF
         # fp other than chrome: the option would be a silent no-op, so it is warned about.
         LINK_F='vless://11111111-2222-3333-4444-555555555555@r.example.com:443?encryption=none&flow=xtls-rprx-vision&fp=firefox&pbk=jNXHt1yRo0vDuchQlIP6Z0ZvjT3KtzVI-T4E7RoLJS0&security=reality&sid=0123abcd&sni=r.example.com&type=tcp'
         LINK_N='vless://11111111-2222-3333-4444-555555555555@r.example.com:443?encryption=none&flow=xtls-rprx-vision&pbk=jNXHt1yRo0vDuchQlIP6Z0ZvjT3KtzVI-T4E7RoLJS0&security=reality&sid=0123abcd&sni=r.example.com&type=tcp'
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         : > "$RM_LOG"
         sing_box_cf_add_proxy_outbound "$base" r "$LINK_R" 0 > /dev/null
         grep -q "key share is only sent with fp=chrome" "$RM_LOG" && echo "fp-chrome-silent:no" || echo "fp-chrome-silent:yes"
         : > "$RM_LOG"
         sing_box_cf_add_proxy_outbound "$base" r "$LINK_F" 0 > /dev/null
         grep -q "key share is only sent with fp=chrome" "$RM_LOG" && echo "fp-other-warned:yes" || echo "fp-other-warned:no"
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_REALITY_MLKEM=0
         : > "$RM_LOG"
         sing_box_cf_add_proxy_outbound "$base" r "$LINK_F" 0 > /dev/null
         grep -q "key share is only sent with fp=chrome" "$RM_LOG" && echo "fp-other-off-silent:no" || echo "fp-other-off-silent:yes"
 
         # A link that does not use the chrome fingerprint never gets the field (the
         # core could reject it next to another fingerprint), and the log says so.
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         : > "$RM_LOG"
         echo "link-fp-other-no-field:$(mlk "$(sing_box_cf_add_proxy_outbound "$base" r "$LINK_F" 0)")"
         grep -q "has fingerprint 'firefox': the X25519MLKEM768 key share is only sent with fp=chrome, so it is not added for this link" "$RM_LOG" && echo "link-fp-other-says-so:yes" || echo "link-fp-other-says-so:no"
@@ -11580,7 +11580,7 @@ SUBEOF
         # Subscription nodes: only chrome nodes get the field; a field that is already
         # there (provider's sing-box config) is removed from every other Reality
         # node, also when the node carries no `enabled` key or a string value.
-        SUBJ3="/tmp/netshift-realitymlkem-sub3-$$.json"
+        SUBJ3="/tmp/postq-realitymlkem-sub3-$$.json"
         cat > "$SUBJ3" << 'SUBEOF'
 {"outbounds":[
  {"type":"vless","tag":"chrome","server":"a.example.com","server_port":443,"uuid":"u","tls":{"enabled":true,"utls":{"enabled":true,"fingerprint":"chrome"},"reality":{"enabled":true,"public_key":"k","short_id":"s"}}},
@@ -11590,17 +11590,17 @@ SUBEOF
  {"type":"vless","tag":"stringtrue","server":"e.example.com","server_port":443,"uuid":"u","tls":{"enabled":true,"utls":{"enabled":true,"fingerprint":"chrome"},"reality":{"enabled":"true","public_key":"k","short_id":"s","support_x25519mlkem768":true}}}
 ]}
 SUBEOF
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$SUBJ3" '[]' '[]')"
         echo "batch-fp-on:$(batch_field chrome),$(batch_field firefox),$(batch_field nofp),$(batch_field noenabled),$(batch_field stringtrue)"
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_REALITY_MLKEM=0
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$SUBJ3" '[]' '[]')"
         echo "batch-fp-off:$(batch_field chrome),$(batch_field firefox),$(batch_field nofp),$(batch_field noenabled),$(batch_field stringtrue)"
         rm -f "$SUBJ3"
 
         # A provider node with a scalar `tls` (or `utls`) must not abort the whole
         # batch: the other nodes still come through.
-        SUBJ4="/tmp/netshift-realitymlkem-sub4-$$.json"
+        SUBJ4="/tmp/postq-realitymlkem-sub4-$$.json"
         cat > "$SUBJ4" << 'SUBEOF'
 {"outbounds":[
  {"type":"vless","tag":"scalar-tls","server":"s.example.com","server_port":443,"uuid":"u","tls":"none"},
@@ -11609,7 +11609,7 @@ SUBEOF
 ]}
 SUBEOF
         for flag in 0 1; do
-            NETSHIFT_REALITY_MLKEM=$flag
+            POSTQ_REALITY_MLKEM=$flag
             BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$SUBJ4" '[]' '[]')"
             echo "batch-scalar-tls-$flag:count=$(printf '%s' "$BATCH" | jq -r '.count // "abort"') chrome=$(batch_field chrome) scalar-utls=$(batch_field scalar-utls)"
         done
@@ -11617,16 +11617,16 @@ SUBEOF
 
         # The core version is resolved once per run, not once per section (a subshell:
         # the stub must not outlive this check).
-        VCOUNT="/tmp/netshift-realitymlkem-vcount-$$"; : > "$VCOUNT"
+        VCOUNT="/tmp/postq-realitymlkem-vcount-$$"; : > "$VCOUNT"
         echo "version-resolved-once:$(
-            get_sing_box_version() { # the real one reuses NETSHIFT_SING_BOX_VERSION when it is set
-                if [ -n "${NETSHIFT_SING_BOX_VERSION:-}" ]; then echo "$NETSHIFT_SING_BOX_VERSION"; return; fi
+            get_sing_box_version() { # the real one reuses POSTQ_SING_BOX_VERSION when it is set
+                if [ -n "${POSTQ_SING_BOX_VERSION:-}" ]; then echo "$POSTQ_SING_BOX_VERSION"; return; fi
                 echo x >> "$VCOUNT"; echo "1.14.1-extended-2.7.2-lite"
             }
-            unset NETSHIFT_SING_BOX_VERSION
+            unset POSTQ_SING_BOX_VERSION
             RM_s_reality_mlkem=1
             set_section_reality_mlkem s; set_section_reality_mlkem s; set_section_reality_mlkem s
-            echo "$(wc -l < "$VCOUNT" | tr -d ' ')/$NETSHIFT_REALITY_MLKEM"
+            echo "$(wc -l < "$VCOUNT" | tr -d ' ')/$POSTQ_REALITY_MLKEM"
         )"
         rm -f "$VCOUNT"
 
@@ -11651,8 +11651,8 @@ SUBEOF
         LINK_HX="$LINK_R&support-x25519mlkem768=maybe"
         LINK_HFP="$LINK_F&support-x25519mlkem768=true"
         hint() { # $1=core version, $2=option ("" = absent), $3=link
-            NETSHIFT_SING_BOX_VERSION="$1"
-            export NETSHIFT_SING_BOX_VERSION
+            POSTQ_SING_BOX_VERSION="$1"
+            export POSTQ_SING_BOX_VERSION
             RM_s_reality_mlkem="$2"
             : > "$RM_LOG"
             set_section_reality_mlkem s
@@ -11682,11 +11682,11 @@ SUBEOF
         # The normalized subscription cache carries the hint as written, whatever
         # the installed core (it is a property of the body), and without a
         # warning; the batch then gates it on the core and the section option.
-        HSRC="/tmp/netshift-realitymlkem-hint-$$.txt"
-        HOUT="/tmp/netshift-realitymlkem-hint-$$.json"
+        HSRC="/tmp/postq-realitymlkem-hint-$$.txt"
+        HOUT="/tmp/postq-realitymlkem-hint-$$.json"
         printf '%s\n%s\n%s\n' "$LINK_H" "$LINK_HF" "$LINK_R" > "$HSRC"
-        NETSHIFT_SING_BOX_VERSION="1.13.14"
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_SING_BOX_VERSION="1.13.14"
+        POSTQ_REALITY_MLKEM=0
         : > "$RM_LOG"
         fields() { jq -r '[.outbounds[] | select(.type == "vless") | .tls.reality // {} | if has("support_x25519mlkem768") then (.support_x25519mlkem768 | tostring) else "absent" end] | join(",")' "$1"; }
         if normalize_subscription_to_singbox "$HSRC" "$HOUT" s; then
@@ -11697,10 +11697,10 @@ SUBEOF
         echo "normalize-hint-silent:$([ "$(hint_warned)" = no ] && echo yes || echo no)"
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$HOUT" '[]' '[]')"
         echo "batch-hint-stock:$(printf '%s' "$BATCH" | fields /dev/stdin)"
-        NETSHIFT_SING_BOX_VERSION="1.14.1-extended-2.7.2"
+        POSTQ_SING_BOX_VERSION="1.14.1-extended-2.7.2"
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$HOUT" '[]' '[]')"
         echo "batch-hint-extended-off:$(printf '%s' "$BATCH" | fields /dev/stdin)"
-        NETSHIFT_REALITY_MLKEM=1
+        POSTQ_REALITY_MLKEM=1
         BATCH="$(sing_box_cf_prepare_subscription_batch "$base" "$HOUT" '[]' '[]')"
         echo "batch-hint-extended-on:$(printf '%s' "$BATCH" | fields /dev/stdin)"
         rm -f "$HSRC" "$HOUT"
@@ -11810,27 +11810,27 @@ test_bittorrent_direct() {
         return
     fi
 
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
-    local facade_lib="${NETSHIFT_LIB_DIR}/sing_box_config_facade.sh"
-    local constants_lib="${NETSHIFT_LIB_DIR}/constants.sh"
-    local jq_helpers="${NETSHIFT_LIB_DIR}/helpers.jq"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
+    local facade_lib="${POSTQ_LIB_DIR}/sing_box_config_facade.sh"
+    local constants_lib="${POSTQ_LIB_DIR}/constants.sh"
+    local jq_helpers="${POSTQ_LIB_DIR}/helpers.jq"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$cm_lib" ] || [ ! -r "$facade_lib" ] || [ ! -r "$constants_lib" ] || [ ! -r "$jq_helpers" ] \
         || [ ! -r "$bin" ]; then
-        skip "config manager / facade / constants / helpers.jq / netshift bin not found"
+        skip "config manager / facade / constants / helpers.jq / postq bin not found"
         return
     fi
 
     # The manager and the facade hardcode the runtime library path; bind the
     # bind-mounted sources there (test_dns_via_outbound pattern).
-    mkdir -p /usr/lib/netshift
-    ln -sf "$jq_helpers" /usr/lib/netshift/helpers.jq
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$cm_lib" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$jq_helpers" /usr/lib/postq/helpers.jq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$cm_lib" /usr/lib/postq/sing_box_config_manager.sh
 
-    local drv="/tmp/netshift-bittorrent-$$.sh"
+    local drv="/tmp/postq-bittorrent-$$.sh"
     cat > "$drv" << 'BTEOF'
-LIB="NETSHIFT_LIB"
+LIB="POSTQ_LIB"
 BIN="BIN_PATH"
 FACADE="FACADE_PATH"
 
@@ -11861,7 +11861,7 @@ config_get() {
 config_foreach() { :; }
 config_list_foreach() { :; }
 get_global_proxy_section() { echo ""; }
-netshift_ipv6_enabled() { return 1; }
+postq_ipv6_enabled() { return 1; }
 get_sections_by_connection_type() { echo ""; }
 get_first_outbound_section() { echo ""; }
 get_outbound_tag_by_section() { echo "$1-out"; }
@@ -11994,9 +11994,9 @@ echo "$out" | jq -e '(.route.rules | length) == 2
 
 echo 'DONE'
 BTEOF
-    sed -i "s|NETSHIFT_LIB|$NETSHIFT_LIB_DIR|g; s|BIN_PATH|$bin|; s|FACADE_PATH|$facade_lib|" "$drv"
+    sed -i "s|POSTQ_LIB|$POSTQ_LIB_DIR|g; s|BIN_PATH|$bin|; s|FACADE_PATH|$facade_lib|" "$drv"
 
-    local bt_out="/tmp/netshift-bittorrent-out-$$.log"
+    local bt_out="/tmp/postq-bittorrent-out-$$.log"
     ash "$drv" > "$bt_out" 2>&1 || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -12032,13 +12032,13 @@ test_check_update_stable() {
         return
     fi
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-stablecheck-$$"
+    local work="/tmp/postq-stablecheck-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
 
@@ -12088,7 +12088,7 @@ nolog() { :; }
 . "DRV_UPDATER"
 updates_check_sing_box_stable
 DRVEOF
-    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${NETSHIFT_LIB_DIR}/helpers.sh|g" "$drv"
+    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${POSTQ_LIB_DIR}/helpers.sh|g" "$drv"
 
     local out="$work/out.json"
     run_check() {
@@ -12167,13 +12167,13 @@ test_check_update_extended() {
         return
     fi
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-extcheck-$$"
+    local work="/tmp/postq-extcheck-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -12194,7 +12194,7 @@ updates_fetch_sing_box_extended_releases() { printf '%s' "$STUBEXT_RELEASES"; }
 updates_extended_release_tag() { printf '%s' "$STUBEXT_TAG"; }
 updates_check_sing_box_extended
 DRVEOF
-    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${NETSHIFT_LIB_DIR}/helpers.sh|g" "$drv"
+    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${POSTQ_LIB_DIR}/helpers.sh|g" "$drv"
 
     local out="$work/out.json"
     run_extcheck() {
@@ -12268,13 +12268,13 @@ DRVEOF
 test_sing_box_extended_arm_arch() {
     header "sing-box-extended ARM asset selection (issue #37)"
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-sbextarch-$$"
+    local work="/tmp/postq-sbextarch-$$"
     local out="$work/out.txt"
     local drv="$work/driver.sh"
     rm -rf "$work"
@@ -12436,7 +12436,7 @@ resolve_case "sbext-riscv64-uses-riscv64" riscv64 tarball 0
 # ── Case 7: END-TO-END real installs with a fake download ────────────
 CASE_UNAME=armv7l
 updates_fetch_sing_box_extended_releases() { printf '%s' "$RELEASES"; }
-updates_restart_netshift() { :; }
+updates_restart_postq() { :; }
 
 # Builds a fake sing-box-extended .ipk with the real layout: a tar.gz holding
 # control.tar.gz + data.tar.gz + debian-binary, payload at ./usr/bin/sing-box
@@ -12536,7 +12536,7 @@ fi
 
 echo DONE
 DRVEOF
-    sed -i "s|DRV_LIB_DIR|${NETSHIFT_LIB_DIR}|g" "$drv"
+    sed -i "s|DRV_LIB_DIR|${POSTQ_LIB_DIR}|g" "$drv"
 
     sh "$drv" > "$out" 2>&1 || true
 
@@ -12560,7 +12560,7 @@ DRVEOF
     fi
 
     # ── Part 2: UPGRADE SIMULATION against real UCI + real config_get ───────
-    # A router upgraded from an older NetShift keeps its own /etc/config/netshift,
+    # A router upgraded from an older PostQ keeps its own /etc/config/postq,
     # so sing_box_extended_arm_build is simply ABSENT there. This part loads a
     # real UCI config dir (no such option) through the real config_load /
     # config_get and checks that the resolution still works, that a CPU which
@@ -12576,7 +12576,7 @@ DRVEOF
     local uout="$work/uci-out.txt"
     local udrv="$work/uci-driver.sh"
     mkdir -p "$uci_dir"
-    cat > "$uci_dir/netshift" << 'UCICFG'
+    cat > "$uci_dir/postq" << 'UCICFG'
 config settings 'settings'
         option dns_type 'udp'
         option update_interval '1d'
@@ -12613,7 +12613,7 @@ resolve() { # <name> <expected-suffix> <expected-kind>
     fi
 }
 
-config_load netshift
+config_load postq
 
 # Upgrade case: the option does not exist in this config at all. The behaviour
 # on a CPU that always worked must be byte-for-byte the old one (armv7 tarball),
@@ -12624,37 +12624,37 @@ CASE_FEATURES="$NO_FPU"
 resolve "sbext-upgrade-absent-option-detects-package" arm_cortex-a9 openwrt-package
 
 # Present-but-unset and present-but-unknown values must fall back to detection.
-uci -c "$UCI_DIR" set netshift.settings.sing_box_extended_arm_build=''
-uci -c "$UCI_DIR" commit netshift > /dev/null 2>&1
-config_load netshift
+uci -c "$UCI_DIR" set postq.settings.sing_box_extended_arm_build=''
+uci -c "$UCI_DIR" commit postq > /dev/null 2>&1
+config_load postq
 resolve "sbext-upgrade-empty-option-detects-package" arm_cortex-a9 openwrt-package
 
-uci -c "$UCI_DIR" set netshift.settings.sing_box_extended_arm_build='banana'
-uci -c "$UCI_DIR" commit netshift > /dev/null 2>&1
-config_load netshift
+uci -c "$UCI_DIR" set postq.settings.sing_box_extended_arm_build='banana'
+uci -c "$UCI_DIR" commit postq > /dev/null 2>&1
+config_load postq
 resolve "sbext-upgrade-unknown-option-detects-package" arm_cortex-a9 openwrt-package
 
 # Explicit overrides, read through the real UCI stack.
-uci -c "$UCI_DIR" set netshift.settings.sing_box_extended_arm_build='armv7'
-uci -c "$UCI_DIR" commit netshift > /dev/null 2>&1
-config_load netshift
+uci -c "$UCI_DIR" set postq.settings.sing_box_extended_arm_build='armv7'
+uci -c "$UCI_DIR" commit postq > /dev/null 2>&1
+config_load postq
 resolve "sbext-upgrade-option-forces-armv7" armv7 tarball
 
-uci -c "$UCI_DIR" set netshift.settings.sing_box_extended_arm_build='armv6'
-uci -c "$UCI_DIR" commit netshift > /dev/null 2>&1
-config_load netshift
+uci -c "$UCI_DIR" set postq.settings.sing_box_extended_arm_build='armv6'
+uci -c "$UCI_DIR" commit postq > /dev/null 2>&1
+config_load postq
 CASE_FEATURES="$VFPV3"
 resolve "sbext-upgrade-option-forces-armv6" armv6 tarball
 
-uci -c "$UCI_DIR" set netshift.settings.sing_box_extended_arm_build='openwrt'
-uci -c "$UCI_DIR" commit netshift > /dev/null 2>&1
-config_load netshift
+uci -c "$UCI_DIR" set postq.settings.sing_box_extended_arm_build='openwrt'
+uci -c "$UCI_DIR" commit postq > /dev/null 2>&1
+config_load postq
 CASE_FEATURES="$VFPV3"
 resolve "sbext-upgrade-option-forces-package" arm_cortex-a9 openwrt-package
 
 echo DONE
 UCIDRV
-    sed -i "s|DRV_LIB_DIR|${NETSHIFT_LIB_DIR}|g" "$udrv"
+    sed -i "s|DRV_LIB_DIR|${POSTQ_LIB_DIR}|g" "$udrv"
 
     UCI_DIR="$uci_dir" UCI_CONFIG_DIR="$uci_dir" sh "$udrv" > "$uout" 2>&1 || true
 
@@ -12701,12 +12701,12 @@ UCIDRV
 test_sing_box_lite() {
     header "sing-box extended lite (third core variant)"
 
-    local constants="${NETSHIFT_LIB_DIR}/constants.sh"
-    local helpers="${NETSHIFT_LIB_DIR}/helpers.sh"
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local constants="${POSTQ_LIB_DIR}/constants.sh"
+    local helpers="${POSTQ_LIB_DIR}/helpers.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$constants" ] || [ ! -r "$helpers" ] || [ ! -r "$updater" ] || [ ! -r "$bin" ]; then
-        skip "constants/helpers/updater/bin not found in ${NETSHIFT_SRC}"
+        skip "constants/helpers/updater/bin not found in ${POSTQ_SRC}"
         return
     fi
     if ! command -v jq > /dev/null 2>&1; then
@@ -12714,7 +12714,7 @@ test_sing_box_lite() {
         return
     fi
 
-    local work="/tmp/netshift-sbextlite-$$"
+    local work="/tmp/postq-sbextlite-$$"
     local out="$work/out.txt"
     local out2="$work/out2.txt"
     local drv="$work/driver.sh"
@@ -12728,8 +12728,8 @@ test_sing_box_lite() {
     if [ -e /usr/libexec/sing-box-core ]; then
         cp -p /usr/libexec/sing-box-core "$work/lite-core.orig" 2>/dev/null || true
     fi
-    if [ -e /etc/netshift/core-version.cache ]; then
-        cp -p /etc/netshift/core-version.cache "$work/core-cache.orig" 2>/dev/null || true
+    if [ -e /etc/postq/core-version.cache ]; then
+        cp -p /etc/postq/core-version.cache "$work/core-cache.orig" 2>/dev/null || true
     fi
     if [ -e /etc/sing-box-version.cache ]; then
         cp -p /etc/sing-box-version.cache "$work/orphan-cache.orig" 2>/dev/null || true
@@ -12771,7 +12771,7 @@ SB_VER_OVERRIDE=""
 STOCK_CORE_VERSION="1.12.0"
 WRK="/tmp/sblite-wrk-$$"
 rm -rf "$WRK"
-mkdir -p "$WRK" /etc/netshift
+mkdir -p "$WRK" /etc/postq
 
 # The stubs below fake ONLY the environment (arch/UCI/RAM/disk) and the
 # network (releases + downloads). The real helpers under test — variant
@@ -12823,7 +12823,7 @@ if [ "${1:-}" != "realhelpers" ]; then
         esac
     }
     updates_system_uses_musl() { return 1; }
-    updates_restart_netshift() { :; }
+    updates_restart_postq() { :; }
     updates_ensure_connectivity() { return 0; }
     updates_restore_after_swap() { :; }
 
@@ -12928,7 +12928,7 @@ main_body() {
     }
 
     rm -f /usr/bin/sing-box /usr/libexec/sing-box-core \
-        /etc/netshift/core-version.cache /etc/sing-box-version.cache
+        /etc/postq/core-version.cache /etc/sing-box-version.cache
     place_fake_bin /usr/bin/sing-box "1.14.1" elf
     variant_case sblite-variant-stock-elf stock 1
     place_fake_bin /usr/bin/sing-box "1.14.1-extended-2.7.2" elf
@@ -13082,7 +13082,7 @@ main_body() {
     CASE_SUMS_MODE=good
     CORE_VERSION="1.14.1-extended-2.7.2-lite"
     place_fake_bin /usr/bin/sing-box "1.14.1" elf
-    rm -f /usr/libexec/sing-box-core /etc/netshift/core-version.cache /etc/sing-box-version.cache
+    rm -f /usr/libexec/sing-box-core /etc/postq/core-version.cache /etc/sing-box-version.cache
     json="$(_updates_install_sing_box_lite_core 2>/dev/null)"
     if printf '%s' "$json" | jq -e '.success == true and .version == "1.14.1-extended-2.7.2-lite" and .build == "elf" and ((has("warning") | not))' >/dev/null 2>&1; then
         echo "sblite-e2e-elf-json:OK"
@@ -13095,7 +13095,7 @@ main_body() {
     else
         echo "sblite-e2e-elf-binary:FAIL ($v)"
     fi
-    if [ ! -e /usr/libexec/sing-box-core ] && [ ! -e /etc/netshift/core-version.cache ] && [ ! -e /etc/sing-box-version.cache ]; then
+    if [ ! -e /usr/libexec/sing-box-core ] && [ ! -e /etc/postq/core-version.cache ] && [ ! -e /etc/sing-box-version.cache ]; then
         echo "sblite-e2e-elf-no-leftovers:OK"
     else
         echo "sblite-e2e-elf-no-leftovers:FAIL"
@@ -13113,7 +13113,7 @@ main_body() {
     fi
     if [ -x /usr/libexec/sing-box-core ] &&
         [ "$(head -c 2 /usr/bin/sing-box 2>/dev/null)" = "#!" ] &&
-        [ -s /etc/netshift/core-version.cache ]; then
+        [ -s /etc/postq/core-version.cache ]; then
         echo "sblite-e2e-upx-layout:OK"
     else
         echo "sblite-e2e-upx-layout:FAIL"
@@ -13135,11 +13135,11 @@ main_body() {
         echo "sblite-e2e-upx-version-from-cache:FAIL (v='$v' calls=$calls2 want=$calls)"
     fi
     # with the cache gone the wrapper probes once and rebuilds it
-    rm -f /etc/netshift/core-version.cache
+    rm -f /etc/postq/core-version.cache
     v="$(sing-box version 2>/dev/null | head -n1)"
     calls3="$(wc -l <"$CORE_MARKER" | tr -d ' ')"
     if [ "$v" = "sing-box version 1.14.1-extended-2.7.2-lite" ] &&
-        [ -s /etc/netshift/core-version.cache ] && [ "$calls3" = "$((calls + 1))" ]; then
+        [ -s /etc/postq/core-version.cache ] && [ "$calls3" = "$((calls + 1))" ]; then
         echo "sblite-e2e-upx-cache-rebuild:OK"
     else
         echo "sblite-e2e-upx-cache-rebuild:FAIL (v='$v' calls=$calls3 want=$((calls + 1)))"
@@ -13167,7 +13167,7 @@ main_body() {
     place_fake_bin /usr/bin/sing-box "1.14.1-extended-2.7.2" wrapper
     place_fake_bin /usr/libexec/sing-box-core "1.14.1-extended-2.7.2" elf
     printf 'manual snapshot\n' >/etc/sing-box-version.cache
-    printf 'netshift snapshot\n' >/etc/netshift/core-version.cache
+    printf 'postq snapshot\n' >/etc/postq/core-version.cache
     CORE_VERSION="1.14.1-extended-2.7.2"
     : >"$CORE_MARKER"
     json="$(_updates_install_sing_box_lite_core 2>/dev/null)"
@@ -13177,7 +13177,7 @@ main_body() {
         [ "$(head -c 2 /usr/bin/sing-box 2>/dev/null)" = "#!" ] &&
         [ -x /usr/libexec/sing-box-core ] &&
         grep -q 'manual snapshot' /etc/sing-box-version.cache &&
-        grep -q 'netshift snapshot' /etc/netshift/core-version.cache; then
+        grep -q 'postq snapshot' /etc/postq/core-version.cache; then
         echo "sblite-e2e-bad-version-rollback:OK"
     else
         echo "sblite-e2e-bad-version-rollback:FAIL (v='$v' json=$json)"
@@ -13225,7 +13225,7 @@ main_body() {
     if printf '%s' "$json" | jq -e '.success == true' >/dev/null 2>&1 &&
         [ "$v" = "sing-box version 1.14.1-extended-2.7.2-x86" ] &&
         [ ! -e /usr/libexec/sing-box-core ] &&
-        [ ! -e /etc/netshift/core-version.cache ] &&
+        [ ! -e /etc/postq/core-version.cache ] &&
         [ ! -e /etc/sing-box-version.cache ]; then
         echo "sblite-leave-extended-cleans-artifacts:OK"
     else
@@ -13253,7 +13253,7 @@ main_body() {
     if printf '%s' "$json" | jq -e '.success == true' >/dev/null 2>&1 &&
         [ "$v" = "sing-box version $STOCK_CORE_VERSION" ] &&
         [ ! -e /usr/libexec/sing-box-core ] &&
-        [ ! -e /etc/netshift/core-version.cache ] &&
+        [ ! -e /etc/postq/core-version.cache ] &&
         [ ! -e /etc/sing-box-version.cache ]; then
         echo "sblite-leave-stock-cleans-artifacts:OK"
     else
@@ -13270,7 +13270,7 @@ main_body() {
         [ "$v" = "sing-box version 1.14.1-extended-2.7.2-lite" ] &&
         [ "$(head -c 2 /usr/bin/sing-box 2>/dev/null)" = "#!" ] &&
         [ -x /usr/libexec/sing-box-core ] &&
-        [ -s /etc/netshift/core-version.cache ]; then
+        [ -s /etc/postq/core-version.cache ]; then
         echo "sblite-leave-stock-fail-restores-lite:OK"
     else
         echo "sblite-leave-stock-fail-restores-lite:FAIL (v='$v' json=$json)"
@@ -13324,7 +13324,7 @@ main_body() {
         awk -v f="$1" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH"
     }
     eval "$(extract get_system_info)"
-    NETSHIFT_VERSION="0.0.0-test"
+    POSTQ_VERSION="0.0.0-test"
     CASE_DF_KB=1048576
     CASE_UNAME=x86_64
     json="$(get_system_info 2>/dev/null)"
@@ -13418,9 +13418,9 @@ DRVEOF
         rm -f /usr/libexec/sing-box-core 2>/dev/null || true
     fi
     if [ -f "$work/core-cache.orig" ]; then
-        cp -p "$work/core-cache.orig" /etc/netshift/core-version.cache 2>/dev/null || true
+        cp -p "$work/core-cache.orig" /etc/postq/core-version.cache 2>/dev/null || true
     else
-        rm -f /etc/netshift/core-version.cache 2>/dev/null || true
+        rm -f /etc/postq/core-version.cache 2>/dev/null || true
     fi
     if [ -f "$work/orphan-cache.orig" ]; then
         cp -p "$work/orphan-cache.orig" /etc/sing-box-version.cache 2>/dev/null || true
@@ -13461,50 +13461,50 @@ DRVEOF
 }
 
 # ─────────────────────────────────────────────────────────────────
-# Test: NetShift update check on-demand (task-029)
+# Test: PostQ update check on-demand (task-029)
 # ─────────────────────────────────────────────────────────────────
 # Two parts:
 #  (A) STATIC: get_system_info must do NO network I/O — the GitHub curl is gone
-#      and netshift_latest_version is the constant "unknown".
-#  (B) updates_check_netshift version compare + v-normalization + JSON shape:
-#      source updater.sh, silence logging, OVERRIDE updates_netshift_latest_tag
-#      (the shared tag fetch) + set NETSHIFT_VERSION, run the check. Stub inputs:
-#      STUBNS_INSTALLED = $NETSHIFT_VERSION; STUBNS_TAG = the GitHub latest tag
+#      and postq_latest_version is the constant "unknown".
+#  (B) updates_check_postq version compare + v-normalization + JSON shape:
+#      source updater.sh, silence logging, OVERRIDE updates_postq_latest_tag
+#      (the shared tag fetch) + set POSTQ_VERSION, run the check. Stub inputs:
+#      STUBNS_INSTALLED = $POSTQ_VERSION; STUBNS_TAG = the GitHub latest tag
 #      (empty → unreachable branch).
-test_check_update_netshift() {
-    header "NetShift Update Check — on-demand + v-prefix (task-029)"
+test_check_update_postq() {
+    header "PostQ Update Check — on-demand + v-prefix (task-029)"
 
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ] || [ ! -r "$bin" ]; then
-        skip "updater.sh / bin not found in ${NETSHIFT_SRC}"
+        skip "updater.sh / bin not found in ${POSTQ_SRC}"
         return
     fi
 
     # ── Part A (static): get_system_info has NO live GitHub curl ────────────────
     # Extract the get_system_info function body and assert it contains no curl to
-    # the releases API, and that it pins netshift_latest_version="unknown".
+    # the releases API, and that it pins postq_latest_version="unknown".
     local fn
     fn="$(awk '/^get_system_info\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$bin")"
     if [ -n "$fn" ] \
         && ! printf '%s' "$fn" | grep -q 'releases/latest' \
-        && printf '%s' "$fn" | grep -q 'netshift_latest_version="unknown"'; then
-        pass "netshiftcheck-get_system_info-no-network:OK"
+        && printf '%s' "$fn" | grep -q 'postq_latest_version="unknown"'; then
+        pass "postqcheck-get_system_info-no-network:OK"
     else
-        fail "netshiftcheck-get_system_info-no-network:FAIL" "$fn"
+        fail "postqcheck-get_system_info-no-network:FAIL" "$fn"
     fi
 
-    local work="/tmp/netshift-netshiftcheck-$$"
+    local work="/tmp/postq-postqcheck-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
     # ── Part B: driver sources updater.sh + helpers.sh, silences logging,
-    # overrides the shared tag fetch + NETSHIFT_VERSION, runs the check.
+    # overrides the shared tag fetch + POSTQ_VERSION, runs the check.
     local drv="$work/driver.sh"
     cat > "$drv" << 'DRVEOF'
 log() { :; }
@@ -13512,81 +13512,81 @@ echolog() { :; }
 nolog() { :; }
 . "DRV_HELPERS"
 . "DRV_UPDATER"
-NETSHIFT_VERSION="$STUBNS_INSTALLED"
-updates_netshift_latest_tag() { printf '%s' "$STUBNS_TAG"; }
-updates_check_netshift
+POSTQ_VERSION="$STUBNS_INSTALLED"
+updates_postq_latest_tag() { printf '%s' "$STUBNS_TAG"; }
+updates_check_postq
 DRVEOF
-    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${NETSHIFT_LIB_DIR}/helpers.sh|g" "$drv"
+    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${POSTQ_LIB_DIR}/helpers.sh|g" "$drv"
 
     local out="$work/out.json"
-    run_netshiftcheck() {
+    run_postqcheck() {
         ash "$drv" > "$out" 2>/dev/null || true
     }
 
     # ── Case 1: installed v0.8.6 vs latest 0.8.6 (no v) → latest (NOT outdated) ──
     export STUBNS_INSTALLED="v0.8.6"
     export STUBNS_TAG="0.8.6"
-    run_netshiftcheck
+    run_postqcheck
     if jq -e '.success == true and .status == "latest"
             and .current_version == "v0.8.6"
             and .latest_version == "0.8.6"' "$out" > /dev/null 2>&1; then
-        pass "netshiftcheck-vprefix-installed-eq-latest:OK"
+        pass "postqcheck-vprefix-installed-eq-latest:OK"
     else
-        fail "netshiftcheck-vprefix-installed-eq-latest:FAIL" "$(cat "$out" 2>/dev/null)"
+        fail "postqcheck-vprefix-installed-eq-latest:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
 
     # ── Case 2: installed 0.8.5 vs latest 0.8.6 → outdated ──────────────────────
     export STUBNS_INSTALLED="0.8.5"
     export STUBNS_TAG="0.8.6"
-    run_netshiftcheck
+    run_postqcheck
     if jq -e '.success == true and .status == "outdated"
             and .current_version == "0.8.5"
             and .latest_version == "0.8.6"' "$out" > /dev/null 2>&1; then
-        pass "netshiftcheck-older-outdated:OK"
+        pass "postqcheck-older-outdated:OK"
     else
-        fail "netshiftcheck-older-outdated:FAIL" "$(cat "$out" 2>/dev/null)"
+        fail "postqcheck-older-outdated:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
 
     # ── Case 3: installed v0.8.6 vs latest v0.8.6 (both v) → latest ─────────────
     export STUBNS_INSTALLED="v0.8.6"
     export STUBNS_TAG="v0.8.6"
-    run_netshiftcheck
+    run_postqcheck
     if jq -e '.success == true and .status == "latest"' "$out" > /dev/null 2>&1; then
-        pass "netshiftcheck-both-vprefix-latest:OK"
+        pass "postqcheck-both-vprefix-latest:OK"
     else
-        fail "netshiftcheck-both-vprefix-latest:FAIL" "$(cat "$out" 2>/dev/null)"
+        fail "postqcheck-both-vprefix-latest:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
 
     # ── Case 4: JSON shape — keys success/current_version/latest_version/status ─
     export STUBNS_INSTALLED="0.8.5"
     export STUBNS_TAG="0.8.6"
-    run_netshiftcheck
+    run_postqcheck
     if jq -e 'has("success") and has("current_version")
             and has("latest_version") and has("status")' "$out" > /dev/null 2>&1; then
-        pass "netshiftcheck-json-shape:OK"
+        pass "postqcheck-json-shape:OK"
     else
-        fail "netshiftcheck-json-shape:FAIL" "$(cat "$out" 2>/dev/null)"
+        fail "postqcheck-json-shape:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
 
     # ── Case 5: tag fetch failure (empty) → success:false ───────────────────────
     export STUBNS_INSTALLED="0.8.6"
     export STUBNS_TAG=""
-    run_netshiftcheck
+    run_postqcheck
     if jq -e '.success == false and (.message | length) > 0' "$out" > /dev/null 2>&1; then
-        pass "netshiftcheck-fetch-failure-successfalse:OK"
+        pass "postqcheck-fetch-failure-successfalse:OK"
     else
-        fail "netshiftcheck-fetch-failure-successfalse:FAIL" "$(cat "$out" 2>/dev/null)"
+        fail "postqcheck-fetch-failure-successfalse:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
 
     # ── Case 6: dev/unstamped build (placeholder) → latest (graceful) ───────────
     export STUBNS_INSTALLED="__COMPILED_VERSION_VARIABLE__"
     export STUBNS_TAG="0.8.6"
-    run_netshiftcheck
+    run_postqcheck
     if jq -e '.success == true and .status == "latest"
             and .latest_version == "0.8.6"' "$out" > /dev/null 2>&1; then
-        pass "netshiftcheck-dev-build-graceful:OK"
+        pass "postqcheck-dev-build-graceful:OK"
     else
-        fail "netshiftcheck-dev-build-graceful:FAIL" "$(cat "$out" 2>/dev/null)"
+        fail "postqcheck-dev-build-graceful:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
 
     unset STUBNS_INSTALLED STUBNS_TAG
@@ -13594,9 +13594,9 @@ DRVEOF
 }
 
 # ─────────────────────────────────────────────────────────────────
-# Test: NetShift latest-tag parse — minified vs pretty JSON (task-047)
+# Test: PostQ latest-tag parse — minified vs pretty JSON (task-047)
 # ─────────────────────────────────────────────────────────────────
-# Guards the false-"outdated" bug: updates_netshift_latest_tag used a
+# Guards the false-"outdated" bug: updates_postq_latest_tag used a
 # field-positional grep|cut that, on MINIFIED GitHub JSON (whole object on one
 # line, "url" before "tag_name"), returned the release "url" instead of the tag
 # — causing a false "outdated" + a self-update that downloaded a garbage
@@ -13604,22 +13604,22 @@ DRVEOF
 #
 # We exercise the REAL parse: the driver sources updater.sh and stubs ONLY the
 # network boundary (updates_http_get_once) with markered JSON, then calls the
-# real updates_netshift_latest_tag / updates_check_netshift. No network.
-test_netshift_latest_tag() {
-    header "NetShift latest-tag jq parse (task-047)"
+# real updates_postq_latest_tag / updates_check_postq. No network.
+test_postq_latest_tag() {
+    header "PostQ latest-tag jq parse (task-047)"
 
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-latesttag-$$"
+    local work="/tmp/postq-latesttag-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -13634,15 +13634,15 @@ nolog() { :; }
 updates_log() { :; }
 . "DRV_HELPERS"
 . "DRV_UPDATER"
-NETSHIFT_RELEASE_API_URL="https://api.test/latest"
-NETSHIFT_VERSION="$STUBLT_INSTALLED"
+POSTQ_RELEASE_API_URL="https://api.test/latest"
+POSTQ_VERSION="$STUBLT_INSTALLED"
 # Force the API-fallback path this test targets: the redirect resolver returns
-# empty so updates_netshift_latest_tag falls back to the stubbed API body.
+# empty so updates_postq_latest_tag falls back to the stubbed API body.
 updates_github_resolve_redirect() { printf ''; }
 updates_http_get_once() { printf '%s' "$STUBLT_BODY"; }
 "$STUBLT_FN"
 DRVEOF
-    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${NETSHIFT_LIB_DIR}/helpers.sh|g" "$drv"
+    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${POSTQ_LIB_DIR}/helpers.sh|g" "$drv"
 
     local out="$work/out.txt"
     local rc_file="$work/rc.txt"
@@ -13666,7 +13666,7 @@ DRVEOF
     # Rate-limit/error object — no tag_name.
     local ratelimit='{"message":"API rate limit exceeded for 1.2.3.4","documentation_url":"https://docs.github.com/rest"}'
 
-    export STUBLT_FN="updates_netshift_latest_tag"
+    export STUBLT_FN="updates_postq_latest_tag"
     export STUBLT_INSTALLED="0.8.8"
 
     # ── Case 1 (REGRESSION GUARD): minified → exactly 0.8.8, NOT the url ──────
@@ -13696,9 +13696,9 @@ DRVEOF
         fail "latesttag-ratelimit-empty-nonzero:FAIL" "got=[$(cat "$out" 2>/dev/null)] rc=$(cat "$rc_file" 2>/dev/null)"
     fi
 
-    # ── Case 4 (end-to-end): minified through updates_check_netshift with
+    # ── Case 4 (end-to-end): minified through updates_check_postq with
     # installed == tag → status "latest" (the false-outdated is gone). ────────
-    export STUBLT_FN="updates_check_netshift"
+    export STUBLT_FN="updates_check_postq"
     export STUBLT_BODY="$minified"
     export STUBLT_INSTALLED="0.8.8"
     run_lt
@@ -13730,13 +13730,13 @@ test_github_redirect_tag() {
         return
     fi
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-ghredirect-$$"
+    local work="/tmp/postq-ghredirect-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -13751,17 +13751,17 @@ nolog() { :; }
 updates_log() { :; }
 . "DRV_HELPERS"
 . "DRV_UPDATER"
-NETSHIFT_REPO_RELEASES_LATEST_URL="https://github.com/yandexru45/netshift/releases/latest"
-NETSHIFT_REPO_RELEASES_DOWNLOAD_BASE="https://github.com/yandexru45/netshift/releases/download"
-NETSHIFT_RELEASE_API_URL="https://api.test/latest"
-UPDATES_NETSHIFT_PKG_CORE="netshift"
-UPDATES_NETSHIFT_PKG_LUCI="luci-app-netshift"
-UPDATES_NETSHIFT_PKG_I18N_RU="luci-i18n-netshift-ru"
+POSTQ_REPO_RELEASES_LATEST_URL="https://github.com/yandexru45/netshift/releases/latest"
+POSTQ_REPO_RELEASES_DOWNLOAD_BASE="https://github.com/yandexru45/netshift/releases/download"
+POSTQ_RELEASE_API_URL="https://api.test/latest"
+UPDATES_POSTQ_PKG_CORE="postq"
+UPDATES_POSTQ_PKG_LUCI="luci-app-postq"
+UPDATES_POSTQ_PKG_I18N_RU="luci-i18n-postq-ru"
 updates_github_resolve_redirect() { printf '%s' "$STUBGR_REDIRECT"; }
 updates_http_get_once() { printf '%s' "$STUBGR_BODY"; }
 eval "$STUBGR_FN"
 DRVEOF
-    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${NETSHIFT_LIB_DIR}/helpers.sh|g" "$drv"
+    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_HELPERS|${POSTQ_LIB_DIR}/helpers.sh|g" "$drv"
 
     local out="$work/out.txt"
     local rc_file="$work/rc.txt"
@@ -13769,7 +13769,7 @@ DRVEOF
         ash "$drv" > "$out" 2>/dev/null && printf '0' > "$rc_file" || printf '%s' "$?" > "$rc_file"
     }
 
-    export STUBGR_FN="updates_netshift_latest_tag"
+    export STUBGR_FN="updates_postq_latest_tag"
     export STUBGR_REDIRECT=""
     export STUBGR_BODY=""
 
@@ -13820,22 +13820,22 @@ DRVEOF
     # ── Case 5: asset-URL builder, ipk → deterministic names ─────────────────
     export STUBGR_REDIRECT=""
     export STUBGR_BODY=""
-    export STUBGR_FN='c="$(updates_netshift_asset_filename netshift 0.8.9 ipk)"; l="$(updates_netshift_asset_filename luci-app-netshift 0.8.9 ipk)"; i="$(updates_netshift_asset_filename luci-i18n-netshift-ru 0.8.9 ipk)"; printf "%s\n%s\n%s\n" "$c" "$l" "$i"'
+    export STUBGR_FN='c="$(updates_postq_asset_filename postq 0.8.9 ipk)"; l="$(updates_postq_asset_filename luci-app-postq 0.8.9 ipk)"; i="$(updates_postq_asset_filename luci-i18n-postq-ru 0.8.9 ipk)"; printf "%s\n%s\n%s\n" "$c" "$l" "$i"'
     run_gr
-    if [ "$(sed -n 1p "$out" 2>/dev/null)" = "netshift-0.8.9-r1-all.ipk" ] &&
-        [ "$(sed -n 2p "$out" 2>/dev/null)" = "luci-app-netshift-0.8.9-r1-all.ipk" ] &&
-        [ "$(sed -n 3p "$out" 2>/dev/null)" = "luci-i18n-netshift-ru-0.8.9.ipk" ]; then
+    if [ "$(sed -n 1p "$out" 2>/dev/null)" = "postq-0.8.9-r1-all.ipk" ] &&
+        [ "$(sed -n 2p "$out" 2>/dev/null)" = "luci-app-postq-0.8.9-r1-all.ipk" ] &&
+        [ "$(sed -n 3p "$out" 2>/dev/null)" = "luci-i18n-postq-ru-0.8.9.ipk" ]; then
         pass "ghredirect:asset-ipk:OK"
     else
         fail "ghredirect:asset-ipk:FAIL" "got=[$(cat "$out" 2>/dev/null)]"
     fi
 
     # ── Case 6: asset-URL builder, apk → deterministic names ─────────────────
-    export STUBGR_FN='c="$(updates_netshift_asset_filename netshift 0.8.9 apk)"; l="$(updates_netshift_asset_filename luci-app-netshift 0.8.9 apk)"; i="$(updates_netshift_asset_filename luci-i18n-netshift-ru 0.8.9 apk)"; printf "%s\n%s\n%s\n" "$c" "$l" "$i"'
+    export STUBGR_FN='c="$(updates_postq_asset_filename postq 0.8.9 apk)"; l="$(updates_postq_asset_filename luci-app-postq 0.8.9 apk)"; i="$(updates_postq_asset_filename luci-i18n-postq-ru 0.8.9 apk)"; printf "%s\n%s\n%s\n" "$c" "$l" "$i"'
     run_gr
-    if [ "$(sed -n 1p "$out" 2>/dev/null)" = "netshift-0.8.9-r1.apk" ] &&
-        [ "$(sed -n 2p "$out" 2>/dev/null)" = "luci-app-netshift-0.8.9-r1.apk" ] &&
-        [ "$(sed -n 3p "$out" 2>/dev/null)" = "luci-i18n-netshift-ru-0.8.9.apk" ]; then
+    if [ "$(sed -n 1p "$out" 2>/dev/null)" = "postq-0.8.9-r1.apk" ] &&
+        [ "$(sed -n 2p "$out" 2>/dev/null)" = "luci-app-postq-0.8.9-r1.apk" ] &&
+        [ "$(sed -n 3p "$out" 2>/dev/null)" = "luci-i18n-postq-ru-0.8.9.apk" ]; then
         pass "ghredirect:asset-apk:OK"
     else
         fail "ghredirect:asset-apk:FAIL" "got=[$(cat "$out" 2>/dev/null)]"
@@ -13846,33 +13846,33 @@ DRVEOF
 }
 
 # ─────────────────────────────────────────────────────────────────
-# Test: NetShift self-update (task-017)
+# Test: PostQ self-update (task-017)
 # ─────────────────────────────────────────────────────────────────
-# Exercises updates_self_update_netshift (public wrapper + private core) through
+# Exercises updates_self_update_postq (public wrapper + private core) through
 # the real sourced updater.sh. Connectivity probes (dig/curl) + the GitHub fetch
 # + the asset download + the package install are all stubbed; the heal flags are
-# re-pinned to temp paths and a fake /etc/init.d/netshift (absolute path) is
+# re-pinned to temp paths and a fake /etc/init.d/postq (absolute path) is
 # written+restored. Asserts the anti-brick contract:
 #   * connectivity-fail  -> aborts BEFORE any change, restore ran, success:false
 #   * download-fail      -> success:false, restore ran, config backup intact
 #   * happy path         -> success:true with version, restore ran
 # Uses the task-009 `... || true` set -e guard (worker returns non-zero on a
 # recoverable failure; assertions read JSON/file-state, not rc).
-test_self_update_netshift() {
-    header "NetShift Self-Update (task-017)"
+test_self_update_postq() {
+    header "PostQ Self-Update (task-017)"
 
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-selfupdate-$$"
+    local work="/tmp/postq-selfupdate-$$"
     rm -rf "$work"
     mkdir -p "$work/bin" "$work/init"
 
@@ -13889,7 +13889,7 @@ exit 1
 CURLEOF
     # Fake opkg: `install <file>` succeeds per marker and records the install.
     # `list-installed` cats $SU_INSTALLED_LIST (the AUTHORITATIVE installed set).
-    # On a REAL (non-no-op) install the install arm rewrites the netshift line in
+    # On a REAL (non-no-op) install the install arm rewrites the postq line in
     # that list to the target version (SU_TARGET_INSTALLED_VER), so the
     # verify-after-install belt sees the upgrade. When $SU_NOOP is set the install
     # arm returns rc=0 but does NOT touch the list (simulates opkg "Not
@@ -13916,13 +13916,13 @@ install)
     # core package, UNLESS we are simulating a no-op ($SU_NOOP set).
     if [ -z "$SU_NOOP" ]; then
         case "$1" in
-        *netshift-* | *netshift_*)
-            # Only the core "netshift" file, not luci-app-/luci-i18n- ones.
+        *postq-* | *postq_*)
+            # Only the core "postq" file, not luci-app-/luci-i18n- ones.
             case "$1" in
             *luci-* ) : ;;
             *)
-                grep -v '^netshift ' "$SU_INSTALLED_LIST" 2>/dev/null > "$SU_INSTALLED_LIST.tmp"
-                printf 'netshift - %s\n' "$SU_TARGET_INSTALLED_VER" >> "$SU_INSTALLED_LIST.tmp"
+                grep -v '^postq ' "$SU_INSTALLED_LIST" 2>/dev/null > "$SU_INSTALLED_LIST.tmp"
+                printf 'postq - %s\n' "$SU_TARGET_INSTALLED_VER" >> "$SU_INSTALLED_LIST.tmp"
                 mv "$SU_INSTALLED_LIST.tmp" "$SU_INSTALLED_LIST"
                 ;;
             esac
@@ -13936,14 +13936,14 @@ exit 0
 OPKGEOF
     chmod 0755 "$work/bin/dig" "$work/bin/curl" "$work/bin/opkg"
 
-    # Fake /etc/init.d/netshift: records stop/start/restart (used by self-heal
-    # teardown/bring-up). We never re-exec /usr/bin/netshift here.
-    cat > "$work/init/netshift" << 'INITEOF'
+    # Fake /etc/init.d/postq: records stop/start/restart (used by self-heal
+    # teardown/bring-up). We never re-exec /usr/bin/postq here.
+    cat > "$work/init/postq" << 'INITEOF'
 #!/bin/sh
 printf '%s\n' "$1" >> "$SU_INIT_LOG"
 exit 0
 INITEOF
-    chmod 0755 "$work/init/netshift"
+    chmod 0755 "$work/init/postq"
 
     # Driver: source updater.sh, re-pin heal/connectivity paths + constants,
     # stub the GitHub fetch + download with markers, run the public wrapper.
@@ -13958,14 +13958,14 @@ UPDATES_RESOLV_BACKUP="DRV_BACKUP"
 UPDATES_FEED_PROBE_HOST="feeds.test"
 UPDATES_GITHUB_PROBE_HOST="github.test"
 UPDATES_HEAL_RESOLVERS="1.1.1.1 9.9.9.9"
-NETSHIFT_VERSION="0.8.0"
-NETSHIFT_CONFIG="DRV_CONFIG"
-NETSHIFT_RELEASE_API_URL="https://api.test/latest"
-UPDATES_NETSHIFT_DOWNLOAD_DIR="DRV_DLDIR"
-UPDATES_NETSHIFT_CONFIG_BACKUP="DRV_CFGBAK"
-UPDATES_NETSHIFT_PKG_CORE="netshift"
-UPDATES_NETSHIFT_PKG_LUCI="luci-app-netshift"
-UPDATES_NETSHIFT_PKG_I18N_RU="luci-i18n-netshift-ru"
+POSTQ_VERSION="0.8.0"
+POSTQ_CONFIG="DRV_CONFIG"
+POSTQ_RELEASE_API_URL="https://api.test/latest"
+UPDATES_POSTQ_DOWNLOAD_DIR="DRV_DLDIR"
+UPDATES_POSTQ_CONFIG_BACKUP="DRV_CFGBAK"
+UPDATES_POSTQ_PKG_CORE="postq"
+UPDATES_POSTQ_PKG_LUCI="luci-app-postq"
+UPDATES_POSTQ_PKG_I18N_RU="luci-i18n-postq-ru"
 . "DRV_UPDATER"
 # Re-pin after sourcing.
 RESOLV_CONF="DRV_RESOLV"
@@ -13973,14 +13973,14 @@ UPDATES_RESOLV_BACKUP="DRV_BACKUP"
 UPDATES_FEED_PROBE_HOST="feeds.test"
 UPDATES_GITHUB_PROBE_HOST="github.test"
 UPDATES_HEAL_RESOLVERS="1.1.1.1 9.9.9.9"
-NETSHIFT_VERSION="0.8.0"
-NETSHIFT_CONFIG="DRV_CONFIG"
-NETSHIFT_RELEASE_API_URL="https://api.test/latest"
-UPDATES_NETSHIFT_DOWNLOAD_DIR="DRV_DLDIR"
-UPDATES_NETSHIFT_CONFIG_BACKUP="DRV_CFGBAK"
-UPDATES_NETSHIFT_PKG_CORE="netshift"
-UPDATES_NETSHIFT_PKG_LUCI="luci-app-netshift"
-UPDATES_NETSHIFT_PKG_I18N_RU="luci-i18n-netshift-ru"
+POSTQ_VERSION="0.8.0"
+POSTQ_CONFIG="DRV_CONFIG"
+POSTQ_RELEASE_API_URL="https://api.test/latest"
+UPDATES_POSTQ_DOWNLOAD_DIR="DRV_DLDIR"
+UPDATES_POSTQ_CONFIG_BACKUP="DRV_CFGBAK"
+UPDATES_POSTQ_PKG_CORE="postq"
+UPDATES_POSTQ_PKG_LUCI="luci-app-postq"
+UPDATES_POSTQ_PKG_I18N_RU="luci-i18n-postq-ru"
 
 # Stub the GitHub latest-release fetch: emit a tiny JSON with a tag and asset
 # URLs only when the marker says GitHub is reachable for the fetch.
@@ -13989,9 +13989,9 @@ updates_http_get_once() {
     cat <<JSON
 {"tag_name":"$SU_LATEST_TAG",
  "assets":[
-   {"browser_download_url":"https://dl.test/netshift-$SU_LATEST_TAG.ipk"},
-   {"browser_download_url":"https://dl.test/luci-app-netshift-$SU_LATEST_TAG.ipk"},
-   {"browser_download_url":"https://dl.test/luci-i18n-netshift-ru-$SU_LATEST_TAG.ipk"}
+   {"browser_download_url":"https://dl.test/postq-$SU_LATEST_TAG.ipk"},
+   {"browser_download_url":"https://dl.test/luci-app-postq-$SU_LATEST_TAG.ipk"},
+   {"browser_download_url":"https://dl.test/luci-i18n-postq-ru-$SU_LATEST_TAG.ipk"}
  ]}
 JSON
 }
@@ -14003,19 +14003,19 @@ updates_download_to_file() {
     [ -s "$2" ]
 }
 
-updates_self_update_netshift
+updates_self_update_postq
 DRVEOF
-    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_RESOLV|$work/resolv.conf|g;s|DRV_BACKUP|$work/resolv.bak|g;s|DRV_CONFIG|$work/etc-config-netshift|g;s|DRV_DLDIR|$work/dl|g;s|DRV_CFGBAK|$work/config.bak|g" "$drv"
+    sed -i "s|DRV_UPDATER|$updater|g;s|DRV_RESOLV|$work/resolv.conf|g;s|DRV_BACKUP|$work/resolv.bak|g;s|DRV_CONFIG|$work/etc-config-postq|g;s|DRV_DLDIR|$work/dl|g;s|DRV_CFGBAK|$work/config.bak|g" "$drv"
 
-    # Install the fake /etc/init.d/netshift (write+restore the real one).
-    local init_target="/etc/init.d/netshift"
+    # Install the fake /etc/init.d/postq (write+restore the real one).
+    local init_target="/etc/init.d/postq"
     local init_saved=""
     if [ -e "$init_target" ]; then
-        init_saved="$work/netshift.realinit"
+        init_saved="$work/postq.realinit"
         cp -p "$init_target" "$init_saved" 2>/dev/null || init_saved=""
     fi
     mkdir -p /etc/init.d 2>/dev/null || true
-    cp -p "$work/init/netshift" "$init_target" 2>/dev/null
+    cp -p "$work/init/postq" "$init_target" 2>/dev/null
     chmod 0755 "$init_target" 2>/dev/null || true
 
     head -c 4000 /dev/urandom > "$work/fixture-payload"
@@ -14030,7 +14030,7 @@ DRVEOF
     export SU_INSTALL_LOG="$work/install.log"
     export SU_INSTALLED_LIST="$work/installed.list"
     export SU_LATEST_TAG="0.8.1"
-    # Version the fake opkg writes for "netshift" after a REAL (non-no-op)
+    # Version the fake opkg writes for "postq" after a REAL (non-no-op)
     # install, so the verify-after-install belt (task-041) sees the upgrade.
     export SU_TARGET_INSTALLED_VER="0.8.1-r1"
 
@@ -14042,11 +14042,11 @@ DRVEOF
 
     # RU i18n NOT installed (so it is never downloaded/installed). The installed
     # list starts with the OLD core version; a real install rewrites it.
-    printf 'netshift - 0.8.0-r1\n' > "$work/installed.list"
+    printf 'postq - 0.8.0-r1\n' > "$work/installed.list"
 
     # ── Scenario 1: connectivity fails → abort BEFORE any change ──────────────
     rm -f "$SU_DNS_OK" "$SU_HTTP_OK" "$SU_GH_OK" "$SU_DL_OK" "$SU_PKG_OK"
-    printf 'CONFIG-ORIG\n' > "$work/etc-config-netshift"
+    printf 'CONFIG-ORIG\n' > "$work/etc-config-postq"
     printf 'original-resolver\n' > "$work/resolv.conf"
     run_scenario
     if jq -e '.success == false and (.message | length) > 0' "$out" > /dev/null 2>&1; then
@@ -14070,7 +14070,7 @@ DRVEOF
     # ── Scenario 2: download fails → success:false, config backup intact ──────
     : > "$SU_DNS_OK"; : > "$SU_HTTP_OK"; : > "$SU_GH_OK"
     rm -f "$SU_DL_OK" "$SU_PKG_OK"
-    printf 'CONFIG-ORIG\n' > "$work/etc-config-netshift"
+    printf 'CONFIG-ORIG\n' > "$work/etc-config-postq"
     printf 'original-resolver\n' > "$work/resolv.conf"
     run_scenario
     if jq -e '.success == false' "$out" > /dev/null 2>&1; then
@@ -14084,20 +14084,20 @@ DRVEOF
     else
         fail "selfupdate-dlfail-no-install:FAIL" "install.log=$(cat "$work/install.log" 2>/dev/null)"
     fi
-    # /etc/config/netshift untouched (download failed before any install).
-    if [ "$(cat "$work/etc-config-netshift" 2>/dev/null)" = "CONFIG-ORIG" ]; then
+    # /etc/config/postq untouched (download failed before any install).
+    if [ "$(cat "$work/etc-config-postq" 2>/dev/null)" = "CONFIG-ORIG" ]; then
         pass "selfupdate-dlfail-config-intact:OK"
     else
-        fail "selfupdate-dlfail-config-intact:FAIL" "$(cat "$work/etc-config-netshift" 2>/dev/null)"
+        fail "selfupdate-dlfail-config-intact:FAIL" "$(cat "$work/etc-config-postq" 2>/dev/null)"
     fi
 
     # ── Scenario 3: happy path → success:true with version, restore ran ───────
     # The fake opkg rewrites the installed list to the target after a real
     # install, so the task-041 verify-after-install belt confirms the upgrade.
     : > "$SU_DNS_OK"; : > "$SU_HTTP_OK"; : > "$SU_GH_OK"; : > "$SU_DL_OK"; : > "$SU_PKG_OK"
-    printf 'CONFIG-ORIG\n' > "$work/etc-config-netshift"
+    printf 'CONFIG-ORIG\n' > "$work/etc-config-postq"
     printf 'original-resolver\n' > "$work/resolv.conf"
-    printf 'netshift - 0.8.0-r1\n' > "$work/installed.list"
+    printf 'postq - 0.8.0-r1\n' > "$work/installed.list"
     run_scenario
     if jq -e '.success == true and .version == "0.8.1"' "$out" > /dev/null 2>&1; then
         pass "selfupdate-happy-successtrue-version:OK"
@@ -14127,8 +14127,8 @@ DRVEOF
     # ── Scenario 3b: the download is an error page, not a package ─────────────
     # Nothing may be installed and the configuration stays as it was.
     : > "$SU_DNS_OK"; : > "$SU_HTTP_OK"; : > "$SU_GH_OK"; : > "$SU_DL_OK"; : > "$SU_PKG_OK"
-    printf 'CONFIG-ORIG\n' > "$work/etc-config-netshift"
-    printf 'netshift - 0.8.0-r1\n' > "$work/installed.list"
+    printf 'CONFIG-ORIG\n' > "$work/etc-config-postq"
+    printf 'postq - 0.8.0-r1\n' > "$work/installed.list"
     local good_fixture="$SU_FIXTURE_PKG"
     printf '<html>API rate limit exceeded%s</html>' "$(head -c 3000 /dev/zero | tr '\0' 'x')" > "$work/fixture-page.ipk"
     export SU_FIXTURE_PKG="$work/fixture-page.ipk"
@@ -14144,16 +14144,16 @@ DRVEOF
     else
         fail "selfupdate-damaged-package-nothing-installed:FAIL" "install.log=$(cat "$work/install.log" 2>/dev/null)"
     fi
-    if [ "$(cat "$work/etc-config-netshift" 2>/dev/null)" = "CONFIG-ORIG" ] && [ ! -d "$work/dl" ]; then
+    if [ "$(cat "$work/etc-config-postq" 2>/dev/null)" = "CONFIG-ORIG" ] && [ ! -d "$work/dl" ]; then
         pass "selfupdate-damaged-package-config-intact-dir-cleaned:OK"
     else
-        fail "selfupdate-damaged-package-config-intact-dir-cleaned:FAIL" "$(cat "$work/etc-config-netshift" 2>/dev/null)"
+        fail "selfupdate-damaged-package-config-intact-dir-cleaned:FAIL" "$(cat "$work/etc-config-postq" 2>/dev/null)"
     fi
 
     # ── Scenario 4: already up to date (idempotent) → success:true, no install
     : > "$SU_DNS_OK"; : > "$SU_HTTP_OK"; : > "$SU_GH_OK"; : > "$SU_DL_OK"; : > "$SU_PKG_OK"
-    printf 'CONFIG-ORIG\n' > "$work/etc-config-netshift"
-    export SU_LATEST_TAG="0.8.0"   # equals the pinned NETSHIFT_VERSION
+    printf 'CONFIG-ORIG\n' > "$work/etc-config-postq"
+    export SU_LATEST_TAG="0.8.0"   # equals the pinned POSTQ_VERSION
     run_scenario
     export SU_LATEST_TAG="0.8.1"
     if jq -e '.success == true and (.message | contains("up to date"))' "$out" > /dev/null 2>&1; then
@@ -14169,8 +14169,8 @@ DRVEOF
 
     # ── Scenario 5: RU i18n IS installed → it is upgraded too (3 installs) ─────
     : > "$SU_DNS_OK"; : > "$SU_HTTP_OK"; : > "$SU_GH_OK"; : > "$SU_DL_OK"; : > "$SU_PKG_OK"
-    printf 'CONFIG-ORIG\n' > "$work/etc-config-netshift"
-    printf 'netshift - 0.8.0-r1\nluci-i18n-netshift-ru - 0.8.0\n' > "$work/installed.list"
+    printf 'CONFIG-ORIG\n' > "$work/etc-config-postq"
+    printf 'postq - 0.8.0-r1\nluci-i18n-postq-ru - 0.8.0\n' > "$work/installed.list"
     run_scenario
     if [ -f "$work/install.log" ] && [ "$(grep -c . "$work/install.log" 2>/dev/null)" = "3" ] \
             && grep -q 'i18n' "$work/install.log" 2>/dev/null; then
@@ -14187,9 +14187,9 @@ DRVEOF
     # this and report success:false WITHOUT touching the config.
     : > "$SU_DNS_OK"; : > "$SU_HTTP_OK"; : > "$SU_GH_OK"; : > "$SU_DL_OK"; : > "$SU_PKG_OK"
     export SU_NOOP=1
-    printf 'CONFIG-ORIG\n' > "$work/etc-config-netshift"
+    printf 'CONFIG-ORIG\n' > "$work/etc-config-postq"
     printf 'original-resolver\n' > "$work/resolv.conf"
-    printf 'netshift - 0.8.0-r1\n' > "$work/installed.list"
+    printf 'postq - 0.8.0-r1\n' > "$work/installed.list"
     run_scenario
     unset SU_NOOP
     # The worker MUST report success:false (the silent no-op is detected), NOT
@@ -14207,10 +14207,10 @@ DRVEOF
     fi
     # Configuration preserved (verify-fail runs the defensive restore; nothing
     # clobbered the live file).
-    if [ "$(cat "$work/etc-config-netshift" 2>/dev/null)" = "CONFIG-ORIG" ]; then
+    if [ "$(cat "$work/etc-config-postq" 2>/dev/null)" = "CONFIG-ORIG" ]; then
         pass "selfupdate-noop-config-intact:OK"
     else
-        fail "selfupdate-noop-config-intact:FAIL" "$(cat "$work/etc-config-netshift" 2>/dev/null)"
+        fail "selfupdate-noop-config-intact:FAIL" "$(cat "$work/etc-config-postq" 2>/dev/null)"
     fi
     # Download dir cleaned even on the no-op failure path.
     if [ ! -d "$work/dl" ]; then
@@ -14225,8 +14225,8 @@ DRVEOF
     # stays) must be reported as a failure: "installed is higher" is no success here.
     : > "$SU_DNS_OK"; : > "$SU_HTTP_OK"; : > "$SU_GH_OK"; : > "$SU_DL_OK"; : > "$SU_PKG_OK"
     export SU_LATEST_TAG="0.7.9" SU_TARGET_INSTALLED_VER="0.7.9-r1"
-    printf 'CONFIG-ORIG\n' > "$work/etc-config-netshift"
-    printf 'netshift - 0.8.0-r1\n' > "$work/installed.list"
+    printf 'CONFIG-ORIG\n' > "$work/etc-config-postq"
+    printf 'postq - 0.8.0-r1\n' > "$work/installed.list"
     run_scenario
     if jq -e '.success == true and .version == "0.7.9"' "$out" > /dev/null 2>&1; then
         pass "selfupdate-downgrade-installed-success:OK"
@@ -14234,7 +14234,7 @@ DRVEOF
         fail "selfupdate-downgrade-installed-success:FAIL" "$(cat "$out" 2>/dev/null)"
     fi
     export SU_NOOP=1
-    printf 'netshift - 0.8.0-r1\n' > "$work/installed.list"
+    printf 'postq - 0.8.0-r1\n' > "$work/installed.list"
     run_scenario
     unset SU_NOOP
     if jq -e '.success == false' "$out" > /dev/null 2>&1; then
@@ -14276,13 +14276,13 @@ DRVEOF
 test_backup_integrity() {
     header "Core-swap Backup Integrity (task-027)"
 
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
     if [ ! -r "$updater" ]; then
-        skip "updater.sh not found in ${NETSHIFT_LIB_DIR}"
+        skip "updater.sh not found in ${POSTQ_LIB_DIR}"
         return
     fi
 
-    local work="/tmp/netshift-backupguard-$$"
+    local work="/tmp/postq-backupguard-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -14409,27 +14409,27 @@ DRVEOF
 }
 
 test_hot_reload() {
-    header "Subscription Update Without NetShift Restart (sing-box SIGHUP)"
+    header "Subscription Update Without PostQ Restart (sing-box SIGHUP)"
 
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="${NETSHIFT_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$bin" ] || [ ! -r "$lib/rulesets.sh" ] || \
         [ ! -r "$lib/sing_box_config_manager.sh" ] || [ ! -r "$lib/helpers.jq" ]; then
-        skip "netshift bin / rulesets.sh / sing_box_config_manager.sh / helpers.jq not found"
+        skip "postq bin / rulesets.sh / sing_box_config_manager.sh / helpers.jq not found"
         return
     fi
 
-    # The config manager imports helpers.jq from /usr/lib/netshift.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
+    # The config manager imports helpers.jq from /usr/lib/postq.
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
 
-    local drv="/tmp/netshift-hotreload-$$.sh"
-    local out="/tmp/netshift-hotreload-$$.out"
+    local drv="/tmp/postq-hotreload-$$.sh"
+    local out="/tmp/postq-hotreload-$$.out"
     cat > "$drv" << 'HREOF'
 log() { :; }
 echolog() { :; }
@@ -14445,7 +14445,7 @@ extract() {
     awk -v f="$1" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH"
 }
 
-HR_DIR="/tmp/netshift-hotreload-state-$$"
+HR_DIR="/tmp/postq-hotreload-state-$$"
 rm -rf "$HR_DIR"
 mkdir -p "$HR_DIR"
 
@@ -14650,9 +14650,9 @@ uci_get() {
 }
 # Fake process table. pidof lists every sing-box process in no particular order
 # and each pid's argv comes from HR_CMDLINE_<pid>: 4241 is one of the transient
-# helpers NetShift spawns (`check`) on NetShift's config, 4242 is the daemon the
+# helpers PostQ spawns (`check`) on PostQ's config, 4242 is the daemon the
 # sing-box init script starts (argv as seen on a router), 4243 is another
-# `sing-box run` on a config that is not NetShift's.
+# `sing-box run` on a config that is not PostQ's.
 # The lite core runs as /usr/libexec/sing-box-core: pidof knows it by that name (HR_CORE_PIDS).
 pidof() {
     local name found=""
@@ -14834,7 +14834,7 @@ fi
 
 # CASE R9: another `sing-box run` on a different config is listed first. It
 #          would take the signal just as well and apply nothing, so the signal
-#          goes to the daemon running NetShift's config.
+#          goes to the daemon running PostQ's config.
 hr_reset
 HR_PIDS="4243 4241 4242"
 reload_sing_box_config_in_place
@@ -14910,7 +14910,7 @@ else
     echo "hr-update-changed-feed-reloads-without-restart(rc=$rc reload=$(hr_count reload) restart=$(hr_count restart)):FAIL"
 fi
 
-# CASE U2: an unchanged feed touches neither sing-box nor NetShift.
+# CASE U2: an unchanged feed touches neither sing-box nor PostQ.
 rm -f "$HR_DIR/reload.log" "$HR_DIR/restart.log" "$SUBSCRIPTION_PENDING_APPLY_FLAG"
 HR_DOWNLOAD_RC=2
 subscription_update > /dev/null 2>&1
@@ -15078,12 +15078,12 @@ fi
 HR_BODY=""
 rm -f "$HR_DIR/reload.log" "$SUBSCRIPTION_NAMES_PENDING_FLAG"
 # ── subscription_startup_retry_worker ─────────────────────────────────
-# The worker runs `/usr/bin/netshift subscription_update` in a child process;
+# The worker runs `/usr/bin/postq subscription_update` in a child process;
 # the test swaps that one command for a stub fed from a list of exit codes, and
 # records every wait instead of sleeping.
 eval "$(extract subscription_startup_retry_worker_cleanup)"
 eval "$(extract subscription_startup_retry_worker_claim)"
-eval "$(extract subscription_startup_retry_worker | sed 's|/usr/bin/netshift subscription_update|hr_worker_update|')"
+eval "$(extract subscription_startup_retry_worker | sed 's|/usr/bin/postq subscription_update|hr_worker_update|')"
 config_load() { :; }
 sleep() {
     printf '%s\n' "$1" >> "$HR_DIR/sleep.log"
@@ -15143,7 +15143,7 @@ fi
 eval "$(extract start_main | sed \
     -e 's|/usr/sbin/ntpd|: ntpd|' \
     -e 's|/etc/init.d/sing-box start|hr_sing_box_start|' \
-    -e 's|/var/run/netshift_list_update.pid|$HR_DIR/list_update.pid|')"
+    -e 's|/var/run/postq_list_update.pid|$HR_DIR/list_update.pid|')"
 TMP_RULESET_FOLDER="$HR_DIR/rulesets"
 migrate_legacy_subscription_url_option() { :; }
 check_requirements() { :; }
@@ -15305,21 +15305,21 @@ HREOF
 test_domain_separators() {
     header "Domain/Subnet List Separators (issue #53)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ] || [ ! -r "$lib/helpers.sh" ] || \
         [ ! -r "$lib/rulesets.sh" ] || [ ! -r "$lib/sing_box_config_manager.sh" ] || \
         [ ! -r "$lib/helpers.jq" ]; then
-        skip "netshift bin / helpers.sh / rulesets.sh / sing_box_config_manager.sh / helpers.jq not found"
+        skip "postq bin / helpers.sh / rulesets.sh / sing_box_config_manager.sh / helpers.jq not found"
         return
     fi
 
     # patch_route_rule / patch_dns_route_rule import helpers.jq from this path.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
 
-    local drv="/tmp/netshift-domsep-$$.sh"
-    local out="/tmp/netshift-domsep-$$.out"
+    local drv="/tmp/postq-domsep-$$.sh"
+    local out="/tmp/postq-domsep-$$.out"
     cat > "$drv" << 'DSEOF'
 log() { :; }
 echolog() { :; }
@@ -15338,9 +15338,9 @@ eval "$(extract rule_references_ruleset)"
 eval "$(extract prepare_source_ruleset)"
 eval "$(extract configure_user_domain_list)"
 eval "$(extract configure_user_subnet_list)"
-eval "$(extract populate_netshift_subnets_from_string)"
-eval "$(extract populate_netshift_subnets_from_file)"
-eval "$(extract netshift_ipv6_enabled)"
+eval "$(extract populate_postq_subnets_from_string)"
+eval "$(extract populate_postq_subnets_from_file)"
+eval "$(extract postq_ipv6_enabled)"
 
 # UCI stub: reads the DS_<section>_<option> variables assigned below.
 ds_key() { printf 'DS_%s_%s' "$(printf '%s' "$1" | tr '.-' '__')" "$2"; }
@@ -15365,7 +15365,7 @@ config_get_bool() {
     return 0
 }
 
-DS_DIR="/tmp/netshift-domsep-state-$$"
+DS_DIR="/tmp/postq-domsep-state-$$"
 rm -rf "$DS_DIR"
 mkdir -p "$DS_DIR"
 TMP_RULESET_FOLDER="$DS_DIR/rulesets"
@@ -15532,15 +15532,15 @@ test_cache_persist() {
         return
     fi
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="${NETSHIFT_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$bin" ] || [ ! -r "$lib/constants.sh" ]; then
-        skip "netshift bin / constants.sh not found"
+        skip "postq bin / constants.sh not found"
         return
     fi
 
-    local drv="/tmp/netshift-cachepersist-$$.sh"
-    local out="/tmp/netshift-cachepersist-$$.out"
+    local drv="/tmp/postq-cachepersist-$$.sh"
+    local out="/tmp/postq-cachepersist-$$.out"
     cat > "$drv" << 'CPEOF'
 . "LIB_DIR/constants.sh"
 
@@ -15558,14 +15558,14 @@ eval "$(extract monitor_sing_box)"
 eval "$(extract dnsmasq_should_be_restored)"
 eval "$(extract clash_api)"
 
-CP_DIR="/tmp/netshift-cachepersist-state-$$"
+CP_DIR="/tmp/postq-cachepersist-state-$$"
 rm -rf "$CP_DIR"
 mkdir -p "$CP_DIR/state"
-NETSHIFT_STATE_DIR="$CP_DIR/state"
-NETSHIFT_CACHE_BACKUP="$NETSHIFT_STATE_DIR/cache.db"
-NETSHIFT_CACHE_SELECTION="$NETSHIFT_STATE_DIR/cache.db.selection"
-NETSHIFT_CACHE_BACKUP_LOCK="$CP_DIR/lock/cache-backup.lock"
-NETSHIFT_CACHE_RESTORED_FLAG="$CP_DIR/run/cache-restored"
+POSTQ_STATE_DIR="$CP_DIR/state"
+POSTQ_CACHE_BACKUP="$POSTQ_STATE_DIR/cache.db"
+POSTQ_CACHE_SELECTION="$POSTQ_STATE_DIR/cache.db.selection"
+POSTQ_CACHE_BACKUP_LOCK="$CP_DIR/lock/cache-backup.lock"
+POSTQ_CACHE_RESTORED_FLAG="$CP_DIR/run/cache-restored"
 LIVE="$CP_DIR/live/cache.db"
 LOG="$CP_DIR/log"
 
@@ -15594,15 +15594,15 @@ config_get_bool() {
     *) eval "$1=\"\${4:-0}\"" ;;
     esac
 }
-# netshift_configured sentinel: driven by CFG_NS_CONFIGURED (1 = NetShift configured dnsmasq).
-dnsmasq_is_configured_for_netshift() { [ "${CFG_NS_CONFIGURED:-0}" = "1" ]; }
+# postq_configured sentinel: driven by CFG_NS_CONFIGURED (1 = PostQ configured dnsmasq).
+dnsmasq_is_configured_for_postq() { [ "${CFG_NS_CONFIGURED:-0}" = "1" ]; }
 get_service_listen_address() { printf '%s' "127.0.0.1"; }
 config_load() { :; }
 network_get_ipaddr() { eval "$1=\$CFG_LAN_IP"; }
 
 reset_state() {
-    rm -rf "$CP_DIR/live" "$NETSHIFT_STATE_DIR" "$LOG" "$CP_DIR/run"
-    mkdir -p "$NETSHIFT_STATE_DIR"
+    rm -rf "$CP_DIR/live" "$POSTQ_STATE_DIR" "$LOG" "$CP_DIR/run"
+    mkdir -p "$POSTQ_STATE_DIR"
     CFG_CACHE_PATH="$LIVE"
     CFG_SHUTDOWN="1"
 }
@@ -15622,20 +15622,20 @@ check cp-restore-without-copy-noop '[ ! -e "$LIVE" ]'
 
 # R2: reboot wiped tmpfs -> the copy becomes the live DB.
 reset_state
-printf 'saved-db' > "$NETSHIFT_CACHE_BACKUP"
+printf 'saved-db' > "$POSTQ_CACHE_BACKUP"
 restore_sing_box_cache
 check cp-restore-after-reboot '[ "$(cat "$LIVE" 2>/dev/null)" = "saved-db" ]'
 
 # R3: a live DB that survived a restart is newer -> left alone.
 reset_state
-printf 'saved-db' > "$NETSHIFT_CACHE_BACKUP"
+printf 'saved-db' > "$POSTQ_CACHE_BACKUP"
 live_db 'live-db'
 restore_sing_box_cache
 check cp-restore-keeps-live-db '[ "$(cat "$LIVE")" = "live-db" ]'
 
 # R4: cache_path on flash survives a reboot by itself -> no copy is used.
 reset_state
-printf 'saved-db' > "$NETSHIFT_CACHE_BACKUP"
+printf 'saved-db' > "$POSTQ_CACHE_BACKUP"
 CFG_CACHE_PATH="$CP_DIR/flash/cache.db"
 sing_box_cache_is_volatile() { return 1; }
 restore_sing_box_cache
@@ -15680,7 +15680,7 @@ get_sing_box_selection() { [ -n "$SELECTION" ] && printf '%s\n' "$SELECTION"; }
 # S1: no live DB yet -> nothing to copy.
 reset_state
 snapshot_sing_box_cache
-check cp-snapshot-without-live-db-noop '[ ! -e "$NETSHIFT_CACHE_BACKUP" ]'
+check cp-snapshot-without-live-db-noop '[ ! -e "$POSTQ_CACHE_BACKUP" ]'
 
 # S2: Clash API down -> the selection is unknown, keep what is on flash.
 reset_state
@@ -15688,44 +15688,44 @@ live_db 'db-1'
 SELECTION=""
 snapshot_sing_box_cache
 SELECTION="$(printf 'main-out\tnode-b')"
-check cp-snapshot-api-down-noop '[ ! -e "$NETSHIFT_CACHE_BACKUP" ]'
+check cp-snapshot-api-down-noop '[ ! -e "$POSTQ_CACHE_BACKUP" ]'
 
 # S3: first selection -> byte-identical copy, selection recorded, mode 600.
 reset_state
 live_db 'db-1'
 snapshot_sing_box_cache
-check cp-snapshot-copies-live-db 'cmp -s "$LIVE" "$NETSHIFT_CACHE_BACKUP"'
-check cp-snapshot-records-selection '[ "$(cat "$NETSHIFT_CACHE_SELECTION")" = "$SELECTION" ]'
-check cp-snapshot-mode-600 '[ "$(ls -l "$NETSHIFT_CACHE_BACKUP" | cut -c1-10)" = "-rw-------" ]'
-check cp-snapshot-no-leftover-tmp '[ ! -e "$NETSHIFT_CACHE_BACKUP.tmp" ] && [ ! -e "$NETSHIFT_CACHE_SELECTION.tmp" ]'
+check cp-snapshot-copies-live-db 'cmp -s "$LIVE" "$POSTQ_CACHE_BACKUP"'
+check cp-snapshot-records-selection '[ "$(cat "$POSTQ_CACHE_SELECTION")" = "$SELECTION" ]'
+check cp-snapshot-mode-600 '[ "$(ls -l "$POSTQ_CACHE_BACKUP" | cut -c1-10)" = "-rw-------" ]'
+check cp-snapshot-no-leftover-tmp '[ ! -e "$POSTQ_CACHE_BACKUP.tmp" ] && [ ! -e "$POSTQ_CACHE_SELECTION.tmp" ]'
 
 # S4: same selection, DB changed by FakeIP -> no flash write.
 live_db 'db-2-fakeip-churn'
 snapshot_sing_box_cache
-check cp-snapshot-same-selection-no-write '[ "$(cat "$NETSHIFT_CACHE_BACKUP")" = "db-1" ]'
+check cp-snapshot-same-selection-no-write '[ "$(cat "$POSTQ_CACHE_BACKUP")" = "db-1" ]'
 
 # S5: selection changed -> copy retaken.
 SELECTION="$(printf 'main-out\tnode-a')"
 snapshot_sing_box_cache
-check cp-snapshot-new-selection-rewrites '[ "$(cat "$NETSHIFT_CACHE_BACKUP")" = "db-2-fakeip-churn" ] && [ "$(cat "$NETSHIFT_CACHE_SELECTION")" = "$SELECTION" ]'
+check cp-snapshot-new-selection-rewrites '[ "$(cat "$POSTQ_CACHE_BACKUP")" = "db-2-fakeip-churn" ] && [ "$(cat "$POSTQ_CACHE_SELECTION")" = "$SELECTION" ]'
 
 # S6: copy from 0.9.3/0.9.4 without a selection file -> retaken once.
 reset_state
 live_db 'db-3'
-printf 'legacy-db' > "$NETSHIFT_CACHE_BACKUP"
+printf 'legacy-db' > "$POSTQ_CACHE_BACKUP"
 snapshot_sing_box_cache
-check cp-snapshot-legacy-copy-retaken '[ "$(cat "$NETSHIFT_CACHE_BACKUP")" = "db-3" ] && [ -f "$NETSHIFT_CACHE_SELECTION" ]'
+check cp-snapshot-legacy-copy-retaken '[ "$(cat "$POSTQ_CACHE_BACKUP")" = "db-3" ] && [ -f "$POSTQ_CACHE_SELECTION" ]'
 
 # S7: sing-box writes the DB during every copy -> old copy kept, no torn file.
 reset_state
 live_db 'db-4'
-printf 'good-db' > "$NETSHIFT_CACHE_BACKUP"
+printf 'good-db' > "$POSTQ_CACHE_BACKUP"
 cp() { command cp "$@"; printf 'x' >> "$LIVE"; }
 sleep() { :; }
 snapshot_sing_box_cache
 unset -f cp sleep
-check cp-snapshot-unstable-keeps-old-copy '[ "$(cat "$NETSHIFT_CACHE_BACKUP")" = "good-db" ] && [ ! -f "$NETSHIFT_CACHE_SELECTION" ]'
-check cp-snapshot-unstable-no-leftover-tmp '[ ! -e "$NETSHIFT_CACHE_BACKUP.tmp" ]'
+check cp-snapshot-unstable-keeps-old-copy '[ "$(cat "$POSTQ_CACHE_BACKUP")" = "good-db" ] && [ ! -f "$POSTQ_CACHE_SELECTION" ]'
+check cp-snapshot-unstable-no-leftover-tmp '[ ! -e "$POSTQ_CACHE_BACKUP.tmp" ]'
 check cp-snapshot-unstable-logs-warn 'grep -q "^warn Could not copy" "$LOG"'
 
 # S8: sing-box writes during the first copy only -> the retry succeeds.
@@ -15736,7 +15736,7 @@ cp() { command cp "$@"; CP_CALLS=$((CP_CALLS + 1)); [ "$CP_CALLS" -eq 1 ] && pri
 sleep() { :; }
 snapshot_sing_box_cache
 unset -f cp sleep
-check cp-snapshot-retry-after-write '[ "$(cat "$NETSHIFT_CACHE_BACKUP")" = "db-5y" ]'
+check cp-snapshot-retry-after-write '[ "$(cat "$POSTQ_CACHE_BACKUP")" = "db-5y" ]'
 
 # S9: cache_path on flash -> nothing copied.
 reset_state
@@ -15746,7 +15746,7 @@ printf 'flash-db' > "$CFG_CACHE_PATH"
 sing_box_cache_is_volatile() { return 1; }
 snapshot_sing_box_cache
 eval "$(extract sing_box_cache_is_volatile)"
-check cp-snapshot-skips-flash-cache-path '[ ! -e "$NETSHIFT_CACHE_BACKUP" ]'
+check cp-snapshot-skips-flash-cache-path '[ ! -e "$POSTQ_CACHE_BACKUP" ]'
 
 # ── monitor_sing_box: periodic check catches dashboard picks ───────────
 # Seven healthy 10 s ticks, then sing-box is gone and the stop was clean.
@@ -15787,36 +15787,36 @@ TICKS=0
 # ── restore marks the cache as restored; a crash then heals it ─────────
 # H1: a restore records that the cache now running came from the copy.
 reset_state
-printf 'saved-db' > "$NETSHIFT_CACHE_BACKUP"
+printf 'saved-db' > "$POSTQ_CACHE_BACKUP"
 restore_sing_box_cache
-check cp-restore-sets-restored-flag '[ -f "$NETSHIFT_CACHE_RESTORED_FLAG" ]'
+check cp-restore-sets-restored-flag '[ -f "$POSTQ_CACHE_RESTORED_FLAG" ]'
 
 # H2: a crash after a restore drops the restored DB and the copy, so the next
 #     start is clean instead of failing on the same file after every reboot.
 discard_restored_sing_box_cache
-check cp-heal-drops-restored-cache '[ ! -e "$LIVE" ] && [ ! -e "$NETSHIFT_CACHE_BACKUP" ] && [ ! -e "$NETSHIFT_CACHE_RESTORED_FLAG" ]'
+check cp-heal-drops-restored-cache '[ ! -e "$LIVE" ] && [ ! -e "$POSTQ_CACHE_BACKUP" ] && [ ! -e "$POSTQ_CACHE_RESTORED_FLAG" ]'
 
 # H3: without a restore this boot, nothing is dropped.
 reset_state
 live_db 'live-db'
-printf 'good-db' > "$NETSHIFT_CACHE_BACKUP"
+printf 'good-db' > "$POSTQ_CACHE_BACKUP"
 discard_restored_sing_box_cache
-check cp-heal-noop-without-restore '[ -e "$LIVE" ] && [ -e "$NETSHIFT_CACHE_BACKUP" ]'
+check cp-heal-noop-without-restore '[ -e "$LIVE" ] && [ -e "$POSTQ_CACHE_BACKUP" ]'
 
 # H4: the monitor heals on the first crash after a restore, not only when the
 #     function is called directly.
 reset_state
 live_db 'live-db'
-printf 'bad-db' > "$NETSHIFT_CACHE_BACKUP"
-mkdir -p "$(dirname "$NETSHIFT_CACHE_RESTORED_FLAG")"
-: > "$NETSHIFT_CACHE_RESTORED_FLAG"
+printf 'bad-db' > "$POSTQ_CACHE_BACKUP"
+mkdir -p "$(dirname "$POSTQ_CACHE_RESTORED_FLAG")"
+: > "$POSTQ_CACHE_RESTORED_FLAG"
 MONITOR_PIDFILE="$CP_DIR/monitor-heal.pid"
 MONITOR_MAX_CRASHES=1
 CFG_SHUTDOWN="0"
 dnsmasq_restore() { :; }
 sing_box_process_exists() { return 1; }
 monitor_sing_box
-check cp-monitor-heals-restored-cache '[ ! -e "$NETSHIFT_CACHE_BACKUP" ] && [ ! -e "$LIVE" ]'
+check cp-monitor-heals-restored-cache '[ ! -e "$POSTQ_CACHE_BACKUP" ] && [ ! -e "$LIVE" ]'
 
 # H5: dont_touch_dhcp. The user owns /etc/config/dhcp then, so a crash must
 #     neither restore nor re-configure dnsmasq (the restore used to wipe their
@@ -15943,9 +15943,9 @@ CPEOF
 test_section_disabled() {
     header "Section disabled option (issue #42)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ]; then
-        skip "netshift bin not found"
+        skip "postq bin not found"
         return
     fi
 
@@ -16072,27 +16072,27 @@ test_section_disabled() {
     # A disabled section picked in "Download Lists via specific proxy section"
     # has no outbound, so nothing may reference "<section>-out" (sing-box check
     # would fail and the whole service would not start).
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
-    local facade_lib="${NETSHIFT_LIB_DIR}/sing_box_config_facade.sh"
-    local jq_helpers="${NETSHIFT_LIB_DIR}/helpers.jq"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
+    local facade_lib="${POSTQ_LIB_DIR}/sing_box_config_facade.sh"
+    local jq_helpers="${POSTQ_LIB_DIR}/helpers.jq"
     if ! command -v jq > /dev/null 2>&1 || [ ! -r "$cm_lib" ] || [ ! -r "$facade_lib" ] || [ ! -r "$jq_helpers" ]; then
         skip "download proxy section disabled: jq / libs not available"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$jq_helpers" /usr/lib/netshift/helpers.jq
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$cm_lib" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$jq_helpers" /usr/lib/postq/helpers.jq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$cm_lib" /usr/lib/postq/sing_box_config_manager.sh
 
     out="$(
         # shellcheck disable=SC2030,SC2031
         extract() {
             awk -v f="$1" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin"
         }
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
-        . "${NETSHIFT_LIB_DIR}/helpers.sh"
-        . "${NETSHIFT_LIB_DIR}/logging.sh" 2>/dev/null || log() { :; }
+        . "${POSTQ_LIB_DIR}/constants.sh"
+        . "${POSTQ_LIB_DIR}/helpers.sh"
+        . "${POSTQ_LIB_DIR}/logging.sh" 2>/dev/null || log() { :; }
         . "$facade_lib"
         for fn in section_is_disabled _active_section_dispatch foreach_active_section \
             subscription_outbound_is_unavailable download_proxy_section_is_unavailable service_proxy_needed \
@@ -16190,31 +16190,31 @@ test_dns_section() {
         return
     fi
 
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
-    local facade_lib="${NETSHIFT_LIB_DIR}/sing_box_config_facade.sh"
-    local constants_lib="${NETSHIFT_LIB_DIR}/constants.sh"
-    local jq_helpers="${NETSHIFT_LIB_DIR}/helpers.jq"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
+    local facade_lib="${POSTQ_LIB_DIR}/sing_box_config_facade.sh"
+    local constants_lib="${POSTQ_LIB_DIR}/constants.sh"
+    local jq_helpers="${POSTQ_LIB_DIR}/helpers.jq"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$cm_lib" ] || [ ! -r "$facade_lib" ] || [ ! -r "$constants_lib" ] || [ ! -r "$jq_helpers" ] \
         || [ ! -r "$bin" ]; then
-        skip "config manager / facade / constants / helpers.jq / netshift bin not found"
+        skip "config manager / facade / constants / helpers.jq / postq bin not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$jq_helpers" /usr/lib/netshift/helpers.jq
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$cm_lib" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$jq_helpers" /usr/lib/postq/helpers.jq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$cm_lib" /usr/lib/postq/sing_box_config_manager.sh
 
-    local drv="/tmp/netshift-dnssection-$$.sh"
+    local drv="/tmp/postq-dnssection-$$.sh"
     cat > "$drv" << 'DSEOF'
-LIB="NETSHIFT_LIB"
+LIB="POSTQ_LIB"
 BIN="BIN_PATH"
 FACADE="FACADE_PATH"
 
 . "$LIB/constants.sh"
 . "$LIB/helpers.sh"
-DS_LOG="/tmp/netshift-dnssec-log-$$"; : > "$DS_LOG"
+DS_LOG="/tmp/postq-dnssec-log-$$"; : > "$DS_LOG"
 log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$DS_LOG"; }
 . "$FACADE"
 
@@ -16238,7 +16238,7 @@ for fn in section_is_dns_rule section_has_enabled_lists configure_dns_section_ha
     patch_section_dns_rule_set section_ipv6_real_dns configure_dns_section_rules _tag_last_dns_rule _add_dns_group_rules; do
     eval "$(awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$BIN")"
 done
-netshift_ipv6_enabled() { return 1; }
+postq_ipv6_enabled() { return 1; }
 get_ruleset_tag() { echo "$1-$2-$3"; }
 get_download_detour_tag() { echo ""; }
 gen_id() { echo "gen$$"; }
@@ -16360,9 +16360,9 @@ ok "$(jqc '[.dns.rules[] | select(.__service_tag == "dns-section-rule-corp") | .
 
 echo 'DONE'
 DSEOF
-    sed -i "s|NETSHIFT_LIB|$NETSHIFT_LIB_DIR|g; s|BIN_PATH|$bin|; s|FACADE_PATH|$facade_lib|" "$drv"
+    sed -i "s|POSTQ_LIB|$POSTQ_LIB_DIR|g; s|BIN_PATH|$bin|; s|FACADE_PATH|$facade_lib|" "$drv"
 
-    local ds_out="/tmp/netshift-dnssection-out-$$.log"
+    local ds_out="/tmp/postq-dnssection-out-$$.log"
     ash "$drv" > "$ds_out" 2>&1 || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -16384,14 +16384,14 @@ DSEOF
 test_update_package_check() {
     header "Self-update: downloaded package files are checked before anything is installed"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     local updater="$lib/updater.sh"
     if [ ! -r "$updater" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "updater.sh / constants.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-pkgcheck-$$"
+    local work="/tmp/postq-pkgcheck-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -16446,8 +16446,8 @@ test_environment_check() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ] || [ ! -r "$lib/helpers.sh" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "bin / helpers.sh / constants.sh not found"
         return
@@ -16496,11 +16496,11 @@ test_environment_check() {
         echo "skew-600=$(j '.clock.skew_seconds')"
         echo "zone=$(j '.clock.timezone')"
         ENV_IPV6="2001:db8::5"
-        echo "ipv6-global=$(j '[.ipv6.router_has_global, .ipv6.netshift_enabled]')"
+        echo "ipv6-global=$(j '[.ipv6.router_has_global, .ipv6.postq_enabled]')"
         ENV_IPV6="fd12:3456::1"
         echo "ipv6-ula-ignored=$(j '.ipv6.router_has_global')"
         ENV_IPV6="2001:db8::5"; ENV_IPV6_ENABLED=1
-        echo "ipv6-enabled=$(j '.ipv6.netshift_enabled')"
+        echo "ipv6-enabled=$(j '.ipv6.postq_enabled')"
     )"
 
     _ev() { expect_line "$out" "$1" "$2"; }
@@ -16528,17 +16528,17 @@ test_mixed_proxy_auth() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ] || [ ! -r "$lib/sing_box_config_manager.sh" ] || [ ! -r "$lib/sing_box_config_facade.sh" ]; then
         fail "bin / libs not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local out
     out="$(
@@ -16546,7 +16546,7 @@ test_mixed_proxy_auth() {
         . "$lib/helpers.sh"
         . "$lib/sing_box_config_manager.sh"
         . "$lib/sing_box_config_facade.sh"
-        LOGF="/tmp/netshift-mixed-log-$$"; : > "$LOGF"
+        LOGF="/tmp/postq-mixed-log-$$"; : > "$LOGF"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$LOGF"; }
         for fn in configure_section_mixed_proxy mixed_proxy_port_is_reserved; do
             eval "$(awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
@@ -16583,7 +16583,7 @@ test_mixed_proxy_auth() {
         run a b; echo "two-ports=$(inb)"
 
         U_c_mixed_proxy_enabled=1 U_c_mixed_proxy_port=9090
-        run c; echo "reserved-clash=$(inb) warned=$(grep -c 'used by NetShift itself' "$LOGF")"
+        run c; echo "reserved-clash=$(inb) warned=$(grep -c 'used by PostQ VPN itself' "$LOGF")"
         U_c_mixed_proxy_port=4534
         run c; echo "reserved-service=$(inb)"
         U_c_mixed_proxy_port=abc
@@ -16632,20 +16632,20 @@ test_mixed_proxy_auth() {
 test_dnsmasq_lifecycle() {
     header "dnsmasq lifecycle ownership and recovery"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift" lib="${NETSHIFT_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq" lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$bin" ] || [ ! -r "$lib/helpers.sh" ] || [ ! -r "$lib/constants.sh" ] || [ ! -r "$lib/dnsforward.sh" ]; then
         fail "dnsmasq lifecycle sources not found"
         return
     fi
 
-    local drv="/tmp/netshift-dnsmasq-lifecycle-$$.sh" saved="/tmp/netshift-dhcp-lifecycle-$$" saved_netshift="/tmp/netshift-config-lifecycle-$$"
+    local drv="/tmp/postq-dnsmasq-lifecycle-$$.sh" saved="/tmp/postq-dhcp-lifecycle-$$" saved_postq="/tmp/postq-config-lifecycle-$$"
     if ! cp /etc/config/dhcp "$saved"; then
         fail "could not save /etc/config/dhcp for dnslifecycle"
         return
     fi
-    if [ -f /etc/config/netshift ] && ! cp /etc/config/netshift "$saved_netshift"; then
+    if [ -f /etc/config/postq ] && ! cp /etc/config/postq "$saved_postq"; then
         rm -f "$saved"
-        fail "could not save /etc/config/netshift for dnslifecycle"
+        fail "could not save /etc/config/postq for dnslifecycle"
         return
     fi
     {
@@ -16658,7 +16658,7 @@ LIB="LIB_DIR"
 . "$LIB/dnsforward.sh"
 BIN="BIN_PATH"
 extract() { awk -v f="$1" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^}/{exit}' "$BIN"; }
-LOG_FILE="/tmp/netshift-dnsmasq-lifecycle-log-$$"
+LOG_FILE="/tmp/postq-dnsmasq-lifecycle-log-$$"
 TEST_RESOLVFILE="/tmp/resolv.conf.d/resolv.conf.auto"
 TEST_RESOLV_EXISTS=0
 log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$LOG_FILE"; }
@@ -16672,7 +16672,7 @@ config_get() {
 }
 kill_switch_enabled() { [ "${TEST_BLOCK_LEAKS:-0}" = 1 ]; }
 DLEOF
-        for fn in backup_dnsmasq_config_option uci_remove_quiet dnsmasq_is_configured_for_netshift dnsmasq_has_backup dnsmasq_should_be_restored dnsmasq_configure dnsmasq_sync_servers dnsmasq_restore; do
+        for fn in backup_dnsmasq_config_option uci_remove_quiet dnsmasq_is_configured_for_postq dnsmasq_has_backup dnsmasq_should_be_restored dnsmasq_configure dnsmasq_sync_servers dnsmasq_restore; do
             awk -v fn="$fn" '$0 ~ "^"fn"\\(\\) \\{"{p=1} p{print} p&&/^}/{exit}' "$bin" | sed 's|/etc/init.d/dnsmasq restart|:|'
         done
         cat << 'DLEOF'
@@ -16680,24 +16680,24 @@ failures=0
 check() { if [ "$2" = "$3" ]; then echo "$1:OK"; else echo "$1:FAIL got=[$2] want=[$3]"; failures=$((failures + 1)); fi; }
 cleanup() {
     cp DHCP_BACKUP /etc/config/dhcp
-    if [ -f NETSHIFT_BACKUP ]; then cp NETSHIFT_BACKUP /etc/config/netshift; else rm -f /etc/config/netshift; fi
-    rm -f DHCP_BACKUP NETSHIFT_BACKUP "$LOG_FILE"
+    if [ -f POSTQ_BACKUP ]; then cp POSTQ_BACKUP /etc/config/postq; else rm -f /etc/config/postq; fi
+    rm -f DHCP_BACKUP POSTQ_BACKUP "$LOG_FILE"
 }
 trap cleanup EXIT
 reset_fixture() {
-    for option in server noresolv cachesize netshift_server netshift_noresolv netshift_cachesize netshift_configured netshift_dnsmasq_backup netshift_noresolv_set netshift_cachesize_set; do
+    for option in server noresolv cachesize postq_server postq_noresolv postq_cachesize postq_configured postq_dnsmasq_backup postq_noresolv_set postq_cachesize_set; do
         uci -q delete "dhcp.@dnsmasq[0].$option" 2>/dev/null || :
     done
     uci -q add_list dhcp.@dnsmasq[0].server='/alpha.lan/192.0.2.53'
     uci -q add_list dhcp.@dnsmasq[0].server='/beta.lan/198.51.100.53'
     uci -q set dhcp.@dnsmasq[0].cachesize=1000
     uci -q set dhcp.@dnsmasq[0].noresolv=0
-    uci -q set netshift.settings=settings
-    uci -q set netshift.settings.shutdown_correctly=0
-    uci -q delete netshift.settings.dns_forward 2>/dev/null || :
-    uci -q set netshift.settings.dont_touch_dhcp="${TEST_DONT_TOUCH:-0}"
-    uci -q set netshift.settings.block_leaks="${TEST_BLOCK_LEAKS:-0}"
-    uci commit dhcp; uci commit netshift; config_load netshift
+    uci -q set postq.settings=settings
+    uci -q set postq.settings.shutdown_correctly=0
+    uci -q delete postq.settings.dns_forward 2>/dev/null || :
+    uci -q set postq.settings.dont_touch_dhcp="${TEST_DONT_TOUCH:-0}"
+    uci -q set postq.settings.block_leaks="${TEST_BLOCK_LEAKS:-0}"
+    uci commit dhcp; uci commit postq; config_load postq
 }
 servers() { uci -q get dhcp.@dnsmasq[0].server | tr ' ' ','; }
 
@@ -16710,10 +16710,10 @@ check apk-remove-path-uses-same-safe-stop "$decision" no
 
 TEST_DONT_TOUCH=0 reset_fixture
 dnsmasq_configure force
-check setup-records-durable-backup "$(uci -q get dhcp.@dnsmasq[0].netshift_dnsmasq_backup)" 1
+check setup-records-durable-backup "$(uci -q get dhcp.@dnsmasq[0].postq_dnsmasq_backup)" 1
 check setup-points-dns-at-sing-box "$(uci -q get dhcp.@dnsmasq[0].server)" 127.0.0.42
 dnsmasq_configure force
-check repeated-setup-keeps-original-cache-backup "$(uci -q get dhcp.@dnsmasq[0].netshift_cachesize)" 1000
+check repeated-setup-keeps-original-cache-backup "$(uci -q get dhcp.@dnsmasq[0].postq_cachesize)" 1000
 dnsmasq_restore
 check normal-stop-restores-forwarders "$(servers)" /alpha.lan/192.0.2.53,/beta.lan/198.51.100.53
 check normal-stop-restores-cache "$(uci -q get dhcp.@dnsmasq[0].cachesize)" 1000
@@ -16739,7 +16739,7 @@ TEST_DONT_TOUCH=0 reset_fixture
     }
     dnsmasq_configure force
 ) >/dev/null 2>&1
-check interrupted-setup-saved-marker "$(uci -q get dhcp.@dnsmasq[0].netshift_dnsmasq_backup)" 1
+check interrupted-setup-saved-marker "$(uci -q get dhcp.@dnsmasq[0].postq_dnsmasq_backup)" 1
 uci -q delete dhcp.@dnsmasq[0].server
 uci -q add_list dhcp.@dnsmasq[0].server=127.0.0.42
 uci -q set dhcp.@dnsmasq[0].cachesize=0
@@ -16756,11 +16756,11 @@ uci -q delete dhcp.@dnsmasq[0].server
 uci -q set dhcp.@dnsmasq[0].resolvfile=/tmp/custom-resolv.conf
 uci -q set dhcp.@dnsmasq[0].cachesize=150
 uci -q set dhcp.@dnsmasq[0].noresolv=1
-uci -q set dhcp.@dnsmasq[0].netshift_dnsmasq_backup=1
-uci -q set dhcp.@dnsmasq[0].netshift_cachesize=1000
-uci -q set dhcp.@dnsmasq[0].netshift_cachesize_set=1
-uci -q set dhcp.@dnsmasq[0].netshift_noresolv=0
-uci -q set dhcp.@dnsmasq[0].netshift_noresolv_set=1
+uci -q set dhcp.@dnsmasq[0].postq_dnsmasq_backup=1
+uci -q set dhcp.@dnsmasq[0].postq_cachesize=1000
+uci -q set dhcp.@dnsmasq[0].postq_cachesize_set=1
+uci -q set dhcp.@dnsmasq[0].postq_noresolv=0
+uci -q set dhcp.@dnsmasq[0].postq_noresolv_set=1
 uci commit dhcp
 : > "$LOG_FILE"
 dnsmasq_restore
@@ -16773,10 +16773,10 @@ if grep -q '^\[debug\] Original dnsmasq config had no explicit servers; nothing 
 
 TEST_DONT_TOUCH=0 reset_fixture
 uci -q delete dhcp.@dnsmasq[0].server
-uci -q delete dhcp.@dnsmasq[0].netshift_dnsmasq_backup
+uci -q delete dhcp.@dnsmasq[0].postq_dnsmasq_backup
 uci -q set dhcp.@dnsmasq[0].noresolv=1
-uci -q set dhcp.@dnsmasq[0].netshift_noresolv=1
-uci -q delete dhcp.@dnsmasq[0].netshift_server
+uci -q set dhcp.@dnsmasq[0].postq_noresolv=1
+uci -q delete dhcp.@dnsmasq[0].postq_server
 uci commit dhcp
 TEST_RESOLV_EXISTS=1
 dnsmasq_restore
@@ -16784,8 +16784,8 @@ check legacy-resolvfile-fallback-remains "$(uci -q get dhcp.@dnsmasq[0].resolvfi
 
 TEST_DONT_TOUCH=0 reset_fixture
 uci -q delete dhcp.@dnsmasq[0].server
-uci -q delete dhcp.@dnsmasq[0].netshift_dnsmasq_backup
-uci -q delete dhcp.@dnsmasq[0].netshift_server
+uci -q delete dhcp.@dnsmasq[0].postq_dnsmasq_backup
+uci -q delete dhcp.@dnsmasq[0].postq_server
 uci commit dhcp
 TEST_RESOLV_EXISTS=0
 : > "$LOG_FILE"
@@ -16795,10 +16795,10 @@ if grep -q 'possible resolving issues' "$LOG_FILE"; then echo 'unrecoverable-leg
 TEST_DONT_TOUCH=1 reset_fixture
 dnsmasq_should_be_restored && decision=yes || decision=no
 check dont-touch-without-ownership "$decision" no
-uci -q set dhcp.@dnsmasq[0].netshift_configured=0; uci commit dhcp
+uci -q set dhcp.@dnsmasq[0].postq_configured=0; uci commit dhcp
 dnsmasq_should_be_restored && decision=yes || decision=no
 check zero-ownership-sentinel "$decision" no
-uci -q set dhcp.@dnsmasq[0].netshift_configured=1; uci commit dhcp
+uci -q set dhcp.@dnsmasq[0].postq_configured=1; uci commit dhcp
 dnsmasq_should_be_restored && decision=yes || decision=no
 check completed-ownership-sentinel "$decision" yes
 TEST_BLOCK_LEAKS=1
@@ -16806,16 +16806,16 @@ dnsmasq_should_be_restored && decision=yes || decision=no
 check block-leaks-defers-dns-restore "$decision" no
 # the stop with block_leaks left dnsmasq configured: the next start still brings the forwards by
 # zone in line (one added, then removed), and the backup of the original servers stays
-: >> /etc/config/netshift
+: >> /etc/config/postq
 reset_fixture
 dnsmasq_configure force
-uci -q add_list netshift.settings.dns_forward='corp.lan 10.0.0.53'; uci commit netshift; config_load netshift
+uci -q add_list postq.settings.dns_forward='corp.lan 10.0.0.53'; uci commit postq; config_load postq
 dnsmasq_configure force
 check block-leaks-start-adds-new-forward "$(servers)" 127.0.0.42,/corp.lan/10.0.0.53
-uci -q delete netshift.settings.dns_forward; uci commit netshift; config_load netshift
+uci -q delete postq.settings.dns_forward; uci commit postq; config_load postq
 dnsmasq_configure force
 check block-leaks-start-drops-removed-forward "$(servers)" 127.0.0.42
-check block-leaks-start-keeps-original-backup "$(uci -q get dhcp.@dnsmasq[0].netshift_server | tr ' ' ',')" /alpha.lan/192.0.2.53,/beta.lan/198.51.100.53
+check block-leaks-start-keeps-original-backup "$(uci -q get dhcp.@dnsmasq[0].postq_server | tr ' ' ',')" /alpha.lan/192.0.2.53,/beta.lan/198.51.100.53
 TEST_BLOCK_LEAKS=0
 dnsmasq_restore
 dnsmasq_should_be_restored && decision=yes || decision=no
@@ -16824,10 +16824,10 @@ check repeated-stop-is-idempotent "$decision" no
 TEST_DONT_TOUCH=0 reset_fixture
 uci -q delete dhcp.@dnsmasq[0].server
 uci -q add_list dhcp.@dnsmasq[0].server=127.0.0.42
-uci -q set dhcp.@dnsmasq[0].netshift_server=192.0.2.53
-uci -q set dhcp.@dnsmasq[0].netshift_cachesize=1000
-uci -q set dhcp.@dnsmasq[0].netshift_noresolv=0
-uci -q set dhcp.@dnsmasq[0].netshift_configured=0
+uci -q set dhcp.@dnsmasq[0].postq_server=192.0.2.53
+uci -q set dhcp.@dnsmasq[0].postq_cachesize=1000
+uci -q set dhcp.@dnsmasq[0].postq_noresolv=0
+uci -q set dhcp.@dnsmasq[0].postq_configured=0
 uci commit dhcp
 dnsmasq_should_be_restored && decision=yes || decision=no
 check legacy-backup-authorizes-recovery "$decision" yes
@@ -16836,7 +16836,7 @@ check legacy-backup-restores-original-values "$(uci -q get dhcp.@dnsmasq[0].serv
 exit "$failures"
 DLEOF
     } > "$drv"
-    sed -i "s|LIB_DIR|$lib|; s|BIN_PATH|$bin|; s|DHCP_BACKUP|$saved|; s|NETSHIFT_BACKUP|$saved_netshift|" "$drv"
+    sed -i "s|LIB_DIR|$lib|; s|BIN_PATH|$bin|; s|DHCP_BACKUP|$saved|; s|POSTQ_BACKUP|$saved_postq|" "$drv"
 
     local out line checks=0 driver_status=0
     if out="$(ash "$drv" 2>&1)"; then :; else driver_status=$?; fi
@@ -16851,7 +16851,7 @@ $out
 EOF
     if [ "$checks" -ne 31 ]; then fail "dnslifecycle expected 31 assertions, got $checks"; fi
     if [ "$driver_status" -ne 0 ] && ! printf '%s\n' "$out" | grep -q ':FAIL'; then fail "dnslifecycle driver exited with status $driver_status"; fi
-    rm -f "$saved" "$saved_netshift" "$drv"
+    rm -f "$saved" "$saved_postq" "$drv"
 }
 
 # ─────────────────────────────────────────────────────────────────
@@ -16863,17 +16863,17 @@ EOF
 test_urltest_filters() {
     header "Subscription country filters"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    if [ ! -r "$bin" ] || [ ! -r "${NETSHIFT_LIB_DIR}/constants.sh" ] || ! command -v jq > /dev/null 2>&1; then
-        skip "netshift bin / constants.sh / jq not found"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    if [ ! -r "$bin" ] || [ ! -r "${POSTQ_LIB_DIR}/constants.sh" ] || ! command -v jq > /dev/null 2>&1; then
+        skip "postq bin / constants.sh / jq not found"
         return
     fi
 
     local out
     out="$(
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
-        log() { printf '[%s] %s\n' "${2:-info}" "$1" >> /tmp/netshift-uf-log-$$; }
-        : > /tmp/netshift-uf-log-$$
+        . "${POSTQ_LIB_DIR}/constants.sh"
+        log() { printf '[%s] %s\n' "${2:-info}" "$1" >> /tmp/postq-uf-log-$$; }
+        : > /tmp/postq-uf-log-$$
         for fn in country_code_to_flag_emoji append_subscription_filter_country_handler \
             build_subscription_filter_json build_subscription_filter_keywords_json \
             append_subscription_filter_keyword_handler; do
@@ -16905,11 +16905,11 @@ test_urltest_filters() {
         exc="$(build_subscription_filter_json s subscription_filter_exclude_keywords subscription_filter_exclude_countries)"
         [ "$(printf '%s' "$inc" | jq -c --arg nl "$NL" --arg de "$DE" '. == ["Premium"] + ([$de, $nl] | unique)')" = true ] && echo "include-merged-unique:ok" || echo "include-merged-unique:wrong [$inc]"
         [ "$(printf '%s' "$exc" | jq -c --arg de "$DE" '. == [$de]')" = true ] && echo "exclude-countries-only:ok" || echo "exclude-countries-only:wrong [$exc]"
-        grep -q "^\[warn\] Ignoring subscription country filter 'bogus'" /tmp/netshift-uf-log-$$ && echo "bad-code-warned:ok" || echo "bad-code-warned:no"
+        grep -q "^\[warn\] Ignoring subscription country filter 'bogus'" /tmp/postq-uf-log-$$ && echo "bad-code-warned:ok" || echo "bad-code-warned:no"
         FILTER_subscription_filter_include_keywords=""; FILTER_subscription_filter_include_countries=""
         [ "$(build_subscription_filter_json s subscription_filter_include_keywords subscription_filter_include_countries)" = "[]" ] && echo "no-filter-empty:ok" || echo "no-filter-empty:wrong"
 
-        rm -f /tmp/netshift-uf-log-$$
+        rm -f /tmp/postq-uf-log-$$
     )"
 
     _uf_check() {
@@ -16946,18 +16946,18 @@ test_urltest_filters() {
 test_subscription_geoip() {
     header "Subscription GeoIP country flags"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    if [ ! -r "$bin" ] || [ ! -r "${NETSHIFT_LIB_DIR}/constants.sh" ] || [ ! -r "${NETSHIFT_LIB_DIR}/helpers.sh" ] \
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    if [ ! -r "$bin" ] || [ ! -r "${POSTQ_LIB_DIR}/constants.sh" ] || [ ! -r "${POSTQ_LIB_DIR}/helpers.sh" ] \
         || ! command -v jq > /dev/null 2>&1; then
-        skip "netshift bin / constants.sh / helpers.sh / jq not found"
+        skip "postq bin / constants.sh / helpers.sh / jq not found"
         return
     fi
 
     local out
     out="$(
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
-        . "${NETSHIFT_LIB_DIR}/helpers.sh"
-        W="/tmp/netshift-geoip-$$"; rm -rf "$W"; mkdir -p "$W"
+        . "${POSTQ_LIB_DIR}/constants.sh"
+        . "${POSTQ_LIB_DIR}/helpers.sh"
+        W="/tmp/postq-geoip-$$"; rm -rf "$W"; mkdir -p "$W"
         GEOIP_CACHE_FILE="$W/geoip.json"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$W/log"; }
         for fn in country_code_to_flag_emoji geoip_hosts_without_flag geoip_is_private_ip geoip_resolve_host geoip_lookup_hosts subscription_geoip_annotate \
@@ -17218,25 +17218,25 @@ test_ipv6_routing() {
         return
     fi
 
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
-    local facade_lib="${NETSHIFT_LIB_DIR}/sing_box_config_facade.sh"
-    local constants_lib="${NETSHIFT_LIB_DIR}/constants.sh"
-    local jq_helpers="${NETSHIFT_LIB_DIR}/helpers.jq"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
+    local facade_lib="${POSTQ_LIB_DIR}/sing_box_config_facade.sh"
+    local constants_lib="${POSTQ_LIB_DIR}/constants.sh"
+    local jq_helpers="${POSTQ_LIB_DIR}/helpers.jq"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$cm_lib" ] || [ ! -r "$facade_lib" ] || [ ! -r "$constants_lib" ] || [ ! -r "$jq_helpers" ] \
         || [ ! -r "$bin" ]; then
-        skip "config manager / facade / constants / helpers.jq / netshift bin not found"
+        skip "config manager / facade / constants / helpers.jq / postq bin not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$jq_helpers" /usr/lib/netshift/helpers.jq
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$cm_lib" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$jq_helpers" /usr/lib/postq/helpers.jq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$cm_lib" /usr/lib/postq/sing_box_config_manager.sh
 
-    local drv="/tmp/netshift-ipv6routing-$$.sh"
+    local drv="/tmp/postq-ipv6routing-$$.sh"
     cat > "$drv" << 'V6EOF'
-LIB="NETSHIFT_LIB"
+LIB="POSTQ_LIB"
 BIN="BIN_PATH"
 FACADE="FACADE_PATH"
 
@@ -17262,7 +17262,7 @@ config_list_foreach() {
     for _i in $_v; do "$_cb" "$_i" "$@"; done
 }
 get_global_proxy_section() { echo ""; }
-netshift_ipv6_enabled() { [ "$V6" = "1" ]; }
+postq_ipv6_enabled() { [ "$V6" = "1" ]; }
 get_sections_by_connection_type() { echo ""; }
 get_first_outbound_section() { echo "main"; }
 get_outbound_tag_by_section() { echo "$1-out"; }
@@ -17406,11 +17406,11 @@ echo "$doh" | jq -e '[.route.rules[] | select(.rule_set != null)][0].inbound == 
 # it) the sing-box cache and its flash copy are dropped once; same range keeps them;
 # without IPv6 nothing is touched or recorded.
 eval "$(awk -v name="drop_stale_fakeip_cache" '$0 == name "() {"{p=1} p{print} p&&/^\}/{exit}' "$BIN")"
-FW="/tmp/netshift-v6cache-$$"; rm -rf "$FW"; mkdir -p "$FW"
-NETSHIFT_STATE_DIR="$FW"; NETSHIFT_CACHE_BACKUP="$FW/cache.db"; NETSHIFT_CACHE_SELECTION="$FW/cache.db.selection"
+FW="/tmp/postq-v6cache-$$"; rm -rf "$FW"; mkdir -p "$FW"
+POSTQ_STATE_DIR="$FW"; POSTQ_CACHE_BACKUP="$FW/cache.db"; POSTQ_CACHE_SELECTION="$FW/cache.db.selection"
 get_sing_box_cache_path() { echo "$FW/live.db"; }
 FLOG="$FW/log"; log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$FLOG"; }
-mkcache() { : > "$FW/live.db"; : > "$NETSHIFT_CACHE_BACKUP"; : > "$NETSHIFT_CACHE_SELECTION"; }
+mkcache() { : > "$FW/live.db"; : > "$POSTQ_CACHE_BACKUP"; : > "$POSTQ_CACHE_SELECTION"; }
 have() { [ -e "$FW/live.db" ] && echo kept || echo dropped; }
 chk() { [ "$2" = "$3" ] && echo "$1:OK" || echo "$1:FAIL [got '$2' want '$3']"; }
 V6=1; mkcache; drop_stale_fakeip_cache
@@ -17418,7 +17418,7 @@ chk ipv6-fakeip-cache-unrecorded-dropped "$(have):$(cat "$FW/fakeip-v6-range"):$
 mkcache; drop_stale_fakeip_cache
 chk ipv6-fakeip-cache-same-range-kept "$(have)" kept
 printf '%s\n' 'fd00:ec3a::/32' > "$FW/fakeip-v6-range"; mkcache; drop_stale_fakeip_cache
-chk ipv6-fakeip-cache-changed-range-dropped "$(have):$([ -e "$NETSHIFT_CACHE_BACKUP" ] && echo copy-kept || echo copy-dropped)" dropped:copy-dropped
+chk ipv6-fakeip-cache-changed-range-dropped "$(have):$([ -e "$POSTQ_CACHE_BACKUP" ] && echo copy-kept || echo copy-dropped)" dropped:copy-dropped
 rm -f "$FW/fakeip-v6-range"; V6=0; mkcache; drop_stale_fakeip_cache
 chk ipv6-fakeip-cache-ipv6-off-untouched "$(have):$([ -e "$FW/fakeip-v6-range" ] && echo recorded || echo none)" kept:none
 rm -rf "$FW"
@@ -17439,9 +17439,9 @@ fi
 
 echo 'DONE'
 V6EOF
-    sed -i "s|NETSHIFT_LIB|$NETSHIFT_LIB_DIR|g; s|BIN_PATH|$bin|; s|FACADE_PATH|$facade_lib|" "$drv"
+    sed -i "s|POSTQ_LIB|$POSTQ_LIB_DIR|g; s|BIN_PATH|$bin|; s|FACADE_PATH|$facade_lib|" "$drv"
 
-    local v6_out="/tmp/netshift-ipv6routing-out-$$.log"
+    local v6_out="/tmp/postq-ipv6routing-out-$$.log"
     ash "$drv" > "$v6_out" 2>&1 || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -17485,31 +17485,31 @@ test_dns_pool() {
         return
     fi
 
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
-    local facade_lib="${NETSHIFT_LIB_DIR}/sing_box_config_facade.sh"
-    local constants_lib="${NETSHIFT_LIB_DIR}/constants.sh"
-    local jq_helpers="${NETSHIFT_LIB_DIR}/helpers.jq"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
+    local facade_lib="${POSTQ_LIB_DIR}/sing_box_config_facade.sh"
+    local constants_lib="${POSTQ_LIB_DIR}/constants.sh"
+    local jq_helpers="${POSTQ_LIB_DIR}/helpers.jq"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$cm_lib" ] || [ ! -r "$facade_lib" ] || [ ! -r "$constants_lib" ] || [ ! -r "$jq_helpers" ] \
         || [ ! -r "$bin" ]; then
-        skip "config manager / facade / constants / helpers.jq / netshift bin not found"
+        skip "config manager / facade / constants / helpers.jq / postq bin not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$jq_helpers" /usr/lib/netshift/helpers.jq
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$cm_lib" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$jq_helpers" /usr/lib/postq/helpers.jq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$cm_lib" /usr/lib/postq/sing_box_config_manager.sh
 
-    local drv="/tmp/netshift-dnspool-$$.sh"
+    local drv="/tmp/postq-dnspool-$$.sh"
     cat > "$drv" << 'DPEOF'
-LIB="NETSHIFT_LIB"
+LIB="POSTQ_LIB"
 BIN="BIN_PATH"
 FACADE="FACADE_PATH"
 
 . "$LIB/constants.sh"
 . "$LIB/helpers.sh"
-LOGF="/tmp/netshift-dnspool-log-$$"
+LOGF="/tmp/postq-dnspool-log-$$"
 log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$LOGF"; }
 . "$FACADE"
 
@@ -17570,7 +17570,7 @@ done
 base='{"dns":{"servers":[{"type":"udp","tag":"bootstrap-dns-server","server":"77.88.8.8","server_port":53},{"type":"udp","tag":"dns-server","server":"8.8.8.8","server_port":53}],"rules":[{"action":"route","server":"fakeip-server"}],"final":"dns-server"}}'
 
 gen() { # $1=version $2=mode $3=entries $4=timeout $5=detour
-    export NETSHIFT_SING_BOX_VERSION="$1"
+    export POSTQ_SING_BOX_VERSION="$1"
     DP_MODE="$2"; DP_ENTRIES="$3"; DP_TIMEOUT="$4"
     : > "$LOGF"
     config="$base"
@@ -17709,9 +17709,9 @@ fi
 rm -f "$LOGF"
 echo 'DONE'
 DPEOF
-    sed -i "s|NETSHIFT_LIB|$NETSHIFT_LIB_DIR|g; s|BIN_PATH|$bin|; s|FACADE_PATH|$facade_lib|" "$drv"
+    sed -i "s|POSTQ_LIB|$POSTQ_LIB_DIR|g; s|BIN_PATH|$bin|; s|FACADE_PATH|$facade_lib|" "$drv"
 
-    local dp_out="/tmp/netshift-dnspool-out-$$.log"
+    local dp_out="/tmp/postq-dnspool-out-$$.log"
     ash "$drv" > "$dp_out" 2>&1 || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -17753,23 +17753,23 @@ test_cascade() {
         return
     fi
 
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
-    local constants_lib="${NETSHIFT_LIB_DIR}/constants.sh"
-    local jq_helpers="${NETSHIFT_LIB_DIR}/helpers.jq"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
+    local constants_lib="${POSTQ_LIB_DIR}/constants.sh"
+    local jq_helpers="${POSTQ_LIB_DIR}/helpers.jq"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$cm_lib" ] || [ ! -r "$constants_lib" ] || [ ! -r "$jq_helpers" ] || [ ! -r "$bin" ]; then
-        skip "config manager / constants / helpers.jq / netshift bin not found"
+        skip "config manager / constants / helpers.jq / postq bin not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$jq_helpers" /usr/lib/netshift/helpers.jq
-    ln -sf "${NETSHIFT_LIB_DIR}/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$cm_lib" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$jq_helpers" /usr/lib/postq/helpers.jq
+    ln -sf "${POSTQ_LIB_DIR}/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$cm_lib" /usr/lib/postq/sing_box_config_manager.sh
 
-    local drv="/tmp/netshift-cascade-$$.sh"
+    local drv="/tmp/postq-cascade-$$.sh"
     cat > "$drv" << 'CCEOF'
-LIB="NETSHIFT_LIB"
+LIB="POSTQ_LIB"
 BIN="BIN_PATH"
 
 . "$LIB/constants.sh"
@@ -17936,9 +17936,9 @@ else
 fi
 echo 'DONE'
 CCEOF
-    sed -i "s|NETSHIFT_LIB|$NETSHIFT_LIB_DIR|g; s|BIN_PATH|$bin|" "$drv"
+    sed -i "s|POSTQ_LIB|$POSTQ_LIB_DIR|g; s|BIN_PATH|$bin|" "$drv"
 
-    local cc_out="/tmp/netshift-cascade-out-$$.log"
+    local cc_out="/tmp/postq-cascade-out-$$.log"
     ash "$drv" > "$cc_out" 2>&1 || true
     local saw_done=0 line
     while IFS= read -r line; do
@@ -17968,17 +17968,17 @@ CCEOF
 test_latency_url() {
     header "Latency test URL"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    if [ ! -r "$bin" ] || [ ! -r "${NETSHIFT_LIB_DIR}/constants.sh" ] || ! command -v jq > /dev/null 2>&1; then
-        skip "netshift bin / constants.sh / jq not found"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    if [ ! -r "$bin" ] || [ ! -r "${POSTQ_LIB_DIR}/constants.sh" ] || ! command -v jq > /dev/null 2>&1; then
+        skip "postq bin / constants.sh / jq not found"
         return
     fi
 
     local out
     out="$(
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
-        . "${NETSHIFT_LIB_DIR}/helpers.sh"
-        LOGF="/tmp/netshift-ltu-log-$$"
+        . "${POSTQ_LIB_DIR}/constants.sh"
+        . "${POSTQ_LIB_DIR}/helpers.sh"
+        LOGF="/tmp/postq-ltu-log-$$"
         : > "$LOGF"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$LOGF"; }
         eval "$(awk -v f="clash_api" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
@@ -18041,16 +18041,16 @@ test_latency_url() {
 test_priority_selection() {
     header "Priority node selection"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    if [ ! -r "$bin" ] || [ ! -r "${NETSHIFT_LIB_DIR}/constants.sh" ] || ! command -v jq > /dev/null 2>&1; then
-        skip "netshift bin / constants.sh / jq not found"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    if [ ! -r "$bin" ] || [ ! -r "${POSTQ_LIB_DIR}/constants.sh" ] || ! command -v jq > /dev/null 2>&1; then
+        skip "postq bin / constants.sh / jq not found"
         return
     fi
 
     local out
     out="$(
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
-        PR_LOG="/tmp/netshift-prio-log-$$"; PR_SET="/tmp/netshift-prio-set-$$"; PR_PROBE="/tmp/netshift-prio-probe-$$"
+        . "${POSTQ_LIB_DIR}/constants.sh"
+        PR_LOG="/tmp/postq-prio-log-$$"; PR_SET="/tmp/postq-prio-set-$$"; PR_PROBE="/tmp/postq-prio-probe-$$"
         : > "$PR_LOG"; : > "$PR_SET"; : > "$PR_PROBE"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$PR_LOG"; }
         for fn in priority_check_interval priority_clash_setup priority_select_for_section _priority_warn_once \
@@ -18151,7 +18151,7 @@ test_priority_selection() {
 
         # a whole cycle: sections that do not fit the budget go first next time
         config_foreach() { local _cb="$1" _s; shift; for _s in $PR_SECTIONS; do "$_cb" "$_s" "$@"; done; }
-        PR_ORDER="/tmp/netshift-prio-order-$$"; : > "$PR_ORDER"
+        PR_ORDER="/tmp/postq-prio-order-$$"; : > "$PR_ORDER"
         priority_select_for_section() { echo "$1" >> "$PR_ORDER"; }
         PR_MODE=1; PR_SECTIONS="a b c"; PR_NOW=B; PR_ALL=A; PR_NOCLASH=""
         PRIORITY_CYCLE_BUDGET=3600; PRIORITY_RESUME=0
@@ -18224,7 +18224,7 @@ test_priority_selection() {
 
 # Test: Bypass sing-box for excluded destinations / devices
 # ─────────────────────────────────────────────────────────────────
-# Runs the REAL nft_select_subnet_target / populate_netshift_subnets_from_file /
+# Runs the REAL nft_select_subnet_target / populate_postq_subnets_from_file /
 # nft_bypass_requested / nft_bypass_source_ips (bin) and
 # nft_add_selective_marking_rules (nft.sh) against a recording `nft` stub. Asserts:
 #   - without bypass nothing changes: same rules, subnets go to the union set;
@@ -18237,29 +18237,29 @@ test_priority_selection() {
 test_bypass() {
     header "Bypass sing-box (excluded destinations / devices)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local nftsh="${NETSHIFT_LIB_DIR}/nft.sh"
-    if [ ! -r "$bin" ] || [ ! -r "$nftsh" ] || [ ! -r "${NETSHIFT_LIB_DIR}/constants.sh" ]; then
-        skip "netshift bin / nft.sh / constants.sh not found"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local nftsh="${POSTQ_LIB_DIR}/nft.sh"
+    if [ ! -r "$bin" ] || [ ! -r "$nftsh" ] || [ ! -r "${POSTQ_LIB_DIR}/constants.sh" ]; then
+        skip "postq bin / nft.sh / constants.sh not found"
         return
     fi
 
     local out
     out="$(
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
-        for fn in nft_select_subnet_target populate_netshift_subnets_from_file _nft_bypass_section_handler \
+        . "${POSTQ_LIB_DIR}/constants.sh"
+        for fn in nft_select_subnet_target populate_postq_subnets_from_file _nft_bypass_section_handler \
             nft_bypass_requested _nft_bypass_source_ip_handler nft_bypass_source_ips; do
             eval "$(awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
         done
         # nft_bypass_source_ips reads routing_excluded_ips through the scalar-aware
         # wrapper, which lives in helpers.sh (the bin sources it at runtime).
-        eval "$(awk -v f="netshift_config_list_foreach" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "${NETSHIFT_LIB_DIR}/helpers.sh")"
+        eval "$(awk -v f="postq_config_list_foreach" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "${POSTQ_LIB_DIR}/helpers.sh")"
         eval "$(awk '/^nft_add_selective_marking_rules\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$nftsh")"
-        BP_LOGF="/tmp/netshift-bypass-log-$$"; : > "$BP_LOGF"
+        BP_LOGF="/tmp/postq-bypass-log-$$"; : > "$BP_LOGF"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$BP_LOGF"; }
         section_is_disabled() { [ "${BP_DISABLED:-}" = "$1" ]; }
 
-        NFT_LOG="/tmp/netshift-bypass-$$"; : > "$NFT_LOG"
+        NFT_LOG="/tmp/postq-bypass-$$"; : > "$NFT_LOG"
         nft() {
             case "$1 $2" in
             "list set") return 0 ;;
@@ -18269,7 +18269,7 @@ test_bypass() {
         nft_add_set_elements_from_file_chunked() { echo "fill4 $3" >> "$NFT_LOG"; }
         nft_add_set_elements_from_file_chunked_v6() { echo "fill6 $3" >> "$NFT_LOG"; }
         V6=0
-        netshift_ipv6_enabled() { [ "$V6" = 1 ]; }
+        postq_ipv6_enabled() { [ "$V6" = 1 ]; }
 
         # UCI stubs: BP_<section>_<option>; sections list in BP_SECTIONS
         config_get() { eval "$1=\"\${BP_${2}_${3}:-$4}\""; }
@@ -18297,15 +18297,15 @@ test_bypass() {
         echo "target-no-leak:$NFT_SUBNET_SET"
 
         # populate follows the target (and the default when nothing was selected)
-        tmp="/tmp/netshift-bypass-list-$$"; echo 1.2.3.0/24 > "$tmp"
-        : > "$NFT_LOG"; nft_select_subnet_target ex_bypass; populate_netshift_subnets_from_file "$tmp"
+        tmp="/tmp/postq-bypass-list-$$"; echo 1.2.3.0/24 > "$tmp"
+        : > "$NFT_LOG"; nft_select_subnet_target ex_bypass; populate_postq_subnets_from_file "$tmp"
         echo "populate-bypass:$(tr '\n' ',' < "$NFT_LOG")"
-        V6=1; : > "$NFT_LOG"; populate_netshift_subnets_from_file "$tmp"
+        V6=1; : > "$NFT_LOG"; populate_postq_subnets_from_file "$tmp"
         echo "populate-bypass-v6:$(tr '\n' ',' < "$NFT_LOG")"
-        : > "$NFT_LOG"; nft_select_subnet_target prox; populate_netshift_subnets_from_file "$tmp"
+        : > "$NFT_LOG"; nft_select_subnet_target prox; populate_postq_subnets_from_file "$tmp"
         echo "populate-union:$(tr '\n' ',' < "$NFT_LOG")"
         V6=0; unset NFT_SUBNET_SET NFT_SUBNET_SET_V6
-        : > "$NFT_LOG"; populate_netshift_subnets_from_file "$tmp"
+        : > "$NFT_LOG"; populate_postq_subnets_from_file "$tmp"
         echo "populate-default-unselected:$(tr '\n' ',' < "$NFT_LOG")"
         rm -f "$tmp"
 
@@ -18365,14 +18365,14 @@ test_bypass() {
         fi
     }
 
-    _bp_check "exclusion section with bypass_singbox targets the bypass sets" "target-bypass-section:netshift_bypass/netshift_bypass_v6/1"
-    _bp_check "an exclusion section without the flag keeps the union set" "target-plain-exclusion:netshift_subnets/0"
-    _bp_check "the flag is ignored outside exclusion sections" "target-proxy-section-ignores-flag:netshift_subnets/0"
-    _bp_check "the choice does not leak into the next section" "target-no-leak:netshift_subnets"
-    _bp_check "subnets of a bypass section fill the bypass set" "populate-bypass:fill4 netshift_bypass,"
-    _bp_check "IPv6 subnets fill the v6 bypass set too" "populate-bypass-v6:fill4 netshift_bypass,fill6 netshift_bypass_v6,"
-    _bp_check "other sections still fill the union set" "populate-union:fill4 netshift_subnets,fill6 netshift_subnets_v6,"
-    _bp_check "without any selection the union set is the default" "populate-default-unselected:fill4 netshift_subnets,"
+    _bp_check "exclusion section with bypass_singbox targets the bypass sets" "target-bypass-section:postq_bypass/postq_bypass_v6/1"
+    _bp_check "an exclusion section without the flag keeps the union set" "target-plain-exclusion:postq_subnets/0"
+    _bp_check "the flag is ignored outside exclusion sections" "target-proxy-section-ignores-flag:postq_subnets/0"
+    _bp_check "the choice does not leak into the next section" "target-no-leak:postq_subnets"
+    _bp_check "subnets of a bypass section fill the bypass set" "populate-bypass:fill4 postq_bypass,"
+    _bp_check "IPv6 subnets fill the v6 bypass set too" "populate-bypass-v6:fill4 postq_bypass,fill6 postq_bypass_v6,"
+    _bp_check "other sections still fill the union set" "populate-union:fill4 postq_subnets,fill6 postq_subnets_v6,"
+    _bp_check "without any selection the union set is the default" "populate-default-unselected:fill4 postq_subnets,"
     _bp_check "a section asks for bypass" "requested-section:yes"
     _bp_check "no flag anywhere: not requested" "requested-none:no"
     _bp_check "bypass_excluded_ips alone requests it" "requested-ips-flag:yes"
@@ -18399,24 +18399,24 @@ test_bypass() {
 test_dns_forward() {
     header "DNS forwarding by zone"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$lib/dnsforward.sh" ] || [ ! -r "$bin" ]; then
-        fail "dnsforward.sh / netshift bin not found"
+        fail "dnsforward.sh / postq bin not found"
         return
     fi
 
-    local drv="/tmp/netshift-dnsforward-$$.sh"
+    local drv="/tmp/postq-dnsforward-$$.sh"
     cat > "$drv" << 'DFEOF'
-LIB="NETSHIFT_LIB"
+LIB="POSTQ_LIB"
 . "$LIB/constants.sh"
 . "$LIB/helpers.sh"
-DF_LOG="/tmp/netshift-dnsforward-log-$$"; : > "$DF_LOG"
+DF_LOG="/tmp/postq-dnsforward-log-$$"; : > "$DF_LOG"
 log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$DF_LOG"; }
 # stubs: the list of the settings section and the user_domains of one section
 DF_FORWARD=""
 DF_DOMAINS=""
-netshift_config_list_foreach() {
+postq_config_list_foreach() {
     local _handler="$3" _item _list
     case "$2" in
     dns_forward) _list="$DF_FORWARD" ;;
@@ -18473,7 +18473,7 @@ dns_forward_apply
 echo "empty-apply:[$DF_ADDED]"
 rm -f "$DF_LOG"
 DFEOF
-    sed -i "s|NETSHIFT_LIB|$lib|" "$drv"
+    sed -i "s|POSTQ_LIB|$lib|" "$drv"
     local out
     out="$(ash "$drv" 2>&1)"
     rm -f "$drv"
@@ -18516,7 +18516,7 @@ DFEOF
     else
         fail "dns_forward_apply is not wired into dnsmasq_configure"
     fi
-    if awk '/^dnsmasq_configure\(\)/{f=1} f&&/dns_forward_apply/{a=NR} f&&/netshift_configured" 1/{b=NR} f&&/^}/{exit} END{exit !(a&&b&&a<b)}' "$bin"; then
+    if awk '/^dnsmasq_configure\(\)/{f=1} f&&/dns_forward_apply/{a=NR} f&&/postq_configured" 1/{b=NR} f&&/^}/{exit} END{exit !(a&&b&&a<b)}' "$bin"; then
         pass "forwards are added before the ownership sentinel and the commit"
     else
         fail "dns_forward_apply is misplaced in dnsmasq_configure"
@@ -18528,31 +18528,31 @@ DFEOF
     fi
 
     # End to end on a real uci: the real dnsmasq_configure / dnsmasq_restore
-    local e2e="/tmp/netshift-dnsforward-e2e-$$.sh" e2e_out
+    local e2e="/tmp/postq-dnsforward-e2e-$$.sh" e2e_out
     {
         cat << 'E2EOF'
 . /lib/functions.sh
 . /lib/config/uci.sh
-LIB="NETSHIFT_LIB"
+LIB="POSTQ_LIB"
 . "$LIB/constants.sh"
 . "$LIB/helpers.sh"
 log() { :; }
 . "$LIB/dnsforward.sh"
 file_exists() { [ -f "$1" ]; }
 E2EOF
-        for fn in backup_dnsmasq_config_option uci_remove_quiet dnsmasq_is_configured_for_netshift dnsmasq_has_backup dnsmasq_configure dnsmasq_restore; do
+        for fn in backup_dnsmasq_config_option uci_remove_quiet dnsmasq_is_configured_for_postq dnsmasq_has_backup dnsmasq_configure dnsmasq_restore; do
             awk -v fn="$fn" '$0 ~ "^"fn"\\(\\) \\{"{f=1} f{print} f&&/^}/{exit}' "$bin"
         done | sed 's|/etc/init.d/dnsmasq restart|:|'
         cat << 'E2EOF'
 cp /etc/config/dhcp /tmp/dhcp.e2e.bak
-: > /etc/config/netshift
-uci -q set netshift.settings=settings
-uci -q set netshift.settings.shutdown_correctly=0
-uci -q add_list netshift.settings.dns_forward='ru 77.88.8.8'
-uci -q add_list netshift.settings.dns_forward='corp.example 10.0.0.53#5353'
-uci -q add_list netshift.settings.dns_forward='broken entry'
-uci -q commit netshift
-config_load netshift
+: > /etc/config/postq
+uci -q set postq.settings=settings
+uci -q set postq.settings.shutdown_correctly=0
+uci -q add_list postq.settings.dns_forward='ru 77.88.8.8'
+uci -q add_list postq.settings.dns_forward='corp.example 10.0.0.53#5353'
+uci -q add_list postq.settings.dns_forward='broken entry'
+uci -q commit postq
+config_load postq
 
 uci -q delete dhcp.@dnsmasq[0].server
 uci -q add_list dhcp.@dnsmasq[0].server='/office.lan/10.1.1.1'
@@ -18563,33 +18563,33 @@ uci -q commit dhcp
 dnsmasq_configure force
 echo "running:$(uci -q get dhcp.@dnsmasq[0].server | tr ' ' ',')"
 echo "noresolv:$(uci -q get dhcp.@dnsmasq[0].noresolv)"
-echo "sentinel:$(uci -q get dhcp.@dnsmasq[0].netshift_configured)"
-echo "backup:$(uci -q get dhcp.@dnsmasq[0].netshift_server | tr ' ' ',')"
+echo "sentinel:$(uci -q get dhcp.@dnsmasq[0].postq_configured)"
+echo "backup:$(uci -q get dhcp.@dnsmasq[0].postq_server | tr ' ' ',')"
 
 dnsmasq_restore
 echo "restored:$(uci -q get dhcp.@dnsmasq[0].server | tr ' ' ',')"
 echo "noresolv-after:$(uci -q get dhcp.@dnsmasq[0].noresolv)"
-echo "sentinel-after:[$(uci -q get dhcp.@dnsmasq[0].netshift_configured)]"
-echo "backup-after:[$(uci -q get dhcp.@dnsmasq[0].netshift_server)]"
+echo "sentinel-after:[$(uci -q get dhcp.@dnsmasq[0].postq_configured)]"
+echo "backup-after:[$(uci -q get dhcp.@dnsmasq[0].postq_server)]"
 
 # no forwards: the list is only the sing-box inbound
-uci -q delete netshift.settings.dns_forward
-uci -q commit netshift
-config_load netshift
+uci -q delete postq.settings.dns_forward
+uci -q commit postq
+config_load postq
 dnsmasq_configure force
 echo "running-empty:$(uci -q get dhcp.@dnsmasq[0].server | tr ' ' ',')"
 dnsmasq_restore
 cp /tmp/dhcp.e2e.bak /etc/config/dhcp
-rm -f /tmp/dhcp.e2e.bak /etc/config/netshift
+rm -f /tmp/dhcp.e2e.bak /etc/config/postq
 E2EOF
     } > "$e2e"
-    sed -i "s|NETSHIFT_LIB|$lib|" "$e2e"
+    sed -i "s|POSTQ_LIB|$lib|" "$e2e"
     e2e_out="$(ash "$e2e" 2>&1)"
     rm -f "$e2e"
     out="$e2e_out"
 
     _df_check "e2e: sing-box inbound first, then the forwards, the user's own entries aside" running "127.0.0.42,/ru/77.88.8.8,/corp.example/10.0.0.53#5353"
-    _df_check "e2e: noresolv is on while NetShift runs" noresolv 1
+    _df_check "e2e: noresolv is on while PostQ runs" noresolv 1
     _df_check "e2e: the ownership sentinel is set" sentinel 1
     _df_check "e2e: the admin's own server list is backed up" backup "/office.lan/10.1.1.1,9.9.9.9"
     _df_check "e2e: restore returns exactly the admin's server list" restored "/office.lan/10.1.1.1,9.9.9.9"
@@ -18609,14 +18609,14 @@ test_domain_rule_prefixes() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$lib/helpers.sh" ] || [ ! -r "$lib/rulesets.sh" ] || [ ! -r "$bin" ]; then
         fail "helpers.sh / rulesets.sh / bin not found"
         return
     fi
 
-    local work="/tmp/netshift-domrules-$$"
+    local work="/tmp/postq-domrules-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -18774,13 +18774,13 @@ test_route_check() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/routecheck.sh" ] || [ ! -r "$lib/helpers.sh" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "routecheck.sh / helpers.sh / constants.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-routecheck-$$"
+    local work="/tmp/postq-routecheck-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -18932,19 +18932,19 @@ test_route_check() {
 test_subscription_param_filters() {
     header "Subscription filters by protocol, transport and security"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="${NETSHIFT_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$bin" ] || [ ! -r "$lib/constants.sh" ] || [ ! -r "$lib/sing_box_config_facade.sh" ] || ! command -v jq > /dev/null 2>&1; then
-        skip "netshift bin / libs / jq not found"
+        skip "postq bin / libs / jq not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
-    local work="/tmp/netshift-paramf-$$"
+    local work="/tmp/postq-paramf-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -19071,21 +19071,21 @@ test_ecs_auto() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$lib/ecs.sh" ] || [ ! -r "$lib/helpers.sh" ] || [ ! -r "$lib/constants.sh" ] || [ ! -r "$bin" ]; then
         fail "ecs.sh / helpers.sh / constants.sh / bin not found"
         return
     fi
 
-    local work="/tmp/netshift-ecsauto-$$"
+    local work="/tmp/postq-ecsauto-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local out
     out="$(
@@ -19094,13 +19094,13 @@ test_ecs_auto() {
         . "$lib/sing_box_config_manager.sh"
         . "$lib/sing_box_config_facade.sh"
         . "$lib/ecs.sh"
-        NETSHIFT_STATE_DIR="$work"
+        POSTQ_STATE_DIR="$work"
         ECS_CACHE_FILE="$work/ecs-external.json"
         LOG=""
         log() { LOG="${LOG}[$2] $1;"; }
         eval "$(awk '/^geoip_is_private_ip\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$bin")"
         eval "$(awk '/^sing_box_configure_dns\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$bin")"
-        eval "$(awk '/^netshift_ipv6_enabled\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$bin")"
+        eval "$(awk '/^postq_ipv6_enabled\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$bin")"
         eval "$(awk '/^_resolve_dns_outbound_tag\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$bin")"
         # the older helper is gone from the product (the routes made it unused): the test keeps its meaning
         _get_dns_detour_tag() { local _v; config_get_bool _v "settings" "dns_via_outbound" 0; [ "$_v" -eq 1 ] || return 0; _resolve_dns_outbound_tag; }
@@ -19277,14 +19277,14 @@ test_dns_servers_check() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "bin / constants.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-dnscheck-$$"
+    local work="/tmp/postq-dnscheck-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -19360,8 +19360,8 @@ test_connections_api() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "bin / constants.sh not found"
         return
@@ -19377,7 +19377,7 @@ test_connections_api() {
         config_get_bool() { eval "$1=0"; }
         snapshot_sing_box_cache() { :; }
 
-        CALLS_FILE="/tmp/netshift-conn-calls-$$"
+        CALLS_FILE="/tmp/postq-conn-calls-$$"
         : > "$CALLS_FILE"
         CONN='{"downloadTotal":5000,"uploadTotal":700,"memory":1,"connections":[
           {"id":"aaaa-1","start":"2026-10-06T10:00:00Z","upload":10,"download":20,"chains":["main-out"],"rule":"RuleSet","rulePayload":"main-ruleset",
@@ -19439,13 +19439,13 @@ test_lan_devices() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/lan.sh" ] || [ ! -r "$lib/helpers.sh" ]; then
         fail "lan.sh / helpers.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-lan-$$"
+    local work="/tmp/postq-lan-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -19488,9 +19488,9 @@ test_lan_devices() {
         echo "info=$(get_lan_info | jq -c '[.subnets, [.static_hosts[] | [.section, .macs, .ip, .name]]]')"
 
         echo "set-new=$(dhcp_host_set 'aa:bb:cc:00:00:10' 192.168.1.50 laptop | jq -c .)"
-        echo "stored=$(uci get dhcp.netshift_aabbcc000010.ip),$(uci get dhcp.netshift_aabbcc000010.name),$(uci get dhcp.netshift_aabbcc000010.mac)"
+        echo "stored=$(uci get dhcp.postq_aabbcc000010.ip),$(uci get dhcp.postq_aabbcc000010.name),$(uci get dhcp.postq_aabbcc000010.mac)"
         echo "set-update=$(dhcp_host_set 'AA:BB:CC:00:00:10' 192.168.1.51 | jq -c .)"
-        echo "updated=$(uci get dhcp.netshift_aabbcc000010.ip),$(uci get dhcp.netshift_aabbcc000010.name)"
+        echo "updated=$(uci get dhcp.postq_aabbcc000010.ip),$(uci get dhcp.postq_aabbcc000010.name)"
         echo "set-existing-entry=$(dhcp_host_set 'aa:bb:cc:00:00:01' 192.168.1.21 | jq -c .)"
         echo "existing-kept-section=$(uci get dhcp.existing.ip),$(uci get dhcp.existing.name)"
         echo "conflict-ip=$(dhcp_host_set 'aa:bb:cc:00:00:11' 192.168.1.21 | jq -c .error)"
@@ -19503,7 +19503,7 @@ test_lan_devices() {
         echo "reloads=$(wc -l < "$work/reloads" | tr -d ' ')"
 
         echo "remove=$(dhcp_host_remove 'aa:bb:cc:00:00:10' | jq -c .)"
-        uci -q get dhcp.netshift_aabbcc000010 > /dev/null && echo "after-remove=present" || echo "after-remove=gone"
+        uci -q get dhcp.postq_aabbcc000010 > /dev/null && echo "after-remove=present" || echo "after-remove=gone"
         echo "remove-missing=$(dhcp_host_remove 'aa:bb:cc:00:00:99' | jq -c .)"
         dhcp_host_remove 'aa:bb:cc:00:00:02' > /dev/null
         echo "multi-left=$(uci get dhcp.multi.mac)"
@@ -19524,9 +19524,9 @@ test_lan_devices() {
     _lv "MAC with dashes is normalized" "mac[aa-bb-cc-dd-ee-ff]=AA:BB:CC:DD:EE:FF"
     _lv "garbage MAC is refused" "mac[xyz]=bad"
     _lv "get_lan_info lists the static leases" 'info=[["10.8.0.0/16","192.168.1.0/24"],[["existing",["AA:BB:CC:00:00:01"],"192.168.1.20","printer"],["multi",["AA:BB:CC:00:00:02","AA:BB:CC:00:00:03"],"192.168.1.30",""]]]'
-    _lv "a new lease is created" 'set-new={"ok":true,"section":"netshift_aabbcc000010"}'
+    _lv "a new lease is created" 'set-new={"ok":true,"section":"postq_aabbcc000010"}'
     _lv "the lease is stored" "stored=192.168.1.50,laptop,AA:BB:CC:00:00:10"
-    _lv "the same MAC updates the lease" 'set-update={"ok":true,"section":"netshift_aabbcc000010"}'
+    _lv "the same MAC updates the lease" 'set-update={"ok":true,"section":"postq_aabbcc000010"}'
     _lv "update keeps the name" "updated=192.168.1.51,laptop"
     _lv "an entry made elsewhere is edited in place" 'set-existing-entry={"ok":true,"section":"existing"}'
     _lv "...and keeps its name" "existing-kept-section=192.168.1.21,printer"
@@ -19556,13 +19556,13 @@ test_update_notice() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/update_notice.sh" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "update_notice.sh / constants.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-notice-$$"
+    local work="/tmp/postq-notice-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -19572,7 +19572,7 @@ test_update_notice() {
         . "$lib/update_notice.sh"
         UPDATE_NOTICE_FILE="$work/notice.json"
         # the versions the router runs; the stored answers are made for them
-        NETSHIFT_VERSION="0.9.10"
+        POSTQ_VERSION="0.9.10"
         SB_NOW="1.12.0-extended-1"
         get_sing_box_version() { echo "$SB_NOW"; }
 
@@ -19581,17 +19581,17 @@ test_update_notice() {
         NS_JSON='{"success":true,"current_version":"0.9.10","latest_version":"0.9.12","status":"outdated"}'
         SB_JSON='{"success":true,"current_version":"1.12.0-extended-1","latest_version":"1.12.0-extended-2","status":"outdated"}'
         VARIANT=extended_lite
-        updates_check_netshift() { printf '%s\n' "$NS_JSON"; }
+        updates_check_postq() { printf '%s\n' "$NS_JSON"; }
         updates_check_sing_box_extended() { echo "EXT-CALLED" >> "$work/calls"; printf '%s\n' "$SB_JSON"; }
         updates_check_sing_box_lite() { echo "LITE-CALLED" >> "$work/calls"; printf '%s\n' "$SB_JSON"; }
         get_sing_box_variant() { echo "$VARIANT"; }
 
-        echo "no-file=$(get_update_notice | jq -c '[.enabled, .stale, .checked, .netshift, .sing_box]')"
+        echo "no-file=$(get_update_notice | jq -c '[.enabled, .stale, .checked, .postq, .sing_box]')"
 
         update_notice_refresh
-        echo "stored=$(jq -c '[.netshift.latest_version, .sing_box.latest_version, (.checked > 1700000000)]' "$UPDATE_NOTICE_FILE")"
+        echo "stored=$(jq -c '[.postq.latest_version, .sing_box.latest_version, (.checked > 1700000000)]' "$UPDATE_NOTICE_FILE")"
         echo "lite-asked=$(cat "$work/calls")"
-        echo "fresh=$(get_update_notice | jq -c '[.enabled, .stale, .netshift.status, .sing_box.status]')"
+        echo "fresh=$(get_update_notice | jq -c '[.enabled, .stale, .postq.status, .sing_box.status]')"
 
         # an old answer is stale
         jq -c '.checked = 1000' "$UPDATE_NOTICE_FILE" > "$work/old" && mv "$work/old" "$UPDATE_NOTICE_FILE"
@@ -19604,66 +19604,66 @@ test_update_notice() {
         # stock core: no GitHub check for it
         rm -f "$work/calls"; VARIANT=stock
         update_notice_refresh
-        echo "stock=$(jq -c '[.netshift.latest_version, .sing_box]' "$UPDATE_NOTICE_FILE")"
+        echo "stock=$(jq -c '[.postq.latest_version, .sing_box]' "$UPDATE_NOTICE_FILE")"
         echo "stock-calls=$(cat "$work/calls" 2> /dev/null | wc -l | tr -d ' ')"
         VARIANT=extended
         update_notice_refresh
         echo "extended-asked=$(cat "$work/calls")"
 
         # GitHub unreachable: the previous answer stays, only the time moves
-        updates_check_netshift() { echo '{"success":false,"message":"unreachable"}'; return 1; }
+        updates_check_postq() { echo '{"success":false,"message":"unreachable"}'; return 1; }
         updates_check_sing_box_extended() { echo '{"success":false}'; return 1; }
         jq -c '.checked = 1000' "$UPDATE_NOTICE_FILE" > "$work/old" && mv "$work/old" "$UPDATE_NOTICE_FILE"
         update_notice_refresh
-        echo "offline-kept=$(jq -c '[.netshift.latest_version, (.checked > 1700000000)]' "$UPDATE_NOTICE_FILE")"
+        echo "offline-kept=$(jq -c '[.postq.latest_version, (.checked > 1700000000)]' "$UPDATE_NOTICE_FILE")"
         echo "offline-not-stale=$(get_update_notice | jq -c '.stale')"
 
         # nothing known and unreachable: an answer with nulls, not a broken file
         rm -f "$UPDATE_NOTICE_FILE"
         update_notice_refresh
-        echo "empty=$(jq -c '[.netshift, .sing_box]' "$UPDATE_NOTICE_FILE")"
+        echo "empty=$(jq -c '[.postq, .sing_box]' "$UPDATE_NOTICE_FILE")"
 
         # garbage in the file is read as "nothing known"
         echo 'not json' > "$UPDATE_NOTICE_FILE"
-        echo "garbage=$(get_update_notice | jq -c '[.stale, .netshift]')"
+        echo "garbage=$(get_update_notice | jq -c '[.stale, .postq]')"
 
         # an answer made for another version: after an update the notice must not keep
         # offering the old step (the answer is kept for a day)
-        printf '%s\n' '{"checked":'"$(date +%s)"',"netshift":{"success":true,"current_version":"0.9.10","latest_version":"0.9.12","status":"outdated"},"sing_box":{"success":true,"current_version":"1.12.0-extended-1","latest_version":"1.12.0-extended-2","status":"outdated"}}' > "$UPDATE_NOTICE_FILE"
-        echo "same-version=$(get_update_notice | jq -c '[.stale, .netshift.latest_version, .sing_box.latest_version]')"
-        NETSHIFT_VERSION="0.9.12"
-        echo "netshift-updated=$(get_update_notice | jq -c '[.stale, .netshift, .sing_box.latest_version]')"
-        NETSHIFT_VERSION="0.9.10"; SB_NOW="1.12.0-extended-2"
-        echo "core-updated=$(get_update_notice | jq -c '[.stale, .netshift.latest_version, .sing_box]')"
+        printf '%s\n' '{"checked":'"$(date +%s)"',"postq":{"success":true,"current_version":"0.9.10","latest_version":"0.9.12","status":"outdated"},"sing_box":{"success":true,"current_version":"1.12.0-extended-1","latest_version":"1.12.0-extended-2","status":"outdated"}}' > "$UPDATE_NOTICE_FILE"
+        echo "same-version=$(get_update_notice | jq -c '[.stale, .postq.latest_version, .sing_box.latest_version]')"
+        POSTQ_VERSION="0.9.12"
+        echo "postq-updated=$(get_update_notice | jq -c '[.stale, .postq, .sing_box.latest_version]')"
+        POSTQ_VERSION="0.9.10"; SB_NOW="1.12.0-extended-2"
+        echo "core-updated=$(get_update_notice | jq -c '[.stale, .postq.latest_version, .sing_box]')"
         SB_NOW="1.12.0-extended-1"
         # ...and with GitHub unreachable right after the update: the refresh keeps nothing that
         # names the old version, so the next page load does not ask for a refresh again
-        updates_check_netshift() { echo '{"success":false}'; return 1; }
+        updates_check_postq() { echo '{"success":false}'; return 1; }
         updates_check_sing_box_lite() { echo '{"success":false}'; return 1; }
         VARIANT=extended_lite
-        printf '%s\n' '{"checked":1000,"netshift":{"success":true,"current_version":"0.9.10","latest_version":"0.9.12","status":"outdated"},"sing_box":{"success":true,"current_version":"1.12.0-extended-1","latest_version":"1.12.0-extended-2","status":"outdated"}}' > "$UPDATE_NOTICE_FILE"
-        NETSHIFT_VERSION="0.9.12"
+        printf '%s\n' '{"checked":1000,"postq":{"success":true,"current_version":"0.9.10","latest_version":"0.9.12","status":"outdated"},"sing_box":{"success":true,"current_version":"1.12.0-extended-1","latest_version":"1.12.0-extended-2","status":"outdated"}}' > "$UPDATE_NOTICE_FILE"
+        POSTQ_VERSION="0.9.12"
         update_notice_refresh
-        echo "offline-after-update=$(get_update_notice | jq -c '[.stale, .netshift, .sing_box.latest_version]')"
-        NETSHIFT_VERSION="0.9.10"
-        updates_check_netshift() { printf '%s\n' "$NS_JSON"; }
+        echo "offline-after-update=$(get_update_notice | jq -c '[.stale, .postq, .sing_box.latest_version]')"
+        POSTQ_VERSION="0.9.10"
+        updates_check_postq() { printf '%s\n' "$NS_JSON"; }
         updates_check_sing_box_lite() { echo "LITE-CALLED" >> "$work/calls"; printf '%s\n' "$SB_JSON"; }
         # no answer at all and GitHub unreachable: the checks are asked once, not twice
         rm -f "$UPDATE_NOTICE_FILE" "$work/calls"
         updates_check_sing_box_lite() { echo "LITE-CALLED" >> "$work/calls"; echo '{"success":false}'; return 1; }
-        updates_check_netshift() { echo '{"success":false}'; return 1; }
+        updates_check_postq() { echo '{"success":false}'; return 1; }
         update_notice_refresh
         echo "offline-asked-once=$(grep -c LITE-CALLED "$work/calls")"
-        updates_check_netshift() { printf '%s\n' "$NS_JSON"; }
+        updates_check_postq() { printf '%s\n' "$NS_JSON"; }
         updates_check_sing_box_lite() { echo "LITE-CALLED" >> "$work/calls"; printf '%s\n' "$SB_JSON"; }
 
         # the background refresh: starts once, a second call while it runs does nothing
         rm -f "$UPDATE_NOTICE_FILE" "$UPDATE_NOTICE_FILE.lock"
-        updates_check_netshift() { sleep 2; printf '%s\n' "$NS_JSON"; }
+        updates_check_postq() { sleep 2; printf '%s\n' "$NS_JSON"; }
         echo "async-first=$(update_notice_refresh_async)"
         echo "async-second=$(update_notice_refresh_async)"
         sleep 4
-        echo "async-done=$(jq -c '.netshift.latest_version' "$UPDATE_NOTICE_FILE")"
+        echo "async-done=$(jq -c '.postq.latest_version' "$UPDATE_NOTICE_FILE")"
         echo "async-lock-removed=$([ -e "$UPDATE_NOTICE_FILE.lock" ] && echo no || echo yes)"
     )"
 
@@ -19683,7 +19683,7 @@ test_update_notice() {
     _un "nothing known and unreachable gives empty parts" "empty=[null,null]"
     _un "a broken file reads as nothing known" "garbage=[true,null]"
     _un "an answer for the installed versions is shown" 'same-version=[false,"0.9.12","1.12.0-extended-2"]'
-    _un "after a NetShift update its old answer is dropped and a refresh is due" 'netshift-updated=[true,null,"1.12.0-extended-2"]'
+    _un "after a PostQ update its old answer is dropped and a refresh is due" 'postq-updated=[true,null,"1.12.0-extended-2"]'
     _un "after a core update its old answer is dropped and a refresh is due" 'core-updated=[true,"0.9.12",null]'
     _un "offline right after an update: the old part is gone and no refresh is asked for again" 'offline-after-update=[false,null,"1.12.0-extended-2"]'
     _un "nothing known and GitHub unreachable: the checks run once" "offline-asked-once=1"
@@ -19704,13 +19704,13 @@ test_config_snapshots() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/snapshots.sh" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "snapshots.sh / constants.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-snap-$$"
+    local work="/tmp/postq-snap-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -19719,10 +19719,10 @@ test_config_snapshots() {
         . "$lib/constants.sh"
         . "$lib/snapshots.sh"
         SNAPSHOT_DIR="$work/snapshots"
-        NETSHIFT_CONFIG_FILE="$work/netshift"
+        POSTQ_CONFIG_FILE="$work/postq"
         SNAPSHOT_KEEP=3
 
-        cfg() { printf "config settings 'settings'\n\toption dns_type '%s'\n\nconfig section 'main'\n\toption connection_type 'proxy'\n" "$1" > "$NETSHIFT_CONFIG_FILE"; }
+        cfg() { printf "config settings 'settings'\n\toption dns_type '%s'\n\nconfig section 'main'\n\toption connection_type 'proxy'\n" "$1" > "$POSTQ_CONFIG_FILE"; }
         # a clock that moves one second per call, so the order is the order of the calls
         echo 1790000000 > "$work/tick"
         date() { local n; n="$(cat "$work/tick")"; n=$((n + 1)); echo "$n" > "$work/tick"; echo "$n"; }
@@ -19749,11 +19749,11 @@ test_config_snapshots() {
         newest="$(snapshot_list | jq -r '.snapshots[1].id')"
         cfg doq
         echo "restore=$(snapshot_restore "$newest" | jq -c '.ok')"
-        echo "restored=$(sed -n "s/.*dns_type '\\(.*\\)'.*/\\1/p" "$NETSHIFT_CONFIG_FILE")"
+        echo "restored=$(sed -n "s/.*dns_type '\\(.*\\)'.*/\\1/p" "$POSTQ_CONFIG_FILE")"
         echo "before-restore=$(snapshot_list | jq -c '[.snapshots[] | select(.label == "before-restore")] | length')"
         echo "before-restore-holds-doq=$(for f in "$SNAPSHOT_DIR"/*before-restore.conf; do sed -n "s/.*dns_type '\\(.*\\)'.*/\\1/p" "$f"; done | head -1)"
 
-        echo "config-mode=$(ls -l "$NETSHIFT_CONFIG_FILE" | cut -c1-10)"
+        echo "config-mode=$(ls -l "$POSTQ_CONFIG_FILE" | cut -c1-10)"
         echo "dir-mode=$(ls -ld "$SNAPSHOT_DIR" | cut -c1-10)"
 
         # a clock that is behind (no time sync yet at boot) does not put a new snapshot before the newest
@@ -19770,7 +19770,7 @@ test_config_snapshots() {
         echo "missing=$(snapshot_restore '1-auto' | jq -c '.error')"
         printf 'not a uci file {{{' > "$SNAPSHOT_DIR/1790009999-manual.conf"
         echo "unusable=$(snapshot_restore '1790009999-manual' | jq -c '.error')"
-        echo "config-untouched=$(sed -n "s/.*dns_type '\\(.*\\)'.*/\\1/p" "$NETSHIFT_CONFIG_FILE")"
+        echo "config-untouched=$(sed -n "s/.*dns_type '\\(.*\\)'.*/\\1/p" "$POSTQ_CONFIG_FILE")"
     )"
 
     _sn() { expect_line "$out" "$1" "$2"; }
@@ -19811,13 +19811,13 @@ test_pin_guard() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/pinguard.sh" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "pinguard.sh / constants.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-pinguard-$$"
+    local work="/tmp/postq-pinguard-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -19952,13 +19952,13 @@ test_dns_benchmark() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/dnsbench.sh" ] || [ ! -r "$lib/helpers.sh" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "dnsbench.sh / helpers.sh / constants.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-bench-$$"
+    local work="/tmp/postq-bench-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -20235,10 +20235,10 @@ CFG
 test_urltest_interval() {
     header "URLTest check interval"
 
-    local cm_lib="${NETSHIFT_LIB_DIR}/sing_box_config_manager.sh"
-    local constants_lib="${NETSHIFT_LIB_DIR}/constants.sh"
-    local ui="${NETSHIFT_SRC}/../luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js"
-    [ -r "$ui" ] || ui="/luci-app-netshift/htdocs/luci-static/resources/view/netshift/section.js"
+    local cm_lib="${POSTQ_LIB_DIR}/sing_box_config_manager.sh"
+    local constants_lib="${POSTQ_LIB_DIR}/constants.sh"
+    local ui="${POSTQ_SRC}/../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js"
+    [ -r "$ui" ] || ui="/luci-app-postq/htdocs/luci-static/resources/view/postq/section.js"
     if [ ! -r "$cm_lib" ] || ! command -v jq > /dev/null 2>&1; then
         skip "config manager / jq not available"
         return
@@ -20285,7 +20285,7 @@ test_urltest_interval() {
     _ti "a compound interval this parser cannot read raises idle_timeout" "idle[1h30m]=1h30m"
 
     if sing-box version > /dev/null 2>&1; then
-        local cfg="/tmp/netshift-urltest-int-$$.json"
+        local cfg="/tmp/postq-urltest-int-$$.json"
         (
             . "$constants_lib"
             . "$cm_lib"
@@ -20301,7 +20301,7 @@ test_urltest_interval() {
         # `sing-box check` accepts a pair the core then refuses at start, so run
         # the core for a moment: a rejected config exits at once with
         # "interval must be less or equal than idle_timeout".
-        local run_out="" run_pid="" run_log="/tmp/netshift-urltest-run-$$.log"
+        local run_out="" run_pid="" run_log="/tmp/postq-urltest-run-$$.log"
         sing-box run -c "$cfg" > "$run_log" 2>&1 &
         run_pid=$!
         sleep 2
@@ -20332,16 +20332,16 @@ test_urltest_interval() {
 test_components_via_proxy() {
     header "Components via the service proxy"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local updater="${NETSHIFT_LIB_DIR}/updater.sh"
-    if [ ! -r "$bin" ] || [ ! -r "$updater" ] || [ ! -r "${NETSHIFT_LIB_DIR}/constants.sh" ]; then
-        skip "netshift bin / updater.sh / constants.sh not found"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local updater="${POSTQ_LIB_DIR}/updater.sh"
+    if [ ! -r "$bin" ] || [ ! -r "$updater" ] || [ ! -r "${POSTQ_LIB_DIR}/constants.sh" ]; then
+        skip "postq bin / updater.sh / constants.sh not found"
         return
     fi
 
     local out
     out="$(
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
+        . "${POSTQ_LIB_DIR}/constants.sh"
         for fn in service_proxy_needed get_service_proxy_address; do
             eval "$(awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
         done
@@ -20361,7 +20361,7 @@ test_components_via_proxy() {
             esac
         }
         # curl stub: records whether -x was used; CP_PROXY_OK=0 makes proxied calls fail
-        CPLOGF="/tmp/netshift-compproxy-log-$$"
+        CPLOGF="/tmp/postq-compproxy-log-$$"
         : > "$CPLOGF"
         curl() {
             local proxied=direct a out=""
@@ -20386,7 +20386,7 @@ test_components_via_proxy() {
             if [ -n "$2" ] && [ "${CP_PROXY_OK:-1}" = 0 ]; then return 22; fi
             echo "body"
         }
-        D="/tmp/netshift-compproxy-$$"
+        D="/tmp/postq-compproxy-$$"
         LOGRESET() { : > "$CPLOGF"; }
 
         for flags in "0 0:no" "1 0:yes" "0 1:yes" "1 1:yes"; do
@@ -20486,18 +20486,18 @@ test_components_via_proxy() {
 test_empty_link_sections() {
     header "Empty required link option in a section"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     local facade_lib="$lib/sing_box_config_facade.sh"
     if [ ! -r "$facade_lib" ] || [ ! -r "$bin" ]; then
         fail "facade lib / bin not found"
         return
     fi
 
-    # The facade sources helpers + manager from /usr/lib/netshift.
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    # The facade sources helpers + manager from /usr/lib/postq.
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
     local drv="/tmp/test-emptylink-$$.sh"
     local out="/tmp/test-emptylink-out-$$.txt"
@@ -20511,7 +20511,7 @@ log()     { printf '%s|%s\n' "${2:-info}" "$1" >> "$WARN_LOG"; }
 echolog() { printf '%s|%s\n' "${2:-info}" "$1" >> "$WARN_LOG"; }
 nolog()   { :; }
 
-set_section_reality_mlkem() { NETSHIFT_REALITY_MLKEM=0; }
+set_section_reality_mlkem() { POSTQ_REALITY_MLKEM=0; }
 tproxy_route_inbounds() { printf 'tproxy-in'; }
 
 eval "$(awk '/^mark_section_outbound_unavailable\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH")"
@@ -20642,8 +20642,8 @@ ELEOF
 test_scalar_option_fallback() {
     header "Scalar (non-list) value of a list option"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="${NETSHIFT_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$bin" ] || [ ! -r "$lib/constants.sh" ] || [ ! -r "$lib/helpers.sh" ]; then
         skip "scalar-option (bin / constants.sh / helpers.sh not found)"
         return
@@ -20653,7 +20653,7 @@ test_scalar_option_fallback() {
     # of them would silently break only one of the two paths (nft marks vs the
     # sing-box direct route rule).
     local wrapped unwrapped
-    wrapped="$(grep -c 'netshift_config_list_foreach "settings" "routing_excluded_ips"' "$bin" || true)"
+    wrapped="$(grep -c 'postq_config_list_foreach "settings" "routing_excluded_ips"' "$bin" || true)"
     unwrapped="$(grep -cE '(^|[^_])config_list_foreach "settings" "routing_excluded_ips"' "$bin" || true)"
     if [ "$wrapped" = "2" ] && [ "$unwrapped" = "0" ]; then
         pass "scalar:both-call-sites-wrapped — routing_excluded_ips is read through the wrapper twice"
@@ -20684,7 +20684,7 @@ for fn in nft_bypass_source_ips _nft_bypass_source_ip_handler \
 done
 
 NFT_TABLE_NAME="scalaropt_$$"
-netshift_ipv6_enabled() { return 1; }
+postq_ipv6_enabled() { return 1; }
 log() { printf 'LOG:%s\n' "$1"; }
 nolog() { :; }
 echolog() { printf 'ECHO:%s\n' "$1"; }
@@ -20740,7 +20740,7 @@ printf '%s' "$out_nft" | grep -q 'counter return' \
     || echo 'scalar-nft-return:FAIL'
 
 config=""
-netshift_config_list_foreach settings routing_excluded_ips \
+postq_config_list_foreach settings routing_excluded_ips \
     exclude_source_ip_from_routing_handler RULE1
 grep -q 'PATCH:tag=RULE1 field=source_ip_cidr value=10.0.0.5' "$PATCH_LOG" \
     && echo 'scalar-routing-direct-rule:OK' \
@@ -20766,7 +20766,7 @@ for ip in 10.0.0.11 10.0.0.12; do
 done
 
 : > "$PATCH_LOG"
-netshift_config_list_foreach settings routing_excluded_ips \
+postq_config_list_foreach settings routing_excluded_ips \
     exclude_source_ip_from_routing_handler RULE2
 n_patch="$(grep -c 'PATCH:tag=RULE2 field=source_ip_cidr' "$PATCH_LOG" || true)"
 [ "$n_patch" -eq 2 ] \
@@ -20816,19 +20816,19 @@ SCEOF
 test_dns_hijack() {
     header "DNS hijack"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    if [ ! -r "$bin" ] || [ ! -r "${NETSHIFT_LIB_DIR}/constants.sh" ]; then
-        skip "netshift bin / constants.sh not found"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    if [ ! -r "$bin" ] || [ ! -r "${POSTQ_LIB_DIR}/constants.sh" ]; then
+        skip "postq bin / constants.sh not found"
         return
     fi
 
     local out
     out="$(
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
+        . "${POSTQ_LIB_DIR}/constants.sh"
         eval "$(awk '/^nft_add_dns_hijack\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$bin")"
-        DH_LOG="/tmp/netshift-dnshijack-log-$$"; : > "$DH_LOG"
+        DH_LOG="/tmp/postq-dnshijack-log-$$"; : > "$DH_LOG"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$DH_LOG"; }
-        NFT_LOG="/tmp/netshift-dnshijack-$$"; : > "$NFT_LOG"
+        NFT_LOG="/tmp/postq-dnshijack-$$"; : > "$NFT_LOG"
         nft() { echo "$*" >> "$NFT_LOG"; }
         NFT_TABLE_NAME=T
         NFT_INTERFACE_SET_NAME=interfaces
@@ -20871,7 +20871,7 @@ test_dns_hijack() {
 
     # the generated rules are loaded as they are written (syntax of the real nft)
     if command -v nft > /dev/null 2>&1 && nft --version > /dev/null 2>&1; then
-        local ruleset="/tmp/netshift-dnshijack-$$.nft"
+        local ruleset="/tmp/postq-dnshijack-$$.nft"
         cat > "$ruleset" << 'NFTEOF'
 table inet T {
     set interfaces { type ifname; elements = { "br-lan" } }
@@ -20903,13 +20903,13 @@ test_subscription_info() {
         return
     fi
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$lib/subinfo.sh" ] || [ ! -r "$lib/constants.sh" ]; then
         fail "subinfo.sh / constants.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-subinfo-$$"
+    local work="/tmp/postq-subinfo-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -21018,22 +21018,22 @@ test_subscription_info() {
 test_port_rules() {
     header "Port rules (direct ports, proxy-only ports)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
     if [ ! -r "$bin" ] || [ ! -r "$lib/sing_box_config_manager.sh" ]; then
-        fail "netshift bin / config manager not found"
+        fail "postq bin / config manager not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
 
-    local work="/tmp/netshift-ports-test-$$"
+    local work="/tmp/postq-ports-test-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -21049,7 +21049,7 @@ test_port_rules() {
         done
         gen_id() { PR_N=$((${PR_N:-0} + 1)); echo "rule$PR_N"; }
         V6=0
-        netshift_ipv6_enabled() { [ "$V6" = 1 ]; }
+        postq_ipv6_enabled() { [ "$V6" = 1 ]; }
         config_get() { eval "$1=\"\${PR_${3}:-}\""; }
         config_get_bool() { eval "$1=\"\${PR_${3}:-$4}\""; }
         NFT_TABLE_NAME=T
@@ -21243,7 +21243,7 @@ test_port_rules() {
 test_config_lint() {
     header "Config warnings (DNS section shadowed by a routing section)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -21253,11 +21253,11 @@ test_config_lint() {
         return
     fi
 
-    local out lt_tmp="/tmp/netshift-lint-tmp-$$"
+    local out lt_tmp="/tmp/postq-lint-tmp-$$"
     out="$(
         . "$lib/constants.sh"
         . "$lib/helpers.sh"
-        LT_LOG="/tmp/netshift-lint-log-$$"; : > "$LT_LOG"
+        LT_LOG="/tmp/postq-lint-log-$$"; : > "$LT_LOG"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$LT_LOG"; }
         mkdir -p "$lt_tmp"
         TMPDIR="$lt_tmp"; export TMPDIR
@@ -21265,7 +21265,7 @@ test_config_lint() {
         section_is_disabled() { [ "${LT_DISABLED:-}" = "$1" ]; }
         config_foreach() { local _s; for _s in $LT_SECTIONS; do "$1" "$_s"; done; }
         config_get() { eval "$1=\"\${LT_${2}_${3}:-}\""; }
-        netshift_config_list_foreach() {
+        postq_config_list_foreach() {
             local _l _d
             eval "_l=\"\${LT_${1}_${2}:-}\""
             for _d in $_l; do "$3" "$_d"; done
@@ -21350,10 +21350,10 @@ test_config_lint() {
 
         # a fixed file in /tmp pointing elsewhere is not followed
         printf 'keep me\n' > "$lt_tmp/victim"
-        ln -s "$lt_tmp/victim" /tmp/netshift-lint.tmp
+        ln -s "$lt_tmp/victim" /tmp/postq-lint.tmp
         w > /dev/null
         echo "symlink-victim=$(cat "$lt_tmp/victim")"
-        rm -f /tmp/netshift-lint.tmp
+        rm -f /tmp/postq-lint.tmp
     )"
     rm -rf "$lt_tmp"
 
@@ -21386,23 +21386,23 @@ test_config_lint() {
 test_naive() {
     header "NaiveProxy links"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
-    if [ ! -r "$lib/naive.sh" ] || [ ! -r "$lib/sing_box_config_facade.sh" ] || [ ! -r "$lib/sing_box_config_manager.sh" ] || [ ! -r "${NETSHIFT_SRC}/etc/init.d/netshift-naive" ]; then
+    if [ ! -r "$lib/naive.sh" ] || [ ! -r "$lib/sing_box_config_facade.sh" ] || [ ! -r "$lib/sing_box_config_manager.sh" ] || [ ! -r "${POSTQ_SRC}/etc/init.d/postq-naive" ]; then
         fail "naive.sh / facade / manager / the init script not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
-    local work="/tmp/netshift-naive-test-$$"
+    local work="/tmp/postq-naive-test-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
 
@@ -21559,13 +21559,13 @@ test_naive() {
     _nv "a client that is not running after the start is reported" "apply-dead-client-reported=1"
     _nv "...and a running one is not" "apply-live-client-quiet=0"
 
-    if sh -n "${NETSHIFT_SRC}/etc/init.d/netshift-naive" 2> /dev/null; then
+    if sh -n "${POSTQ_SRC}/etc/init.d/postq-naive" 2> /dev/null; then
         pass "the init script has no syntax errors"
     else
         fail "the init script has a syntax error"
     fi
-    if [ -r "${NETSHIFT_SRC}/../Makefile" ]; then
-        if grep -q 'files/etc/init.d/netshift-naive' "${NETSHIFT_SRC}/../Makefile"; then
+    if [ -r "${POSTQ_SRC}/../Makefile" ]; then
+        if grep -q 'files/etc/init.d/postq-naive' "${POSTQ_SRC}/../Makefile"; then
             pass "the package installs the init script of the clients"
         else
             fail "the package installs the init script of the clients"
@@ -21587,7 +21587,7 @@ test_naive() {
     else
         fail "mangle_output returns the naive client uid before the marking rules" "uid at ${_uid_line:-none}, marking at ${_mark_line:-none}"
     fi
-    if grep -q 'procd_set_param user "\$NAIVE_CLIENT_USER"' "${NETSHIFT_SRC}/etc/init.d/netshift-naive" &&
+    if grep -q 'procd_set_param user "\$NAIVE_CLIENT_USER"' "${POSTQ_SRC}/etc/init.d/postq-naive" &&
         grep -q '^NAIVE_CLIENT_UID=' "$lib/constants.sh"; then
         pass "the init script runs the clients as the dedicated user"
     else
@@ -21672,7 +21672,7 @@ test_naive() {
 test_core_caps() {
     header "Core capabilities and feature gates"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -21682,12 +21682,12 @@ test_core_caps() {
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
-    local work="/tmp/netshift-caps-test-$$"
+    local work="/tmp/postq-caps-test-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
 
@@ -21734,27 +21734,27 @@ test_core_caps() {
         RL='vless://11111111-2222-3333-4444-555555555555@r.example.com:443?security=reality&pbk=KEYKEYKEY&sid=ab&fp=chrome&sni=r.example.com&type=tcp'
         TL='vless://11111111-2222-3333-4444-555555555555@t.example.com:443?security=tls&fp=chrome&sni=t.example.com&type=tcp'
 
-        NETSHIFT_SING_BOX_TAGS="with_quic,with_utls,with_clash_api"
+        POSTQ_SING_BOX_TAGS="with_quic,with_utls,with_clash_api"
         o="$(add s1 "$HY")"; echo "hy-quic=$(printf '%s' "$o" | jq -c '.outbounds | length')"
         o="$(add s1 "$RL")"; echo "reality-utls=$(printf '%s' "$o" | jq -c '.outbounds[0].tls.reality.enabled // false')"
-        NETSHIFT_SING_BOX_TAGS="with_clash_api,with_utls"
+        POSTQ_SING_BOX_TAGS="with_clash_api,with_utls"
         o="$(add s1 "$HY")"; rc=$?; echo "hy-noquic-rc=$rc unchanged=$([ "$o" = "$base" ] && echo yes || echo no)"
-        NETSHIFT_SING_BOX_TAGS="with_clash_api,with_quic"
+        POSTQ_SING_BOX_TAGS="with_clash_api,with_quic"
         o="$(add s1 "$RL")"; rc=$?; echo "reality-noutls-rc=$rc unchanged=$([ "$o" = "$base" ] && echo yes || echo no)"
         o="$(add s1 "$TL")"; rc=$?
         echo "tls-noutls=$rc $(printf '%s' "$o" | jq -c '.outbounds[0].tls | [.server_name, has("utls")]')"
-        NETSHIFT_SING_BOX_TAGS="with_clash_api,with_quic,with_utls"
+        POSTQ_SING_BOX_TAGS="with_clash_api,with_quic,with_utls"
         o="$(add s1 "$TL")"
         echo "tls-utls=$(printf '%s' "$o" | jq -c '.outbounds[0].tls.utls.fingerprint')"
-        NETSHIFT_SING_BOX_TAGS=""
+        POSTQ_SING_BOX_TAGS=""
         o="$(add s1 "$HY")"; echo "hy-unknown-tags=$(printf '%s' "$o" | jq -c '.outbounds | length')"
 
         # DNS transports over QUIC fall back where the core has no QUIC
         dns() { sing_box_cf_add_dns_server '{"dns":{"servers":[]}}' "$1" t "$2" "" ""; }
-        NETSHIFT_SING_BOX_TAGS="with_clash_api,with_utls"
+        POSTQ_SING_BOX_TAGS="with_clash_api,with_utls"
         echo "doh3-noquic=$(dns doh3 'dns.google/dns-query' | jq -c '.dns.servers[0] | [.type, .server_port, .path]')"
         echo "doq-noquic=$(dns doq 'dns.adguard-dns.com' | jq -c '.dns.servers[0] | [.type, .server_port]')"
-        NETSHIFT_SING_BOX_TAGS="with_clash_api,with_quic"
+        POSTQ_SING_BOX_TAGS="with_clash_api,with_quic"
         echo "doh3-quic=$(dns doh3 'dns.google/dns-query' | jq -c '.dns.servers[0] | [.type, .server_port]')"
         echo "doq-quic=$(dns doq 'dns.adguard-dns.com' | jq -c '.dns.servers[0] | [.type, .server_port]')"
         echo "warned=$(grep -c 'built without QUIC' "$CAPS_LOG")"
@@ -21784,22 +21784,22 @@ test_core_caps() {
 test_ipv6_dns_policy() {
     header "IPv6 answers of a section (ipv6_dns_policy=real)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
     if [ ! -r "$bin" ] || [ ! -r "$lib/sing_box_config_manager.sh" ]; then
-        fail "netshift bin / config manager not found"
+        fail "postq bin / config manager not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
 
-    local work="/tmp/netshift-ipv6dns-test-$$"
+    local work="/tmp/postq-ipv6dns-test-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -21814,7 +21814,7 @@ test_ipv6_dns_policy() {
             eval "$(awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
         done
         V6=1
-        netshift_ipv6_enabled() { [ "$V6" = 1 ]; }
+        postq_ipv6_enabled() { [ "$V6" = 1 ]; }
         config_get() { eval "$1=\"\${IP_${2}_${3}:-$4}\""; }
         section_is_disabled() { [ "${IP_DISABLED:-}" = "$1" ]; }
         section_has_enabled_lists() { [ "${IP_NOLISTS:-}" != "$1" ]; }
@@ -21928,7 +21928,7 @@ test_ipv6_dns_policy() {
 test_xhttp_extra() {
     header "XHTTP links: the extra (padding, post sizes, xmux) of the link"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -21938,12 +21938,12 @@ test_xhttp_extra() {
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
-    local work="/tmp/netshift-xhttpextra-test-$$"
+    local work="/tmp/postq-xhttpextra-test-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -21959,7 +21959,7 @@ test_xhttp_extra() {
         is_sing_box_extended() { return 0; }
         is_sing_box_extended_at_least() { return 0; }
         is_sing_box_at_least() { return 0; }
-        NETSHIFT_REALITY_MLKEM=0
+        POSTQ_REALITY_MLKEM=0
         U=29a8999e-3cff-4de5-8ae5-27645a3a6615
 
         tr_of() { sing_box_cf_add_proxy_outbound '{"outbounds":[]}' t "$1" 0 | jq -c '.outbounds[0].transport'; }
@@ -22047,10 +22047,10 @@ XJ
 test_quic_mode() {
     header "disable_quic: off, tunneled (the old flag) and all"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ]; then
-        fail "netshift bin not found"
+        fail "postq bin not found"
         return
     fi
 
@@ -22073,7 +22073,7 @@ test_quic_mode() {
 
         # the rule on the nft side, in the real nft: only the "all" mode writes it
         if command -v nft > /dev/null 2>&1; then
-            NFT_TABLE_NAME="NetShiftQuicTest$$"
+            NFT_TABLE_NAME="PostQQuicTest$$"
             NFT_INTERFACE_SET_NAME="interfaces"
             nft add table inet "$NFT_TABLE_NAME" 2> /dev/null &&
                 nft add set inet "$NFT_TABLE_NAME" "$NFT_INTERFACE_SET_NAME" '{ type ifname; }' &&
@@ -22109,14 +22109,14 @@ test_quic_mode() {
 test_telegram_fallback() {
     header "Telegram ranges when the community list cannot be downloaded"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ]; then
-        fail "netshift bin not found"
+        fail "postq bin not found"
         return
     fi
 
-    local work="/tmp/netshift-tgfallback-$$"
+    local work="/tmp/postq-tgfallback-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -22129,7 +22129,7 @@ test_telegram_fallback() {
         get_service_proxy_address() { :; }
         TG_DOWNLOAD_RC=1
         download_to_file() { [ "$TG_DOWNLOAD_RC" = 0 ] && printf '10.0.0.0/8\n' > "$2"; return "$TG_DOWNLOAD_RC"; }
-        populate_netshift_subnets_from_file() { cp "$1" "$work/populated"; echo "$1" > "$work/populated.path"; }
+        populate_postq_subnets_from_file() { cp "$1" "$work/populated"; echo "$1" > "$work/populated.path"; }
 
         rm -f "$work/populated"
         import_community_service_subnet_list_handler telegram
@@ -22162,7 +22162,7 @@ test_telegram_fallback() {
 test_naive_component() {
     header "NaiveProxy client component"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -22172,7 +22172,7 @@ test_naive_component() {
         return
     fi
 
-    local work="/tmp/netshift-naivecomp-$$"
+    local work="/tmp/postq-naivecomp-$$"
     rm -rf "$work"
     mkdir -p "$work/bin" "$work/fixture/naiveproxy-v1.2.3-4-openwrt-x86_64" "$work/state"
 
@@ -22191,7 +22191,7 @@ test_naive_component() {
         GOOD_SUM="$good_sum"
         ARCHIVE="$work/archive.tar.xz"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$NC_LOG"; }
-        NETSHIFT_STATE_DIR="$work/state"
+        POSTQ_STATE_DIR="$work/state"
         . "$lib/updater.sh"
         . "$lib/naive.sh"
         NAIVE_BIN="$work/bin/naive"
@@ -22215,8 +22215,8 @@ test_naive_component() {
         updates_download_to_file() { cp "$ARCHIVE" "$2"; }
         xz() { [ "$1" = "-dc" ] && gzip -dc "$2"; }
         pidof() { return 1; }
-        eval "$(awk '/^sing_box_pids\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "${NETSHIFT_SRC}/usr/bin/netshift")"
-        updates_restart_netshift() { echo restarted >> "$NC_LOG"; }
+        eval "$(awk '/^sing_box_pids\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "${POSTQ_SRC}/usr/bin/postq")"
+        updates_restart_postq() { echo restarted >> "$NC_LOG"; }
 
         j() { jq -c "$1"; }
 
@@ -22271,7 +22271,7 @@ test_naive_component() {
         echo "wrong-arch=$(naive_component_install | j '[.success, .message]')"
         echo "wrong-arch-installed=$([ -e "$NAIVE_BIN" ] && echo yes || echo no)"
 
-        # running NetShift is restarted after an install and a removal
+        # running PostQ is restarted after an install and a removal
         printf '#!/bin/sh\necho "naive 1.2.3"\n' > "$work/fixture/naiveproxy-v1.2.3-4-openwrt-x86_64/naive"
         tar -czf "$ARCHIVE" -C "$work/fixture" naiveproxy-v1.2.3-4-openwrt-x86_64
         NC_DIGEST="sha256:$(sha256sum "$ARCHIVE" | awk '{print $1}')"
@@ -22302,14 +22302,14 @@ test_naive_component() {
     _nc "the install reports the release" 'install=[true,"1.2.3-4"]'
     _nc "the binary and the version file are in place" "installed=yes version-file=1.2.3-4"
     _nc "the binary runs" "binary-works=naive 1.2.3"
-    _nc "a stopped NetShift is not restarted" "restart-when-stopped=0"
+    _nc "a stopped PostQ is not restarted" "restart-when-stopped=0"
     _nc "an installed client is the latest" 'check-latest=["1.2.3-4","latest"]'
     _nc "a newer release is told" 'check-outdated=["1.2.3-4","1.2.4-1","outdated"]'
     _nc "a client that was put there by hand is offered an update" 'check-by-hand=["unknown","outdated"]'
     _nc "a binary that does not start is refused" 'wrong-arch=[false,"The NaiveProxy binary does not run on this device"]'
     _nc "and is not installed" "wrong-arch-installed=no"
-    _nc "a running NetShift is restarted after an install" "restart-when-running=1"
-    _nc "removal deletes the binary and the version file, restarting NetShift" "remove=[true] left=no/no restarted=1"
+    _nc "a running PostQ is restarted after an install" "restart-when-running=1"
+    _nc "removal deletes the binary and the version file, restarting PostQ" "remove=[true] left=no/no restarted=1"
     _nc "after the removal the client is not installed" 'check-after-remove=["not installed","not_installed"]'
     _nc "component_action knows naive" 'dispatch-check="not_installed"'
     rm -rf "$work"
@@ -22318,7 +22318,7 @@ test_naive_component() {
 test_collected_lists() {
     header "Collected lists: odd links, the cap on servers, lists of feeds"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -22328,19 +22328,19 @@ test_collected_lists() {
         return
     fi
 
-    local work="/tmp/netshift-collected-$$"
+    local work="/tmp/postq-collected-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
     local out
     out="$(
-        mkdir -p /usr/lib/netshift
+        mkdir -p /usr/lib/postq
         for f in constants.sh helpers.sh logging.sh sing_box_config_manager.sh sing_box_config_facade.sh; do
-            ln -sf "$lib/$f" "/usr/lib/netshift/$f"
+            ln -sf "$lib/$f" "/usr/lib/postq/$f"
         done
-        . /usr/lib/netshift/constants.sh
-        . /usr/lib/netshift/logging.sh
-        . /usr/lib/netshift/sing_box_config_facade.sh
+        . /usr/lib/postq/constants.sh
+        . /usr/lib/postq/logging.sh
+        . /usr/lib/postq/sing_box_config_facade.sh
         . "$lib/feedlist.sh"
         CL_LOG="$work/log"; : > "$CL_LOG"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$CL_LOG"; }
@@ -22357,9 +22357,9 @@ trojan://secret@g.example.com:443?security=none&type=tcp#trojan-none
 vless://2f35965a-9a9b-45fd-ba32-987296dfb6be@h.example.com:443?security=weird&type=tcp#weird
 LIST
         # section settings come from a real uci config
-        : > /etc/config/netshift
-        uci -q set netshift.cl=section
-        uci -q commit netshift
+        : > /etc/config/postq
+        uci -q set postq.cl=section
+        uci -q commit postq
 
         n="$work/n.json"
         normalize_subscription_to_singbox "$work/odd.txt" "$n" "cl" > /dev/null 2>&1
@@ -22376,14 +22376,14 @@ LIST
             echo "vless://2f35965a-9a9b-45fd-ba32-987296dfb6be@s$i.example.com:443?security=tls&type=tcp&sni=s$i.example.com#n$i" >> "$work/many.txt"
             i=$((i + 1))
         done
-        uci -q set netshift.cl.subscription_max_nodes=5; uci -q commit netshift
+        uci -q set postq.cl.subscription_max_nodes=5; uci -q commit postq
         : > "$CL_LOG"
         normalize_subscription_to_singbox "$work/many.txt" "$work/m.json" "cl" > /dev/null 2>&1
         echo "cap-5=$(jq -c '.outbounds | length' "$work/m.json") warned=$(grep -c 'only the first 5' "$CL_LOG")"
-        uci -q set netshift.cl.subscription_max_nodes=0; uci -q commit netshift
+        uci -q set postq.cl.subscription_max_nodes=0; uci -q commit postq
         normalize_subscription_to_singbox "$work/many.txt" "$work/m.json" "cl" > /dev/null 2>&1
         echo "cap-0=$(jq -c '.outbounds | length' "$work/m.json")"
-        uci -q delete netshift.cl.subscription_max_nodes; uci -q commit netshift
+        uci -q delete postq.cl.subscription_max_nodes; uci -q commit postq
         SUBSCRIPTION_MAX_NODES_DEFAULT=7
         normalize_subscription_to_singbox "$work/many.txt" "$work/m.json" "cl" > /dev/null 2>&1
         echo "cap-default=$(jq -c '.outbounds | length' "$work/m.json")"
@@ -22427,19 +22427,19 @@ LIST
     _cl "a failed download is an error" 'download-fails=[false,"the list could not be downloaded"]'
     _cl "an address that is not http(s) is refused" 'bad-address=[false,"the address of the list must start with http:// or https://"]'
     _cl "at most 200 feeds are taken" "capped=200"
-    rm -rf "$work" /etc/config/netshift
+    rm -rf "$work" /etc/config/postq
 }
 
 test_filter_keyword_alternatives() {
     header "Subscription keyword filters: several words in one entry (a|b)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ] || ! command -v jq > /dev/null 2>&1; then
-        skip "netshift bin / jq not found"
+        skip "postq bin / jq not found"
         return
     fi
 
-    local work="/tmp/netshift-kwalt-$$"
+    local work="/tmp/postq-kwalt-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -22483,13 +22483,13 @@ test_filter_keyword_alternatives() {
 test_install_download() {
     header "Installer: a download that stalls or fails is given up and retried (wget, then curl)"
 
-    local installer="${NETSHIFT_SRC}/../install.sh"
+    local installer="${POSTQ_SRC}/../install.sh"
     if [ ! -r "$installer" ]; then
         skip "install.sh is not mounted into the test container"
         return
     fi
 
-    local work="/tmp/netshift-installdl-$$"
+    local work="/tmp/postq-installdl-$$"
     rm -rf "$work"
     mkdir -p "$work/bin" "$work/dl"
 
@@ -22554,7 +22554,7 @@ CEOF
 test_proxy_bootstrap() {
     header "Proxy bootstrap resolver: a proxy hostname must not resolve through the DNS that detours via the proxy"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -22603,7 +22603,7 @@ test_proxy_bootstrap() {
     _pb_check idempotent yes "bootstrap-is-idempotent"
 
     # Wired into the generator: the DNS configuration applies it after the pool.
-    if grep -q 'sing_box_cm_set_proxy_bootstrap_resolver "\$config" "\$SB_BOOTSTRAP_SERVER_TAG" "\$dns_detour_tag"' "${NETSHIFT_SRC}/usr/bin/netshift"; then
+    if grep -q 'sing_box_cm_set_proxy_bootstrap_resolver "\$config" "\$SB_BOOTSTRAP_SERVER_TAG" "\$dns_detour_tag"' "${POSTQ_SRC}/usr/bin/postq"; then
         pass "bootstrap-wired-into-sing_box_configure_dns"
     else
         fail "bootstrap-wired-into-sing_box_configure_dns:FAIL"
@@ -22612,22 +22612,22 @@ test_proxy_bootstrap() {
 test_dns_section_pool() {
     header "DNS section: several servers (dns_pool_server, dns_pool_mode)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
     if [ ! -r "$bin" ] || [ ! -r "$lib/sing_box_config_manager.sh" ]; then
-        fail "netshift bin / config manager not found"
+        fail "postq bin / config manager not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
 
-    local work="/tmp/netshift-dnssecpool-test-$$"
+    local work="/tmp/postq-dnssecpool-test-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -22768,18 +22768,18 @@ test_dns_section_pool() {
 test_apply_config() {
     header "Applying a configuration change: restart only when the service depends on it"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local initscript="${NETSHIFT_SRC}/etc/init.d/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local initscript="${POSTQ_SRC}/etc/init.d/postq"
     if ! command -v uci > /dev/null 2>&1 || [ ! -r "$lib/applyconfig.sh" ] || [ ! -r "$bin" ]; then
-        skip "uci, applyconfig.sh or the netshift bin not available"
+        skip "uci, applyconfig.sh or the postq bin not available"
         return
     fi
 
-    local work="/tmp/netshift-applycfg-$$"
+    local work="/tmp/postq-applycfg-$$"
     rm -rf "$work"
     mkdir -p "$work/uci"
-    cat > "$work/uci/netshift" << 'CF'
+    cat > "$work/uci/postq" << 'CF'
 config settings 'settings'
 	option dns_type 'doh'
 	option update_notice '1'
@@ -22799,7 +22799,7 @@ CF
         . "$lib/constants.sh"
         log() { printf '%s\n' "$1" >> "$work/log"; }
         uci() { command uci -c "$work/uci" "$@"; }
-        NETSHIFT_INIT="$work/init"
+        POSTQ_INIT="$work/init"
         config_load() { :; }
         sync_auto_update_cron_job() { echo sync >> "$work/cron-syncs"; }
         . "$lib/applyconfig.sh"
@@ -22816,10 +22816,10 @@ CF
         echo "hash-file-mode=$(ls -l "$CONFIG_APPLIED_HASH_FILE" | cut -c1-10)"
 
         : > "$work/restarts"
-        uci -q set netshift.settings.shutdown_correctly='1'
-        uci -q set netshift.settings.update_notice='0'
-        uci -q set netshift.settings.wget_ipv4_mode='on'
-        uci -q commit netshift
+        uci -q set postq.settings.shutdown_correctly='1'
+        uci -q set postq.settings.update_notice='0'
+        uci -q set postq.settings.wget_ipv4_mode='on'
+        uci -q commit postq
         apply_config_change
         echo "ignored-options-restarts=$(n)"
         echo "ignored-options-hash-same=$([ "$(config_runtime_hash)" = "$h0" ] && echo yes || echo no)"
@@ -22828,22 +22828,22 @@ CF
         # the options of the monitor, the dashboard and the component installer
         config_applied_hash_save
         : > "$work/restarts"
-        uci -q set netshift.settings.priority_check_interval='60'
-        uci -q set netshift.settings.latency_test_url='https://example.org/204'
-        uci -q set netshift.main.pin_guard='1'
-        uci -q set netshift.main.priority_mode='1'
-        uci -q commit netshift
+        uci -q set postq.settings.priority_check_interval='60'
+        uci -q set postq.settings.latency_test_url='https://example.org/204'
+        uci -q set postq.main.pin_guard='1'
+        uci -q set postq.main.priority_mode='1'
+        uci -q commit postq
         apply_config_change
         echo "monitor-options-restarts=$(n)"
 
-        # where NetShift updates itself from (read by the updater on demand) and the tiles of the
+        # where PostQ updates itself from (read by the updater on demand) and the tiles of the
         # dashboard (read by the page): no restart
         config_applied_hash_save
         : > "$work/restarts"
-        uci -q set netshift.settings.update_repo='fork'
-        uci -q add_list netshift.settings.update_mirror='https://gh-proxy.com/'
-        uci -q set netshift.settings.dashboard_widgets='0'
-        uci -q commit netshift
+        uci -q set postq.settings.update_repo='other'
+        uci -q add_list postq.settings.update_mirror='https://gh-proxy.com/'
+        uci -q set postq.settings.dashboard_widgets='0'
+        uci -q commit postq
         apply_config_change
         echo "update-and-dashboard-options-restarts=$(n)"
 
@@ -22851,26 +22851,26 @@ CF
         config_applied_hash_save
         : > "$work/restarts"
         : > "$work/cron-syncs"
-        uci -q set netshift.settings.auto_update='1'
-        uci -q set netshift.settings.auto_update_interval='12h'
-        uci -q set netshift.settings.auto_update_time='03:15'
-        uci -q set netshift.settings.auto_update_on_boot='0'
-        uci -q set netshift.settings.auto_update_netshift='0'
-        uci -q set netshift.settings.auto_update_sing_box='0'
-        uci -q commit netshift
+        uci -q set postq.settings.auto_update='1'
+        uci -q set postq.settings.auto_update_interval='12h'
+        uci -q set postq.settings.auto_update_time='03:15'
+        uci -q set postq.settings.auto_update_on_boot='0'
+        uci -q set postq.settings.auto_update_postq='0'
+        uci -q set postq.settings.auto_update_sing_box='0'
+        uci -q commit postq
         apply_config_change
         echo "auto-update-options-restarts=$(n) cron-syncs=$(wc -l < "$work/cron-syncs" | tr -d ' ')"
 
         : > "$work/restarts"
-        uci -q set netshift.settings.dns_type='udp'
-        uci -q commit netshift
+        uci -q set postq.settings.dns_type='udp'
+        uci -q commit postq
         apply_config_change
         echo "dns-change-restarts=$(n)"
 
         config_applied_hash_save
         : > "$work/restarts"
-        uci -q add_list netshift.main.user_domains='b.com'
-        uci -q commit netshift
+        uci -q add_list postq.main.user_domains='b.com'
+        uci -q commit postq
         apply_config_change
         echo "section-change-restarts=$(n)"
 
@@ -22878,12 +22878,12 @@ CF
         # the hashed options back to what they were at the last good start (reverting the change that
         # broke the start) does not pass for "only options that need no restart"
         config_applied_hash_save
-        uci -q set netshift.settings.dns_type='tcp'
-        uci -q commit netshift
+        uci -q set postq.settings.dns_type='tcp'
+        uci -q commit postq
         config_applied_hash_clear
         : > "$work/restarts"
-        uci -q set netshift.settings.dns_type='udp'
-        uci -q commit netshift
+        uci -q set postq.settings.dns_type='udp'
+        uci -q commit postq
         apply_config_change
         echo "down-service-restarts=$(n)"
         echo "hash-gone-after-clear=$([ -e "$CONFIG_APPLIED_HASH_FILE" ] && echo no || echo yes)"
@@ -22898,11 +22898,11 @@ CF
 start-clears-before-start_main=$(printf '%s\n' "$start_body" | awk '/config_applied_hash_clear/{c=NR} /^    start_main/{s=NR} END{print (c && s && c < s) ? "yes" : "no"}')
 start-saves-after-success=$(printf '%s\n' "$start_body" | awk '/^    start_main/{s=NR} /return "\$start_rc"/{r=NR} /config_applied_hash_save/{v=NR} END{print (s && r && v && v > r) ? "yes" : "no"}')
 stop-clears=$(printf '%s\n' "$stop_body" | grep -c 'config_applied_hash_clear')
-trigger-wired=$(grep -cF 'procd_add_config_trigger "config.change" "$NAME" /usr/bin/netshift apply_config' "$initscript" 2> /dev/null)
+trigger-wired=$(grep -cF 'procd_add_config_trigger "config.change" "$NAME" /usr/bin/postq apply_config' "$initscript" 2> /dev/null)
 command-wired=$(grep -c '^apply_config)' "$bin")"
 
     _ac() { expect_line "$out" "$1" "$2"; }
-    _ac "no saved hash (not started by NetShift): restart as before" "no-hash-restarts=1"
+    _ac "no saved hash (not started by PostQ): restart as before" "no-hash-restarts=1"
     _ac "the hash is saved at start" "hash-saved=yes"
     _ac "...readable by root only" "hash-file-mode=-rw-------"
     _ac "only the notice, an extra option of the downloads and the shutdown flag changed: no restart" "ignored-options-restarts=0"
@@ -22918,7 +22918,7 @@ command-wired=$(grep -c '^apply_config)' "$bin")"
     _ac "start() forgets the hash before it starts the service" "start-clears-before-start_main=yes"
     _ac "...and saves it only after a start that succeeded" "start-saves-after-success=yes"
     _ac "stop() forgets the hash" "stop-clears=1"
-    _ac "procd calls netshift apply_config when the configuration changes" "trigger-wired=1"
+    _ac "procd calls postq apply_config when the configuration changes" "trigger-wired=1"
     _ac "...and the command exists" "command-wired=1"
     rm -rf "$work"
 }
@@ -22926,7 +22926,7 @@ command-wired=$(grep -c '^apply_config)' "$bin")"
 test_tuic_anytls() {
     header "TUIC and AnyTLS links"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -22936,12 +22936,12 @@ test_tuic_anytls() {
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
-    local work="/tmp/netshift-tuic-test-$$"
+    local work="/tmp/postq-tuic-test-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -22959,7 +22959,7 @@ test_tuic_anytls() {
         field() { printf '%s' "$1" | jq -c "$2"; }
 
         TU='tuic://11111111-2222-3333-4444-555555555555:p%40ss@tuic.example.com:8443?congestion_control=bbr&udp_relay_mode=native&alpn=h3&sni=tuic.example.com&allow_insecure=1#node'
-        NETSHIFT_SING_BOX_TAGS="with_quic,with_utls"
+        POSTQ_SING_BOX_TAGS="with_quic,with_utls"
         # a subscription or collected list of links: tuic:// and anytls:// are kept (an unknown scheme is not)
         printf '%s\n' "$TU" 'anytls://pw@any.example.com:443?sni=any.example.com#any' 'hysteria://x@h.example.com:443#old' > "$work/list.txt"
         (
@@ -22974,13 +22974,13 @@ test_tuic_anytls() {
         echo "tuic-defaults=$(field "$o" '.outbounds[0] | [.server_port, has("congestion_control"), has("udp_relay_mode"), (.tls | has("utls"))]')"
         o="$(add s1 'tuic://tuic.example.com:443')"; rc=$?
         echo "tuic-no-uuid=$rc unchanged=$([ "$o" = "$base" ] && echo yes || echo no)"
-        NETSHIFT_SING_BOX_TAGS="with_utls"
+        POSTQ_SING_BOX_TAGS="with_utls"
         o="$(add s1 "$TU")"; rc=$?
         echo "tuic-noquic=$rc unchanged=$([ "$o" = "$base" ] && echo yes || echo no)"
-        NETSHIFT_SING_BOX_TAGS="with_quic,with_utls"
+        POSTQ_SING_BOX_TAGS="with_quic,with_utls"
 
         AN='anytls://se%23cret@any.example.com:8443?sni=any.example.com&insecure=1&alpn=h2,http/1.1&fp=chrome#node'
-        NETSHIFT_SING_BOX_VERSION=1.12.22
+        POSTQ_SING_BOX_VERSION=1.12.22
         o="$(add s2 "$AN")"
         echo "anytls=$(field "$o" '.outbounds[0] | [.type, .tag, .server, .server_port, .password]')"
         echo "anytls-tls=$(field "$o" '.outbounds[0].tls | [.enabled, .server_name, .alpn, .insecure, .utls.fingerprint]')"
@@ -22988,10 +22988,10 @@ test_tuic_anytls() {
         echo "anytls-port=$(field "$o" '.outbounds[0].server_port')"
         o="$(add s2 'anytls://any.example.com:443')"; rc=$?
         echo "anytls-no-password=$rc unchanged=$([ "$o" = "$base" ] && echo yes || echo no)"
-        NETSHIFT_SING_BOX_VERSION=1.11.4
+        POSTQ_SING_BOX_VERSION=1.11.4
         o="$(add s2 "$AN")"; rc=$?
         echo "anytls-old-core=$rc unchanged=$([ "$o" = "$base" ] && echo yes || echo no)"
-        NETSHIFT_SING_BOX_VERSION=1.12.22
+        POSTQ_SING_BOX_VERSION=1.12.22
 
         # the core accepts what is made (the test image core is 1.12 with QUIC)
         if command -v sing-box > /dev/null 2>&1 && sing-box version 2> /dev/null | grep -q with_quic; then
@@ -23021,16 +23021,16 @@ test_tuic_anytls() {
 }
 
 test_update_repo() {
-    header "NetShift update source (update_repo) and GitHub mirrors (update_mirror)"
+    header "PostQ update source (update_repo) and GitHub mirrors (update_mirror)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     local updater="$lib/updater.sh"
     if [ ! -r "$updater" ]; then
         fail "updater.sh not found"
         return
     fi
 
-    local work="/tmp/netshift-updaterepo-$$"
+    local work="/tmp/postq-updaterepo-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
 
@@ -23043,10 +23043,10 @@ nolog() { :; }
 . "DRV_UPDATER"
 . "DRV_CONSTANTS"
 updates_log() { printf '%s\n' "$1" >> "$WORK/log"; }
-NETSHIFT_VERSION="0.9.0"
+POSTQ_VERSION="0.9.0"
 UR_CHOICE=""; UR_MIRRORS=""; UR_MIRROR_FORM=list
 # uci as it is: a list has <option>_LENGTH and is read by config_list_foreach; a plain option is only
-# read by config_get (the real netshift_config_list_foreach of helpers.sh decides between the two)
+# read by config_get (the real postq_config_list_foreach of helpers.sh decides between the two)
 config_get() {
     case "$3" in
     update_mirror_LENGTH) [ "$UR_MIRROR_FORM" = list ] && [ -n "$UR_MIRRORS" ] && eval "$1=1" || eval "$1=\"\"" ;;
@@ -23056,53 +23056,42 @@ config_get() {
 }
 config_list_foreach() { local _m; [ "$UR_MIRROR_FORM" = list ] || return 0; for _m in $UR_MIRRORS; do "$3" "$_m"; done; }
 updates_components_proxy_address() { :; }
-updates_github_resolve_redirect() { printf '%s\n' "$1" >> "$WORK/gets"; case "$1" in */cergo666/*) printf '%s' "$UR_REDIRECT_FORK" ;; *) printf '%s' "$UR_REDIRECT" ;; esac; }
+updates_github_resolve_redirect() { printf '%s\n' "$1" >> "$WORK/gets"; case "$1" in *) printf '%s' "$UR_REDIRECT" ;; esac; }
 updates_http_get() { printf '%s\n' "$1" >> "$WORK/gets"; case "$1" in */releases/tags/*) printf '%s' "$UR_NOTES" ;; *) printf '%s' "$UR_API" ;; esac; }
 
 UR_REDIRECT="https://github.com/yandexru45/netshift/releases/tag/0.9.10"
-UR_REDIRECT_FORK="https://github.com/cergo666/netshift/releases/tag/0.9.10.1"
 UR_API='{"tag_name":"0.9.10.1"}'
 UR_NOTES='{"body":"## 0.9.10.1\n- one\n- two"}'
 
 # the developer's repository (default): the redirect of /releases/latest
 UR_CHOICE=upstream; : > "$WORK/gets"
-echo "upstream-tag=$(updates_netshift_latest_tag)"
-echo "upstream-no-fork=$(grep -c 'cergo666' "$WORK/gets")"
+echo "upstream-tag=$(updates_postq_latest_tag)"
 UR_CHOICE=""
-echo "unset-is-upstream=$(updates_netshift_latest_tag)"
+echo "unset-is-upstream=$(updates_postq_latest_tag)"
 
-# the fork: the same /releases/latest of ITS repository (test builds are pre-releases and not seen)
-UR_CHOICE=fork; : > "$WORK/gets"
-echo "fork-tag=$(updates_netshift_latest_tag)"
-echo "fork-redirect-used=$(grep -c 'github.com/cergo666/netshift/releases/latest' "$WORK/gets")"
-updates_select_netshift_repo
-echo "fork-base=$NETSHIFT_REPO_RELEASES_DOWNLOAD_BASE"
-echo "fork-api=$NETSHIFT_RELEASE_API_URL"
-UR_REDIRECT_FORK=""
-echo "fork-api-fallback=$(updates_netshift_latest_tag)"
+# without the redirect the API gives the tag; with nothing reachable there is no tag
+UR_REDIRECT_KEPT="$UR_REDIRECT"; UR_REDIRECT=""
+echo "api-fallback=$(updates_postq_latest_tag)"
 UR_API=""
-updates_netshift_latest_tag > /dev/null && echo "fork-none=ok" || echo "fork-none=fail"
-UR_CHOICE=""
+updates_postq_latest_tag > /dev/null && echo "none-reachable=ok" || echo "none-reachable=fail"
 
 # the status: a newer build is "outdated", the same is "latest", a lower one is a "switch"
-UR_REDIRECT_FORK="https://github.com/cergo666/netshift/releases/tag/0.9.10.1"; UR_API='{"tag_name":"0.9.10.1"}'
-NETSHIFT_VERSION="0.9.10"; UR_CHOICE=fork
-echo "fork-status=$(updates_check_netshift 2> /dev/null | jq -r '.status')"
-NETSHIFT_VERSION="0.9.10.1"
-echo "fork-current=$(updates_check_netshift 2> /dev/null | jq -r '.status')"
-echo "latest-has-no-notes=$(updates_check_netshift with_notes 2> /dev/null | jq -r 'has("notes")')"
-NETSHIFT_VERSION="0.9.11.4"
-echo "fork-lower=$(updates_check_netshift 2> /dev/null | jq -r '.status')"
-# each call of the CLI is a process of its own: the upstream answers come from fresh shells
-UR_CHOICE=upstream
-UR_CHOICE=fork; NETSHIFT_VERSION="0.9.10"; : > "$WORK/gets"
-echo "notes-of-the-offered-build=$(updates_check_netshift with_notes 2> /dev/null | jq -c '.notes')"
-echo "notes-url=$(grep -c 'repos/cergo666/netshift/releases/tags/0.9.10.1' "$WORK/gets")"
+UR_REDIRECT="https://github.com/postq-vpn/postq-OW/releases/tag/0.9.10.1"; UR_API='{"tag_name":"0.9.10.1"}'
+POSTQ_VERSION="0.9.10"
+echo "status-newer=$(updates_check_postq 2> /dev/null | jq -r '.status')"
+POSTQ_VERSION="0.9.10.1"
+echo "status-same=$(updates_check_postq 2> /dev/null | jq -r '.status')"
+echo "latest-has-no-notes=$(updates_check_postq with_notes 2> /dev/null | jq -r 'has("notes")')"
+POSTQ_VERSION="0.9.11.4"
+echo "status-lower=$(updates_check_postq 2> /dev/null | jq -r '.status')"
+POSTQ_VERSION="0.9.10"; : > "$WORK/gets"
+echo "notes-of-the-offered-build=$(updates_check_postq with_notes 2> /dev/null | jq -c '.notes')"
+echo "notes-url=$(grep -c 'repos/postq-vpn/postq-OW/releases/tags/0.9.10.1' "$WORK/gets")"
 # the background check of the dashboard notice does not ask for the notes at all
 : > "$WORK/gets"
-echo "notice-check-no-notes=$(updates_check_netshift 2> /dev/null | jq -c 'has("notes")') asked=$(grep -c 'releases/tags/' "$WORK/gets")"
+echo "notice-check-no-notes=$(updates_check_postq 2> /dev/null | jq -c 'has("notes")') asked=$(grep -c 'releases/tags/' "$WORK/gets")"
 UR_NOTES=""
-echo "no-notes-still-ok=$(updates_check_netshift with_notes 2> /dev/null | jq -c '[.success, has("notes")]')"
+echo "no-notes-still-ok=$(updates_check_postq with_notes 2> /dev/null | jq -c '[.success, has("notes")]')"
 UR_CHOICE=""
 
 # mirrors: used only after the direct download failed, only for GitHub files, only https://
@@ -23159,18 +23148,13 @@ DRVEOF
 
     _ur() { expect_line "$out" "$1" "$2"; }
     _ur "the developer's repository: the redirect of /releases/latest gives the tag" "upstream-tag=0.9.10"
-    _ur "...and the fork is not asked" "upstream-no-fork=0"
     _ur "no setting is the developer's repository" "unset-is-upstream=0.9.10"
-    _ur "the fork: the /releases/latest of its repository" "fork-tag=0.9.10.1"
-    _ur "...read from the repository of the fork" "fork-redirect-used=1"
-    _ur "...and its packages are downloaded from the fork" "fork-base=https://github.com/cergo666/netshift/releases/download"
-    _ur "...the API fallback is the latest release of the fork" "fork-api=https://api.github.com/repos/cergo666/netshift/releases/latest"
-    _ur "without the redirect the API gives the tag" "fork-api-fallback=0.9.10.1"
-    _ur "nothing reachable: no tag, a failure" "fork-none=fail"
-    _ur "a newer build of the fork is offered as an update" "fork-status=outdated"
-    _ur "the build that is installed is the latest" "fork-current=latest"
+    _ur "without the redirect the API gives the tag" "api-fallback=0.9.10.1"
+    _ur "nothing reachable: no tag, a failure" "none-reachable=fail"
+    _ur "a newer build is offered as an update" "status-newer=outdated"
+    _ur "the build that is installed is the latest" "status-same=latest"
     _ur "the latest build has no release notes fetched" "latest-has-no-notes=false"
-    _ur "a LOWER build of the chosen repository is offered as a switch" "fork-lower=switch"
+    _ur "a LOWER build of the repository is offered as a switch" "status-lower=switch"
     _ur "the release notes of the offered build come with the check" 'notes-of-the-offered-build="## 0.9.10.1\n- one\n- two"'
     _ur "...fetched from the repository the build is in" "notes-url=1"
     _ur "the background check of the dashboard notice does not fetch the notes" "notice-check-no-notes=false asked=0"
@@ -23197,10 +23181,10 @@ DRVEOF
 test_keep_core() {
     header "Installer keeps an extended core, installs lite otherwise; unsupported links name the core"
 
-    local installer="${NETSHIFT_SRC}/../install.sh"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="${NETSHIFT_LIB_DIR}"
-    local work="/tmp/netshift-keepcore-$$"
+    local installer="${POSTQ_SRC}/../install.sh"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="${POSTQ_LIB_DIR}"
+    local work="/tmp/postq-keepcore-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
 
@@ -23273,7 +23257,7 @@ DRVEOF
         KC_V="1.12.22"; echo "stock:$(unsupported_links_hint)"
         KC_V="1.14.3-extended-2.7.3"; echo "extended:$(unsupported_links_hint)"
     )"
-    if printf '%s\n' "$hint" | grep -qF 'stock: Installed core: stock sing-box 1.12.22. Links with XHTTP, VMess or VLESS Encryption need sing-box-extended: install it in Services - NetShift - Components manager.'; then
+    if printf '%s\n' "$hint" | grep -qF 'stock: Installed core: stock sing-box 1.12.22. Links with XHTTP, VMess or VLESS Encryption need sing-box-extended: install it in Services - PostQ - Components manager.'; then
         pass "unsupported links on a stock core: the core and the way to sing-box-extended are named"
     else
         fail "unsupported links on a stock core: the core and the way to sing-box-extended are named" "$hint"
@@ -23302,47 +23286,47 @@ DRVEOF
 test_quick_commands() {
     header "Quick answers: status, log and core capabilities without loading every library"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$lib/quick.sh" ] || [ ! -r "$bin" ]; then
         fail "quick.sh / bin not found"
         return
     fi
 
-    local work="/tmp/netshift-quick-$$"
+    local work="/tmp/postq-quick-$$"
     rm -rf "$work"
     mkdir -p "$work/lib" "$work/bin" "$work/rc.d"
     # a copy of the command line that finds only the three files of the quick path: the full path
     # would stop at the first missing library
     cp "$lib/constants.sh" "$lib/logging.sh" "$lib/quick.sh" "$work/lib/"
-    sed -e "s|^NETSHIFT_LIB=.*|NETSHIFT_LIB=\"$work/lib\"|" "$bin" > "$work/netshift"
-    sed -i "s|/etc/rc.d/S99netshift|$work/rc.d/S99netshift|" "$work/lib/quick.sh"
+    sed -e "s|^POSTQ_LIB=.*|POSTQ_LIB=\"$work/lib\"|" "$bin" > "$work/postq"
+    sed -i "s|/etc/rc.d/S99postq|$work/rc.d/S99postq|" "$work/lib/quick.sh"
     sed -i "s|^CORE_CAPABILITIES_CACHE=.*|CORE_CAPABILITIES_CACHE=\"$work/caps.json\"|" "$work/lib/constants.sh"
     cat > "$work/bin/logread" << 'LEOF'
 #!/bin/sh
-printf '%s\n' 'Mon netshift: [info] old line' 'Mon netshift: [info] Starting netshift' 'Mon sing-box[1]: INFO started' 'Mon kernel: other'
+printf '%s\n' 'Mon postq: [info] old line' 'Mon postq: [info] Starting postq' 'Mon sing-box[1]: INFO started' 'Mon kernel: other'
 LEOF
     chmod +x "$work/bin/logread"
 
     local out
     out="$(
         PATH="$work/bin:$PATH"
-        echo "status-disabled=$(sh "$work/netshift" get_status)"
-        : > "$work/rc.d/S99netshift"; chmod +x "$work/rc.d/S99netshift"
-        echo "status-enabled=$(sh "$work/netshift" get_status)"
-        echo "logs=$(sh "$work/netshift" check_logs | tr '\n' '|')"
-        echo "sing-box-status=$(sh "$work/netshift" get_sing_box_status | jq -c 'keys' 2> /dev/null)"
+        echo "status-disabled=$(sh "$work/postq" get_status)"
+        : > "$work/rc.d/S99postq"; chmod +x "$work/rc.d/S99postq"
+        echo "status-enabled=$(sh "$work/postq" get_status)"
+        echo "logs=$(sh "$work/postq" check_logs | tr '\n' '|')"
+        echo "sing-box-status=$(sh "$work/postq" get_sing_box_status | jq -c 'keys' 2> /dev/null)"
         # no cache yet: the quick path steps aside, and the full one cannot run in this copy
-        sh "$work/netshift" get_core_capabilities > "$work/caps.out" 2>&1; echo "caps-no-cache-rc=$?"
+        sh "$work/postq" get_core_capabilities > "$work/caps.out" 2>&1; echo "caps-no-cache-rc=$?"
         # a cache made for the cores installed now is the answer
         (
             . "$work/lib/constants.sh"; . "$work/lib/quick.sh"
             core_capabilities_store '{"version":"1.14.3","extended":true}'
         )
-        echo "caps-cached=$(sh "$work/netshift" get_core_capabilities)"
+        echo "caps-cached=$(sh "$work/postq" get_core_capabilities)"
         # another core (its fingerprint changes): the cache is not used
         printf 'another core\n' > "$work/caps.json.key"
-        sh "$work/netshift" get_core_capabilities > /dev/null 2>&1; echo "caps-other-core-rc=$?"
+        sh "$work/postq" get_core_capabilities > /dev/null 2>&1; echo "caps-other-core-rc=$?"
     )"
 
     # the full answer asks the core twice at most, whatever the number of features
@@ -23376,7 +23360,7 @@ LEOF
     }
     _qk "get_status is answered without the other libraries" 'status-disabled={"enabled":0,"status":"disabled"}'
     _qk "...and sees an enabled service" 'status-enabled={"enabled":1,"status":"enabled"}'
-    _qk "check_logs is answered without them: the log since the last start" 'logs=Mon netshift: [info] Starting netshift|Mon sing-box[1]: INFO started|'
+    _qk "check_logs is answered without them: the log since the last start" 'logs=Mon postq: [info] Starting postq|Mon sing-box[1]: INFO started|'
     _qk "get_sing_box_status is answered without them too" 'sing-box-status=["dns_configured","enabled","running","status"]'
     _qk "get_core_capabilities without a cache goes on to the full command line" "caps-no-cache-rc=1"
     _qk "...with a cache for the cores installed now, the cache is the answer" 'caps-cached={"version":"1.14.3","extended":true}'
@@ -23394,10 +23378,10 @@ SMOKE_SELF="$0"
 test_cron_running() {
     header "cron is started for the scheduled updates (a fresh router has no running crond)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    [ -r "$bin" ] || { skip "netshift bin not found"; return; }
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    [ -r "$bin" ] || { skip "postq bin not found"; return; }
 
-    local work="/tmp/netshift-cronrun-$$"
+    local work="/tmp/postq-cronrun-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -23423,7 +23407,7 @@ CRON
         : > "$W/enabled"
         cron_ensure_running
         echo "no-job-no-start=$([ -e "$W/started" ] && echo started || echo none)"
-        CRONTAB_LINES="13 9 * * * /usr/bin/netshift list_update
+        CRONTAB_LINES="13 9 * * * /usr/bin/postq list_update
 "
         cron_ensure_running
         echo "job-starts-cron=$(cat "$W/started" 2> /dev/null | wc -l | tr -d ' ')"
@@ -23438,7 +23422,7 @@ CRON
     _cr() {
         if printf '%s\n' "$out" | grep -qxF -- "$2"; then pass "$1"; else fail "$1" "wanted [$2] in: $(printf '%s' "$out" | tr '\n' '~')"; fi
     }
-    _cr "without a job of NetShift nothing is started" "no-job-no-start=none"
+    _cr "without a job of PostQ nothing is started" "no-job-no-start=none"
     _cr "a job and no crond: cron is started" "job-starts-cron=1"
     _cr "a running crond is left alone" "running-left-alone=none"
     _cr "a cron the administrator disabled is not started, and it is said" "disabled-not-started=none warned=1"
@@ -23453,8 +23437,8 @@ CRON
 test_list_update_checks() {
     header "list_update: the DNS and GitHub checks (an answer on the last attempt counts)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    [ -r "$bin" ] || { skip "netshift bin not found"; return; }
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    [ -r "$bin" ] || { skip "postq bin not found"; return; }
 
     local out
     out="$(
@@ -23486,12 +23470,12 @@ test_list_update_checks() {
 }
 
 test_daemon_and_route_table() {
-    header "The sing-box daemon is told from helper processes; the routing table of NetShift"
+    header "The sing-box daemon is told from helper processes; the routing table of PostQ"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    [ -r "$bin" ] || { skip "netshift bin not found"; return; }
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    [ -r "$bin" ] || { skip "postq bin not found"; return; }
 
-    local work="/tmp/netshift-daemon-$$" saved_rt=""
+    local work="/tmp/postq-daemon-$$" saved_rt=""
     rm -rf "$work"
     mkdir -p "$work" /etc/iproute2
     if [ -f /etc/iproute2/rt_tables ]; then
@@ -23501,7 +23485,7 @@ test_daemon_and_route_table() {
 
     local out
     out="$(
-        . "${NETSHIFT_LIB_DIR}/constants.sh"
+        . "${POSTQ_LIB_DIR}/constants.sh"
         for fn in sing_box_pids get_sing_box_daemon_pid sing_box_process_exists route_table_rule_mark; do
             eval "$(awk -v f="$fn" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
         done
@@ -23539,7 +23523,7 @@ $CFG"
         ARGV_13="/usr/bin/sing-box
 run
 -c
-/tmp/netshift-bench/cfg.json"
+/tmp/postq-bench/cfg.json"
         alive() { sing_box_process_exists && echo yes || echo no; }
         PIDS_SB="10"; echo "only-check=$(alive)"
         PIDS_SB="10 13"; echo "only-helpers=$(alive)"
@@ -23549,7 +23533,7 @@ run
 
         # the routing table: written once, a table of another name under the same number is said
         ip() { :; }
-        netshift_ipv6_enabled() { return 1; }
+        postq_ipv6_enabled() { return 1; }
         CFG=""
         printf '255\tlocal\n254\tmain\n' > /etc/iproute2/rt_tables
         route_table_rule_mark; route_table_rule_mark
@@ -23592,22 +23576,22 @@ test_e2e_config() {
     header "End to end: the generated configuration of many options together, checked and run by sing-box 1.14"
 
     local sb="/usr/local/bin/sing-box-1.14"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -x "$sb" ] || [ ! -r "$bin" ] || [ ! -r /lib/functions.sh ]; then
-        skip "sing-box 1.14, the netshift bin or /lib/functions.sh not available"
+        skip "sing-box 1.14, the postq bin or /lib/functions.sh not available"
         return
     fi
 
-    local work="/tmp/netshift-e2e-$$" saved_config="" sb_link_saved=""
+    local work="/tmp/postq-e2e-$$" saved_config="" sb_link_saved=""
     rm -rf "$work"
-    mkdir -p "$work" /usr/lib/netshift /etc/sing-box /tmp/sing-box
+    mkdir -p "$work" /usr/lib/postq /etc/sing-box /tmp/sing-box
     local f
-    for f in "${NETSHIFT_LIB_DIR}"/*; do
-        ln -sf "$f" "/usr/lib/netshift/$(basename "$f")"
+    for f in "${POSTQ_LIB_DIR}"/*; do
+        ln -sf "$f" "/usr/lib/postq/$(basename "$f")"
     done
-    if [ -f /etc/config/netshift ]; then
-        saved_config="$work/netshift.saved"
-        cp /etc/config/netshift "$saved_config"
+    if [ -f /etc/config/postq ]; then
+        saved_config="$work/postq.saved"
+        cp /etc/config/postq "$saved_config"
     fi
     if [ -e /usr/bin/sing-box ]; then
         sb_link_saved="$work/sing-box.saved"
@@ -23616,7 +23600,7 @@ test_e2e_config() {
     ln -sf "$sb" /usr/bin/sing-box
     ip link add e2ewg0 type dummy 2> /dev/null || true
 
-    cat > /etc/config/netshift << UCI
+    cat > /etc/config/postq << UCI
 config settings 'settings'
 	option dns_type 'doh'
 	option dns_server 'dns.google/dns-query'
@@ -23673,11 +23657,11 @@ UCI
     local out
     out="$(
         cd "$work" || exit 1
-        NETSHIFT_LIB=/usr/lib/netshift
+        POSTQ_LIB=/usr/lib/postq
         for f in constants logging helpers sing_box_config_manager sing_box_config_facade nft rulesets \
             kill_switch lint naive corecaps failover support filterpreview applyconfig update_notice \
             dnsbench dnsforward ecs lan pinguard routecheck snapshots subinfo feedlist updater; do
-            [ -r "$NETSHIFT_LIB/$f.sh" ] && . "$NETSHIFT_LIB/$f.sh"
+            [ -r "$POSTQ_LIB/$f.sh" ] && . "$POSTQ_LIB/$f.sh"
         done
         . /lib/functions.sh
         . /lib/config/uci.sh
@@ -23685,7 +23669,7 @@ UCI
         . "$work/funcs.sh"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$work/log"; }
         nolog() { :; }
-        config_load netshift
+        config_load postq
         ( sing_box_init_config ) > /dev/null 2>&1
         echo "built=$([ -s "$work/config.json" ] && echo yes || echo no)"
     )"
@@ -23732,7 +23716,7 @@ UCI
     _e2e "IPv6: the inbounds of both families" 'ipv6-inbounds=["dns-in","dns-in-v6","tproxy-in","tproxy-in-v6"]'
     _e2e "no deprecated independent_cache for sing-box 1.14" "no-independent-cache=true"
 
-    if [ -n "$saved_config" ]; then cp "$saved_config" /etc/config/netshift; else rm -f /etc/config/netshift; fi
+    if [ -n "$saved_config" ]; then cp "$saved_config" /etc/config/postq; else rm -f /etc/config/postq; fi
     if [ -n "$sb_link_saved" ]; then cp -P "$sb_link_saved" /usr/bin/sing-box; else rm -f /usr/bin/sing-box; fi
     ip link del e2ewg0 2> /dev/null || true
     rm -rf "$work"
@@ -23741,9 +23725,9 @@ UCI
 test_retry_lifecycle() {
     header "Subscription retry worker: singleton, TERM handling, pidfile ownership, procd fd"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$bin" ]; then
-        skip "netshift bin not found"
+        skip "postq bin not found"
         return
     fi
     if ! command -v setsid > /dev/null 2>&1; then
@@ -23751,10 +23735,10 @@ test_retry_lifecycle() {
         return
     fi
 
-    local work="/tmp/netshift-retry-$$"
+    local work="/tmp/postq-retry-$$"
     rm -rf "$work"
     mkdir -p "$work"
-    local cli="$work/netshift" pidfile="$work/retry.pid"
+    local cli="$work/postq" pidfile="$work/retry.pid"
 
     # The shipped worker functions, verbatim; only the pidfile and the binary path
     # are redirected and the 10 s start-up delay is shortened. The subscription
@@ -23765,7 +23749,7 @@ test_retry_lifecycle() {
 log() { :; }
 config_load() { :; }
 sleep() { if [ "$1" = 10 ]; then /bin/sleep 0.15 2> /dev/null || /bin/sleep 1; else /bin/sleep "$@"; fi; }
-NETSHIFT_CONFIG=netshift
+POSTQ_CONFIG=postq
 SUBSCRIPTION_RETRY_INTERVAL=1
 SUBSCRIPTION_RETRY_PIDFILE=$TEST_ROOT/retry.pid
 SUBSCRIPTION_UPDATE_APPLY_FAILED=3
@@ -23773,7 +23757,7 @@ SUBSCRIPTION_RETRY_MAX_APPLY_FAILURES=3
 SUBSCRIPTION_RETRY_BACKOFF_MAX=5
 HEAD
         awk '/^stop_subscription_startup_retry_worker\(\) \{/ {on=1} /^# --- selected server survives/ {on=0} on' "$bin" \
-            | sed -e "s#/usr/bin/netshift#$cli#g"
+            | sed -e "s#/usr/bin/postq#$cli#g"
         cat << 'TAIL'
 case "$1" in
 start) start_subscription_startup_retry_worker ;;
@@ -23938,7 +23922,7 @@ TAIL
 test_bulk_links() {
     header "Bulk conversion: the single-pass converter agrees with the per-link builder"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -23948,26 +23932,26 @@ test_bulk_links() {
         return
     fi
 
-    local work="/tmp/netshift-bulk-$$"
+    local work="/tmp/postq-bulk-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
     local out
     out="$(
-        mkdir -p /usr/lib/netshift
+        mkdir -p /usr/lib/postq
         for f in constants.sh helpers.sh logging.sh sing_box_config_manager.sh sing_box_config_facade.sh; do
-            ln -sf "$lib/$f" "/usr/lib/netshift/$f"
+            ln -sf "$lib/$f" "/usr/lib/postq/$f"
         done
-        . /usr/lib/netshift/constants.sh
-        . /usr/lib/netshift/logging.sh
-        . /usr/lib/netshift/sing_box_config_facade.sh
+        . /usr/lib/postq/constants.sh
+        . /usr/lib/postq/logging.sh
+        . /usr/lib/postq/sing_box_config_facade.sh
         CL_LOG="$work/log"; : > "$CL_LOG"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$CL_LOG"; }
         # VMess needs the extended core: pretend to have it, as both paths read the version
         get_sing_box_version() { echo "1.13.14-extended-2.5.0"; }
-        : > /etc/config/netshift
-        uci -q set netshift.bk=section
-        uci -q commit netshift
+        : > /etc/config/postq
+        uci -q set postq.bk=section
+        uci -q commit postq
 
         U=2f35965a-9a9b-45fd-ba32-987296dfb6be
         cat > "$work/links.txt" << LIST
@@ -24010,7 +23994,7 @@ ss://a:b:c@s4.example.com:8388#ss-three
 ss://YWVzLTI1Ni1nY206cHc=@[2001:db8::2]:8388/?plugin=v2ray-plugin#ss-plugin
 LIST
         n_fast="$work/fast.json"; n_slow="$work/slow.json"
-        ln -sf "$lib/linkfast.jq" /usr/lib/netshift/linkfast.jq
+        ln -sf "$lib/linkfast.jq" /usr/lib/postq/linkfast.jq
         echo "linkfast-parses=$(jq -R -n -c --argjson opt '{"base":0}' -f "$lib/linkfast.jq" < /dev/null > /dev/null 2>&1 && echo yes || echo no)"
         : > "$CL_LOG"
         normalize_subscription_to_singbox "$work/links.txt" "$n_fast" "bk" > /dev/null 2>&1
@@ -24018,7 +24002,7 @@ LIST
         # would also pass when everything silently goes the slow way)
         fc="$(sed -n 's/.*link(s) in this round, \([0-9]*\) converted.*/\1/p' "$CL_LOG" | head -1)"
         if [ "${fc:-0}" -ge 25 ]; then echo "fast-converted=yes"; else echo "fast-converted=no(${fc:-0})"; fi
-        rm -f /usr/lib/netshift/linkfast.jq
+        rm -f /usr/lib/postq/linkfast.jq
         normalize_subscription_to_singbox "$work/links.txt" "$n_slow" "bk" > /dev/null 2>&1
         echo "count-fast=$(jq -c '.outbounds | length' "$n_fast")"
         echo "count-slow=$(jq -c '.outbounds | length' "$n_slow")"
@@ -24034,30 +24018,30 @@ LIST
         echo "utf8=$(jq -c '[.outbounds[].tag | select(contains("Berlin"))] | length' "$n_fast")"
 
         # the "UDP over TCP" flag reaches socks and ss links, the same on both paths
-        uci -q set netshift.bk.enable_udp_over_tcp=1; uci -q commit netshift
-        ln -sf "$lib/linkfast.jq" /usr/lib/netshift/linkfast.jq
+        uci -q set postq.bk.enable_udp_over_tcp=1; uci -q commit postq
+        ln -sf "$lib/linkfast.jq" /usr/lib/postq/linkfast.jq
         normalize_subscription_to_singbox "$work/links.txt" "$work/uot_fast.json" "bk" > /dev/null 2>&1
-        rm -f /usr/lib/netshift/linkfast.jq
+        rm -f /usr/lib/postq/linkfast.jq
         normalize_subscription_to_singbox "$work/links.txt" "$work/uot_slow.json" "bk" > /dev/null 2>&1
         echo "uot-set=$(jq -c '[.outbounds[] | select(.udp_over_tcp.enabled == true) | .type] | unique' "$work/uot_slow.json")"
         echo "uot-only-those=$(jq -c '[.outbounds[] | select(.udp_over_tcp != null and ((.type == "socks" or .type == "shadowsocks") | not))] | length' "$work/uot_slow.json")"
         if [ "$(jq -S -c . "$work/uot_fast.json")" = "$(jq -S -c . "$work/uot_slow.json")" ]; then echo "uot-same=yes"; else echo "uot-same=no"; fi
-        uci -q delete netshift.bk.enable_udp_over_tcp; uci -q commit netshift
+        uci -q delete postq.bk.enable_udp_over_tcp; uci -q commit postq
         # a single link
         echo "uot-single=$(sing_box_cf_add_proxy_outbound '{"outbounds":[]}' x 'ss://aes-128-gcm:pw@h.example.com:8388#n' 1 | jq -c '.outbounds[0].udp_over_tcp')"
         echo "uot-single-socks=$(sing_box_cf_add_proxy_outbound '{"outbounds":[]}' x 'socks5://u:p@h.example.com:1080#n' 1 | jq -c '.outbounds[0].udp_over_tcp')"
         echo "uot-single-off=$(sing_box_cf_add_proxy_outbound '{"outbounds":[]}' x 'ss://aes-128-gcm:pw@h.example.com:8388#n' 0 | jq -c '.outbounds[0].udp_over_tcp')"
 
         # the cap counts converted links as well
-        ln -sf "$lib/linkfast.jq" /usr/lib/netshift/linkfast.jq
-        uci -q set netshift.bk.subscription_max_nodes=4; uci -q commit netshift
+        ln -sf "$lib/linkfast.jq" /usr/lib/postq/linkfast.jq
+        uci -q set postq.bk.subscription_max_nodes=4; uci -q commit postq
         : > "$CL_LOG"
         normalize_subscription_to_singbox "$work/links.txt" "$work/cap.json" "bk" > /dev/null 2>&1
         echo "cap=$(jq -c '.outbounds | length' "$work/cap.json") warned=$(grep -c 'only the first 4' "$CL_LOG")"
 
-        uci -q set netshift.bk.subscription_max_nodes=0; uci -q commit netshift
+        uci -q set postq.bk.subscription_max_nodes=0; uci -q commit postq
         # links the two paths read differently once: ML-KEM hint, ss without padding; allow_insecure is read by both
-        ln -sf "$lib/linkfast.jq" /usr/lib/netshift/linkfast.jq
+        ln -sf "$lib/linkfast.jq" /usr/lib/postq/linkfast.jq
         cat > "$work/tricky.txt" << LIST
 vless://$U@a.example.com:443?security=reality&type=tcp&sni=a.example.com&fp=chrome&pbk=abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG&sid=01&support-x25519mlkem768=true#mlkem-true
 vless://$U@b.example.com:443?security=reality&type=tcp&sni=b.example.com&fp=chrome&pbk=abcdefghijklmnopqrstuvwxyz0123456789ABCDEFG&sid=01&support-x25519mlkem768=false#mlkem-false
@@ -24067,7 +24051,7 @@ ss://YWVzLTI1Ni1nY206cHcxOA@s1.example.com:8388#ss-unpadded-18
 ss://YWVzLTI1Ni1nY206cHc=@s2.example.com:8388#ss-padded
 LIST
         normalize_subscription_to_singbox "$work/tricky.txt" "$work/tr_fast.json" "bk" > /dev/null 2>&1
-        rm -f /usr/lib/netshift/linkfast.jq
+        rm -f /usr/lib/postq/linkfast.jq
         normalize_subscription_to_singbox "$work/tricky.txt" "$work/tr_slow.json" "bk" > /dev/null 2>&1
         if [ "$(jq -S -c . "$work/tr_fast.json")" = "$(jq -S -c . "$work/tr_slow.json")" ]; then
             echo "tricky-same=yes"
@@ -24080,19 +24064,19 @@ LIST
         echo "tricky-count=$(jq -c '.outbounds | length' "$work/tr_fast.json")"
 
         # a linkfast.jq that does not run (a broken file) costs only speed, never links
-        printf 'this is not jq (' > /usr/lib/netshift/linkfast.jq
+        printf 'this is not jq (' > /usr/lib/postq/linkfast.jq
         normalize_subscription_to_singbox "$work/links.txt" "$work/broken.json" "bk" > /dev/null 2>&1
-        rm -f /usr/lib/netshift/linkfast.jq
+        rm -f /usr/lib/postq/linkfast.jq
         if [ "$(jq -S -c . "$work/broken.json")" = "$(jq -S -c . "$n_slow")" ]; then echo "broken-same=yes"; else echo "broken-same=no"; fi
 
         # the cap limits the WORK: 400 links with a limit of 10 are not all converted
-        ln -sf "$lib/linkfast.jq" /usr/lib/netshift/linkfast.jq
+        ln -sf "$lib/linkfast.jq" /usr/lib/postq/linkfast.jq
         i=0; : > "$work/big.txt"
         while [ "$i" -lt 400 ]; do
             echo "vless://$U@b$i.example.com:443?security=tls&type=tcp&sni=b$i.example.com#b$i" >> "$work/big.txt"
             i=$((i + 1))
         done
-        uci -q set netshift.bk.subscription_max_nodes=10; uci -q commit netshift
+        uci -q set postq.bk.subscription_max_nodes=10; uci -q commit postq
         : > "$CL_LOG"
         normalize_subscription_to_singbox "$work/big.txt" "$work/bigcap.json" "bk" > /dev/null 2>&1
         echo "bigcap=$(jq -c '.outbounds | length' "$work/bigcap.json")"
@@ -24103,13 +24087,13 @@ LIST
         normalize_subscription_to_singbox "$work/bigbad.txt" "$work/bigbad.json" "bk" > /dev/null 2>&1
         echo "bigbad=$(jq -c '.outbounds | length' "$work/bigbad.json")"
         # a feed shorter than the limit: no warning
-        uci -q set netshift.bk.subscription_max_nodes=1000; uci -q commit netshift
+        uci -q set postq.bk.subscription_max_nodes=1000; uci -q commit postq
         : > "$CL_LOG"
         normalize_subscription_to_singbox "$work/big.txt" "$work/bigall.json" "bk" > /dev/null 2>&1
         echo "bigall=$(jq -c '.outbounds | length' "$work/bigall.json") warned=$(grep -c 'only the first' "$CL_LOG")"
 
         # many links, one pass: it must stay quick
-        uci -q set netshift.bk.subscription_max_nodes=0; uci -q commit netshift
+        uci -q set postq.bk.subscription_max_nodes=0; uci -q commit postq
         i=0; : > "$work/many.txt"
         while [ "$i" -lt 1500 ]; do
             echo "vless://$U@s$i.example.com:443?security=tls&type=tcp&sni=s$i.example.com#n$i" >> "$work/many.txt"
@@ -24153,29 +24137,29 @@ LIST
     _bk "a feed shorter than the limit is taken whole, without a warning" "bigall=400 warned=0"
     _bk "1500 links all become servers" "many=1500"
     _bk "1500 links are converted in a few seconds" "quick=yes"
-    rm -rf "$work" /etc/config/netshift /usr/lib/netshift/linkfast.jq
+    rm -rf "$work" /etc/config/postq /usr/lib/postq/linkfast.jq
 }
 
 test_failover_direct() {
     header "Failover to direct: the wrapping selector and the monitor"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if ! command -v jq > /dev/null 2>&1 || [ ! -r "$bin" ] || [ ! -r "$lib/failover.sh" ]; then
-        skip "jq, the netshift bin or failover.sh not available"
+        skip "jq, the postq bin or failover.sh not available"
         return
     fi
-    mkdir -p /usr/lib/netshift
+    mkdir -p /usr/lib/postq
     local f
     for f in "$lib"/*.sh "$lib"/*.jq; do
-        ln -sf "$f" "/usr/lib/netshift/$(basename "$f")"
+        ln -sf "$f" "/usr/lib/postq/$(basename "$f")"
     done
 
-    local work="/tmp/netshift-failover-$$"
+    local work="/tmp/postq-failover-$$"
     rm -rf "$work"
     mkdir -p "$work/uci"
     awk '/^[a-zA-Z_][a-zA-Z0-9_]*\(\) \{/{p=1} p{print} p&&/^\}/{p=0}' "$bin" > "$work/funcs.sh"
-    cat > "$work/uci/netshift" << 'CF'
+    cat > "$work/uci/postq" << 'CF'
 config settings 'settings'
 	option dns_type 'doh'
 
@@ -24214,7 +24198,7 @@ CF
         . "$lib/failover.sh"
         FO_LOG="$work/log"; : > "$FO_LOG"
         log() { printf '[%s] %s\n' "${2:-info}" "$1" >> "$FO_LOG"; }
-        UCI_CONFIG_DIR="$work/uci" config_load netshift
+        UCI_CONFIG_DIR="$work/uci" config_load postq
 
         config='{"outbounds":[{"type":"urltest","tag":"main-out","outbounds":["main-1-out"]},{"type":"vless","tag":"main-1-out"},{"type":"vless","tag":"plain-out"},{"type":"direct","tag":"direct-out"},{"type":"vless","tag":"x","detour":"main-out"}],
           "route":{"final":"main-out","rules":[{"inbound":["tproxy-in"],"outbound":"main-out"},{"inbound":["tproxy-in"],"outbound":"plain-out"},{"action":"reject"}],"rule_set":[{"tag":"r","download_detour":"main-out"}]},
@@ -24364,16 +24348,16 @@ CF
 test_dns_server_route() {
     header "DNS server route (direct / tunnel per server)"
 
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
-    local lib="${NETSHIFT_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
+    local lib="${POSTQ_LIB_DIR}"
     if [ ! -r "$bin" ] || [ ! -r "$lib/helpers.sh" ]; then
-        fail "netshift bin / helpers.sh not found"
+        fail "postq bin / helpers.sh not found"
         return
     fi
 
-    local drv="/tmp/netshift-dnsroute-$$.sh"
+    local drv="/tmp/postq-dnsroute-$$.sh"
     cat > "$drv" << 'DREOF'
-LIB="NETSHIFT_LIB"
+LIB="POSTQ_LIB"
 . "$LIB/constants.sh"
 . "$LIB/helpers.sh"
 log() { :; }
@@ -24397,11 +24381,11 @@ config_get() {
 config_list_foreach() {
     local _handler="$3" _item
     shift 3
-    printf '%s\n' "$RT_ROUTES" | tr ' ' '\n' | awk 'NR % 2 {printf "%s ", $0; next} {print}' > /tmp/netshift-dnsroute-list.$$
+    printf '%s\n' "$RT_ROUTES" | tr ' ' '\n' | awk 'NR % 2 {printf "%s ", $0; next} {print}' > /tmp/postq-dnsroute-list.$$
     while IFS= read -r _item; do
         [ -n "$_item" ] && "$_handler" "$_item" "$@"
-    done < /tmp/netshift-dnsroute-list.$$
-    rm -f /tmp/netshift-dnsroute-list.$$
+    done < /tmp/postq-dnsroute-list.$$
+    rm -f /tmp/postq-dnsroute-list.$$
 }
 section_has_configured_outbound() { [ "$1" != gone ]; }
 get_first_outbound_section() { echo main; }
@@ -24429,9 +24413,9 @@ echo "two-entries:[$(tag udp://1.1.1.1)][$(tag $DOH)]"
 RT_VIA=0; RT_ROUTES="$DOH direct udp://1.1.1.1 via:second"
 eval "$(awk '$0 == "_resolve_dns_outbound_tag() {"{p=1} p{print} p&&/^\}/{exit}' "BIN_PATH" | sed '1s/^_resolve_dns_outbound_tag()/_resolve_dns_outbound_tag_real()/')"
 # (it runs in a command substitution: the count goes to a file)
-_resolve_dns_outbound_tag() { [ -n "${1:-}" ] || echo x >> /tmp/netshift-dnsroute-resolves.$$; _resolve_dns_outbound_tag_real "$@"; }
-resolves() { cat /tmp/netshift-dnsroute-resolves.$$ 2> /dev/null | wc -l | tr -d ' '; rm -f /tmp/netshift-dnsroute-resolves.$$; }
-rm -f /tmp/netshift-dnsroute-resolves.$$
+_resolve_dns_outbound_tag() { [ -n "${1:-}" ] || echo x >> /tmp/postq-dnsroute-resolves.$$; _resolve_dns_outbound_tag_real "$@"; }
+resolves() { cat /tmp/postq-dnsroute-resolves.$$ 2> /dev/null | wc -l | tr -d ' '; rm -f /tmp/postq-dnsroute-resolves.$$; }
+rm -f /tmp/postq-dnsroute-resolves.$$
 dns_routes_init
 echo "no-tunnel-entry-not-resolved:[$(resolves)]"
 RT_ROUTES="$DOH tunnel"; dns_routes_init
@@ -24466,7 +24450,7 @@ echo "key-lower-entry-upper-lookup:[$(tag DoH://Dns.Google/dns-query)]"
 RT_ROUTES="doh://dns.google/Dns-Query tunnel"
 echo "key-path-stays-case-sensitive:[$(tag doh://dns.google/dns-query)]"
 DREOF
-    sed -i "s|NETSHIFT_LIB|$lib|; s|BIN_PATH|$bin|" "$drv"
+    sed -i "s|POSTQ_LIB|$lib|; s|BIN_PATH|$bin|" "$drv"
     local out
     out="$(ash "$drv" 2>&1)"
     rm -f "$drv"
@@ -24504,14 +24488,14 @@ DREOF
 test_first_run_message() {
     header "First start without a connection: a warning that says what to do"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$lib/helpers.sh" ] || [ ! -r "$bin" ]; then
         fail "helpers.sh / bin not found"
         return
     fi
 
-    local work="/tmp/netshift-firstrun-$$"
+    local work="/tmp/postq-firstrun-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
     printf '#!/bin/sh\necho "sing-box version 1.13.0"\n' > "$work/bin/sing-box"
@@ -24571,9 +24555,9 @@ DRVEOF
         fi
     }
     _fr_check "fresh install: not started" "$fresh" "rc=1"
-    _fr_check "fresh install: a warning" "$fresh" "LOG warn|NetShift is not started: no section has a connection yet"
+    _fr_check "fresh install: a warning" "$fresh" "LOG warn|PostQ VPN is not started: no section has a connection yet"
     _fr_check "fresh install: names the empty section" "$fresh" "(main: proxy, url)"
-    _fr_check "fresh install: says where to add the link" "$fresh" "Open Services → NetShift → Sections"
+    _fr_check "fresh install: says where to add the link" "$fresh" "Open Services → PostQvpn and paste the subscription link"
     if printf '%s\n' "$fresh" | grep -q 'LOG error|'; then
         fail "fresh install: no error is logged"
     else
@@ -24589,14 +24573,14 @@ DRVEOF
 test_auto_update() {
     header "Automatic updates with a rollback (lib/autoupdate.sh)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$lib/autoupdate.sh" ] || [ ! -r "$bin" ] || [ ! -r "$lib/updater.sh" ]; then
         fail "autoupdate.sh / updater.sh / bin not found"
         return
     fi
 
-    local work="/tmp/netshift-autoupdate-$$"
+    local work="/tmp/postq-autoupdate-$$"
     rm -rf "$work"
     mkdir -p "$work/jobs"
 
@@ -24636,7 +24620,7 @@ priority_probe_delay() { [ -f "$W/dead" ] && echo 0 || echo 120; }
 # the router: installed versions live in files (installs run in command substitutions)
 echo "1.14.2-extended-2.7.2" > "$W/sb"; echo "0.9.11" > "$W/ns"
 SB_LATEST="1.14.3-extended-2.7.3"; NS_LATEST="0.9.12"; SB_BROKEN=""; NS_BROKEN=""; SB_VARIANT=extended
-NETSHIFT_VERSION="0.9.11"
+POSTQ_VERSION="0.9.11"
 broken() { [ "$(cat "$W/sb")" = "$SB_BROKEN" ] || [ "$(cat "$W/ns")" = "$NS_BROKEN" ]; }
 curl() { broken && return 7; [ -f "$W/api-down" ] && return 7; echo '{"version":"sing-box"}'; }
 get_sing_box_variant() { echo "$SB_VARIANT"; }
@@ -24647,7 +24631,7 @@ _check() {
 }
 updates_check_sing_box_extended() { _check "$(cat "$W/sb")" "$SB_LATEST"; }
 updates_check_sing_box_lite() { _check "$(cat "$W/sb")" "$SB_LATEST"; }
-updates_check_netshift() { _check "$(cat "$W/ns")" "$NS_LATEST"; }
+updates_check_postq() { _check "$(cat "$W/ns")" "$NS_LATEST"; }
 SB_INSTALL_FAIL=""; NS_INSTALL_FAIL=""
 updates_install_sing_box_extended() {
     local to="${UPDATES_PINNED_TAG:-$SB_LATEST}"
@@ -24656,13 +24640,13 @@ updates_install_sing_box_extended() {
     echo "$to" > "$W/sb"; echo '{"success":true}'
 }
 updates_install_sing_box_lite() { echo "lite-install" >> "$W/calls"; updates_install_sing_box_extended; }
-updates_self_update_netshift() {
+updates_self_update_postq() {
     local to="${UPDATES_PINNED_TAG:-$NS_LATEST}"
-    echo "ns-install pinned=${UPDATES_PINNED_TAG:-} installed=$NETSHIFT_VERSION" >> "$W/calls"
+    echo "ns-install pinned=${UPDATES_PINNED_TAG:-} installed=$POSTQ_VERSION" >> "$W/calls"
     case " $NS_INSTALL_FAIL " in *" $to "*) echo '{"success":false,"message":"package refused"}'; return 1 ;; esac
     echo "$to" > "$W/ns"; echo '{"success":true}'
 }
-updates_restart_netshift() { echo "restart" >> "$W/calls"; }
+updates_restart_postq() { echo "restart" >> "$W/calls"; }
 
 reset() { rm -f "$W/calls" "$W/log" "$W/dead" "$W/api-down"; rm -rf "$W/lock"; }
 results() { jq -c '[.last_run.results[] | "\(.component):\(.result):\(.from)>\(.to)"]' "$W/state.json" 2> /dev/null; }
@@ -24674,7 +24658,7 @@ auto_update_run scheduled
 echo "off=[$(calls)] state=$([ -f "$W/state.json" ] && echo yes || echo no)"
 AU_OPTS="auto_update=1"
 
-# A2: NetShift does not work before the update -> nothing is installed
+# A2: PostQ does not work before the update -> nothing is installed
 reset; touch "$W/dead"
 auto_update_run scheduled
 echo "unhealthy=[$(calls)] $(results)"
@@ -24701,11 +24685,11 @@ reset; SB_LATEST="1.14.5-extended-2.8.1"; SB_BROKEN=""
 auto_update_run scheduled
 echo "sb-newer=[$(calls)] sb=$(cat "$W/sb")"
 
-# A7: a new NetShift breaks the router -> reinstalled by its tag; the rollback install sees the
+# A7: a new PostQ breaks the router -> reinstalled by its tag; the rollback install sees the
 #     version that is installed now, not the one this (old) process was started with
-reset; NS_LATEST="0.9.13"; NS_BROKEN="0.9.13"; NETSHIFT_VERSION="0.9.12"
+reset; NS_LATEST="0.9.13"; NS_BROKEN="0.9.13"; POSTQ_VERSION="0.9.12"
 auto_update_run scheduled
-echo "ns-rollback=[$(calls)] $(results) ns=$(cat "$W/ns") version=$NETSHIFT_VERSION"
+echo "ns-rollback=[$(calls)] $(results) ns=$(cat "$W/ns") version=$POSTQ_VERSION"
 
 # A8: the install fails -> nothing to roll back
 reset; NS_LATEST="0.9.14"; NS_BROKEN=""; NS_INSTALL_FAIL="0.9.14"; SB_LATEST="$(cat "$W/sb")"
@@ -24717,14 +24701,14 @@ NS_INSTALL_FAIL=""
 reset; NS_LATEST="0.9.15"; NS_BROKEN="0.9.15"; NS_INSTALL_FAIL="0.9.12"
 auto_update_run scheduled
 echo "rollback-fail=[$(calls)] $(results)"
-NS_INSTALL_FAIL=""; NS_BROKEN=""; echo "0.9.12" > "$W/ns"; NETSHIFT_VERSION="0.9.12"
+NS_INSTALL_FAIL=""; NS_BROKEN=""; echo "0.9.12" > "$W/ns"; POSTQ_VERSION="0.9.12"
 
 # A10: stock sing-box is not touched; only sing-box can be turned off
 reset; SB_VARIANT=stock; NS_LATEST="0.9.12"
 auto_update_run scheduled
 echo "stock=[$(calls)] $(results)"
 echo "reason-stock=$(jq -r '.last_run.results[0].reason' "$W/state.json") updated-has-no-reason=$(jq -r '.last_run.results[1] | has("reason")' "$W/state.json")"
-SB_VARIANT=extended_lite; SB_LATEST="1.14.6-extended-2.8.2-lite"; AU_OPTS="auto_update=1 auto_update_netshift=0"
+SB_VARIANT=extended_lite; SB_LATEST="1.14.6-extended-2.8.2-lite"; AU_OPTS="auto_update=1 auto_update_postq=0"
 reset
 auto_update_run scheduled
 echo "lite-only=[$(calls)] $(results)"
@@ -24752,7 +24736,7 @@ for spec in "12h 04:30" "1d 23:05" "1w 00:00" "1d 7:5" "2d 04:30"; do
     echo "cron $1 $2=[$(get_auto_update_cron_line "$1" "$2")]"
 done
 crontab() { if [ "$1" = "-l" ]; then cat "$W/crontab" 2> /dev/null; else cat > "$W/crontab.new"; mv "$W/crontab.new" "$W/crontab"; fi; }
-printf '%s\n' "0 4 * * * /usr/bin/netshift list_update" "1 1 * * * /usr/bin/netshift auto_update scheduled" > "$W/crontab"
+printf '%s\n' "0 4 * * * /usr/bin/postq list_update" "1 1 * * * /usr/bin/postq auto_update scheduled" > "$W/crontab"
 AU_OPTS="auto_update=1 auto_update_interval=12h auto_update_time=03:15"; sync_auto_update_cron_job
 echo "crontab-on=[$(tr '\n' ';' < "$W/crontab")]"
 AU_OPTS="auto_update=1 auto_update_interval=off"; sync_auto_update_cron_job
@@ -24783,7 +24767,7 @@ echo "pin-v=$(UPDATES_PINNED_TAG=v1.14.2-extended-2.7.2 updates_extended_release
 echo "pin-missing=[$(UPDATES_PINNED_TAG=1.13.0-extended-1.0.0 updates_extended_release_tag "$rel")]"
 echo "pin-prerelease=[$(UPDATES_PINNED_TAG=1.14.1-extended-2.7.1 updates_extended_release_tag "$rel")]"
 updates_github_resolve_redirect() { echo "https://github.com/x/y/releases/tag/0.9.99"; }
-echo "ns-latest=$(updates_netshift_latest_tag) ns-pinned=$(UPDATES_PINNED_TAG=0.9.11 updates_netshift_latest_tag)"
+echo "ns-latest=$(updates_postq_latest_tag) ns-pinned=$(UPDATES_PINNED_TAG=0.9.11 updates_postq_latest_tag)"
 echo DONE
 DRVEOF
     sed -i "s|DRV_CONSTANTS|$lib/constants.sh|; s|DRV_HELPERS|$lib/helpers.sh|; s|DRV_UPDATER|$lib/updater.sh|; s|DRV_AUTOUPDATE|$lib/autoupdate.sh|; s|DRV_BIN|$bin|; s|DRV_WORK|$work|g" "$drv"
@@ -24800,31 +24784,31 @@ DRVEOF
         fi
     }
     _au "switched off: a scheduled run does nothing" 'off=[] state=no'
-    _au "NetShift not working before: nothing is installed" 'unhealthy=[] ["all:skipped:>"]'
-    _au "both updated, sing-box first, NetShift restarted" 'updated=[sb-install pinned=;ns-install pinned= installed=0.9.11;restart;] ["sing_box:updated:1.14.2-extended-2.7.2>1.14.3-extended-2.7.3","netshift:updated:0.9.11>0.9.12"] ns=0.9.12 sb=1.14.3-extended-2.7.3'
-    _au "a broken sing-box is rolled back to the release it replaced" 'sb-rollback=[sb-install pinned=;sb-install pinned=1.14.2-extended-2.7.2;] ["sing_box:rolled_back:1.14.2-extended-2.7.2>1.14.4-extended-2.8.0","netshift:latest:0.9.12>0.9.12"] sb=1.14.2-extended-2.7.2 bad=1.14.4-extended-2.8.0'
-    _au "the rolled back release is skipped by the next run" 'sb-skip=[] ["sing_box:skipped:1.14.2-extended-2.7.2>1.14.4-extended-2.8.0","netshift:latest:0.9.12>0.9.12"]'
+    _au "PostQ not working before: nothing is installed" 'unhealthy=[] ["all:skipped:>"]'
+    _au "both updated, sing-box first, PostQ restarted" 'updated=[sb-install pinned=;ns-install pinned= installed=0.9.11;restart;] ["sing_box:updated:1.14.2-extended-2.7.2>1.14.3-extended-2.7.3","postq:updated:0.9.11>0.9.12"] ns=0.9.12 sb=1.14.3-extended-2.7.3'
+    _au "a broken sing-box is rolled back to the release it replaced" 'sb-rollback=[sb-install pinned=;sb-install pinned=1.14.2-extended-2.7.2;] ["sing_box:rolled_back:1.14.2-extended-2.7.2>1.14.4-extended-2.8.0","postq:latest:0.9.12>0.9.12"] sb=1.14.2-extended-2.7.2 bad=1.14.4-extended-2.8.0'
+    _au "the rolled back release is skipped by the next run" 'sb-skip=[] ["sing_box:skipped:1.14.2-extended-2.7.2>1.14.4-extended-2.8.0","postq:latest:0.9.12>0.9.12"]'
     _au "the reasons of a skip are codes the UI translates" 'reason-not-working=not_working'
     _au "...a release rolled back earlier" 'reason-bad-version=bad_version'
     _au "...the stock core; a result that is not a skip has no reason" 'reason-stock=stock_core updated-has-no-reason=false'
     _au "a newer release than the bad one is installed" 'sb-newer=[sb-install pinned=;] sb=1.14.5-extended-2.8.1'
-    _au "a broken NetShift is rolled back; the rollback knows the installed version" 'ns-rollback=[ns-install pinned= installed=0.9.12;restart;ns-install pinned=0.9.12 installed=0.9.13;restart;] ["sing_box:latest:1.14.5-extended-2.8.1>1.14.5-extended-2.8.1","netshift:rolled_back:0.9.12>0.9.13"] ns=0.9.12 version=0.9.12'
-    _au "a failed install keeps the old version, no rollback" 'install-fail=[ns-install pinned= installed=0.9.12;] ["sing_box:latest:1.14.5-extended-2.8.1>1.14.5-extended-2.8.1","netshift:failed:0.9.12>0.9.14"]'
-    _au "a failed rollback is reported" 'rollback-fail=[ns-install pinned= installed=0.9.12;restart;ns-install pinned=0.9.12 installed=0.9.15;] ["sing_box:latest:1.14.5-extended-2.8.1>1.14.5-extended-2.8.1","netshift:failed:0.9.12>0.9.15"]'
-    _au "the stock sing-box is not updated" 'stock=[] ["sing_box:skipped:>","netshift:latest:0.9.12>0.9.12"]'
-    _au "the lite core is updated by its own installer; NetShift can be left out" 'lite-only=[lite-install;sb-install pinned=;] ["sing_box:updated:1.14.5-extended-2.8.1>1.14.6-extended-2.8.2-lite"]'
+    _au "a broken PostQ is rolled back; the rollback knows the installed version" 'ns-rollback=[ns-install pinned= installed=0.9.12;restart;ns-install pinned=0.9.12 installed=0.9.13;restart;] ["sing_box:latest:1.14.5-extended-2.8.1>1.14.5-extended-2.8.1","postq:rolled_back:0.9.12>0.9.13"] ns=0.9.12 version=0.9.12'
+    _au "a failed install keeps the old version, no rollback" 'install-fail=[ns-install pinned= installed=0.9.12;] ["sing_box:latest:1.14.5-extended-2.8.1>1.14.5-extended-2.8.1","postq:failed:0.9.12>0.9.14"]'
+    _au "a failed rollback is reported" 'rollback-fail=[ns-install pinned= installed=0.9.12;restart;ns-install pinned=0.9.12 installed=0.9.15;] ["sing_box:latest:1.14.5-extended-2.8.1>1.14.5-extended-2.8.1","postq:failed:0.9.12>0.9.15"]'
+    _au "the stock sing-box is not updated" 'stock=[] ["sing_box:skipped:>","postq:latest:0.9.12>0.9.12"]'
+    _au "the lite core is updated by its own installer; PostQ can be left out" 'lite-only=[lite-install;sb-install pinned=;] ["sing_box:updated:1.14.5-extended-2.8.1>1.14.6-extended-2.8.2-lite"]'
     _au "an install in the Components manager: skipped" 'job-running=[] ["all:skipped:>"]'
     _au "a run in progress: the second one does nothing" 'locked=[] state=no lock=kept'
     _au "now runs even when switched off" 'now=[ns-install pinned= installed=0.9.12;restart;]'
-    _au "cron 12h: twice a day" 'cron 12h 04:30=[30 4,16 * * * /usr/bin/netshift auto_update scheduled]'
-    _au "cron 1d" 'cron 1d 23:05=[5 23 * * * /usr/bin/netshift auto_update scheduled]'
-    _au "cron 1w: on Sunday, midnight without octal traps" 'cron 1w 00:00=[0 0 * * 0 /usr/bin/netshift auto_update scheduled]'
-    _au "cron: an invalid time takes the default" 'cron 1d 7:5=[30 4 * * * /usr/bin/netshift auto_update scheduled]'
+    _au "cron 12h: twice a day" 'cron 12h 04:30=[30 4,16 * * * /usr/bin/postq auto_update scheduled]'
+    _au "cron 1d" 'cron 1d 23:05=[5 23 * * * /usr/bin/postq auto_update scheduled]'
+    _au "cron 1w: on Sunday, midnight without octal traps" 'cron 1w 00:00=[0 0 * * 0 /usr/bin/postq auto_update scheduled]'
+    _au "cron: an invalid time takes the default" 'cron 1d 7:5=[30 4 * * * /usr/bin/postq auto_update scheduled]'
     _au "cron: an unknown interval has no line" 'cron 2d 04:30=[]'
-    _au "crontab: the job replaces the old one, other jobs stay" 'crontab-on=[0 4 * * * /usr/bin/netshift list_update;15 3,15 * * * /usr/bin/netshift auto_update scheduled;]'
-    _au "crontab: interval off removes the job" 'crontab-interval-off=[0 4 * * * /usr/bin/netshift list_update;]'
-    _au "crontab: switched off removes the job" 'crontab-disabled=[0 4 * * * /usr/bin/netshift list_update;]'
-    _au "crontab: default schedule is daily at 04:30" 'crontab-default=[0 4 * * * /usr/bin/netshift list_update;30 4 * * * /usr/bin/netshift auto_update scheduled;]'
+    _au "crontab: the job replaces the old one, other jobs stay" 'crontab-on=[0 4 * * * /usr/bin/postq list_update;15 3,15 * * * /usr/bin/postq auto_update scheduled;]'
+    _au "crontab: interval off removes the job" 'crontab-interval-off=[0 4 * * * /usr/bin/postq list_update;]'
+    _au "crontab: switched off removes the job" 'crontab-disabled=[0 4 * * * /usr/bin/postq list_update;]'
+    _au "crontab: default schedule is daily at 04:30" 'crontab-default=[0 4 * * * /usr/bin/postq list_update;30 4 * * * /usr/bin/postq auto_update scheduled;]'
     _au "boot: the run is started" 'boot-first=spawned'
     _au "boot: once per boot" 'boot-second=no'
     _au "a restart long after boot is not a boot" 'boot-restart-later=no'
@@ -24836,7 +24820,7 @@ DRVEOF
     _au "pin with v" 'pin-v=v1.14.2-extended-2.7.2'
     _au "pin: a release that is not there gives nothing" 'pin-missing=[]'
     _au "pin: a pre-release is not installed" 'pin-prerelease=[]'
-    _au "NetShift: the pinned tag instead of the latest" 'ns-latest=0.9.99 ns-pinned=0.9.11'
+    _au "PostQ: the pinned tag instead of the latest" 'ns-latest=0.9.99 ns-pinned=0.9.11'
     _au "driver completed" 'DONE'
 
     rm -rf "$work"
@@ -24847,14 +24831,14 @@ DRVEOF
 test_oneshot_memlimit() {
     header "Memory ceiling of short-lived sing-box runs (GOMEMLIMIT)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if [ ! -r "$lib/helpers.sh" ] || [ ! -r "$bin" ]; then
         fail "helpers.sh / bin not found"
         return
     fi
 
-    local work="/tmp/netshift-memlimit-$$"
+    local work="/tmp/postq-memlimit-$$"
     rm -rf "$work"
     mkdir -p "$work/bin"
     cat > "$work/bin/sing-box" << 'SBEOF'
@@ -24873,16 +24857,16 @@ nolog() { :; }
 PATH="DRV_WORK/bin:$PATH"
 SB_LOG="DRV_WORK/sb.log"; export SB_LOG
 meminfo() { printf 'MemTotal:       %s kB\nMemFree:        1000 kB\n' "$1" > DRV_WORK/meminfo; }
-NETSHIFT_MEMINFO_PATH=DRV_WORK/meminfo
+POSTQ_MEMINFO_PATH=DRV_WORK/meminfo
 for kb in 65536 131072 262144 524288 1048576 4194304; do
     meminfo "$kb"
     printf 'limit %s=%s\n' "$kb" "$(sing_box_oneshot_memlimit)"
 done
-NETSHIFT_MEMINFO_PATH=DRV_WORK/missing
+POSTQ_MEMINFO_PATH=DRV_WORK/missing
 printf 'limit missing=[%s]\n' "$(sing_box_oneshot_memlimit)"
 
 meminfo 262144
-NETSHIFT_MEMINFO_PATH=DRV_WORK/meminfo
+POSTQ_MEMINFO_PATH=DRV_WORK/meminfo
 unset GOMEMLIMIT
 ( sing_box_oneshot -c /tmp/x.json check )
 ( GOMEMLIMIT=200MiB; export GOMEMLIMIT; sing_box_oneshot rule-set match a b )
@@ -24951,7 +24935,7 @@ SBEOF
         . "$lib/helpers.sh"
         PATH="$work/bin:$PATH"
         SB_PIDFILE="$work/sb.pid"; SB_ENVFILE="$work/sb.env"; export SB_PIDFILE SB_ENVFILE
-        NETSHIFT_MEMINFO_PATH="$work/meminfo"
+        POSTQ_MEMINFO_PATH="$work/meminfo"
         printf 'MemTotal:       262144 kB\n' > "$work/meminfo"
         eval "$(awk '/^sing_box_fetch_ifconfig_with_timeout\(\) \{/{p=1} p{print} p&&/^\}/{exit}' "$bin")"
         # the watchdog waits 20 s in production; a second here
@@ -24978,7 +24962,7 @@ SBEOF
         fail "the proxy check runs without the ceiling" "$fetch_out"
     fi
 
-    if grep -q 'GOMEMLIMIT="\$NETSHIFT_ONESHOT_GOMEMLIMIT" sing-box run' "$lib/dnsbench.sh"; then
+    if grep -q 'GOMEMLIMIT="\$POSTQ_ONESHOT_GOMEMLIMIT" sing-box run' "$lib/dnsbench.sh"; then
         pass "the DNS benchmark tunnel runs with the ceiling"
     else
         fail "the DNS benchmark tunnel runs without the ceiling"
@@ -24990,17 +24974,17 @@ SBEOF
 test_hy2_hop() {
     header "Hysteria2 links: port hopping (mport, hop-interval)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
-    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/netshift/sing_box_config_manager.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
+    ln -sf "$lib/sing_box_config_manager.sh" /usr/lib/postq/sing_box_config_manager.sh
 
-    local work="/tmp/netshift-hy2hop-test-$$"
+    local work="/tmp/postq-hy2hop-test-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -25146,10 +25130,10 @@ test_hy2_hop() {
 test_filter_preview() {
     header "Subscription filter preview: what the filters in the form keep"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if ! command -v jq > /dev/null 2>&1 || ! command -v uci > /dev/null 2>&1 || [ ! -r "$bin" ]; then
-        skip "jq, uci or the netshift bin not available"
+        skip "jq, uci or the postq bin not available"
         return
     fi
     if [ ! -r "$lib/filterpreview.sh" ]; then
@@ -25157,19 +25141,19 @@ test_filter_preview() {
         return
     fi
 
-    mkdir -p /usr/lib/netshift
+    mkdir -p /usr/lib/postq
     local f
     for f in "$lib"/*.sh "$lib"/*.jq; do
-        ln -sf "$f" "/usr/lib/netshift/$(basename "$f")"
+        ln -sf "$f" "/usr/lib/postq/$(basename "$f")"
     done
 
-    local work="/tmp/netshift-fprev-$$"
+    local work="/tmp/postq-fprev-$$"
     rm -rf "$work"
     mkdir -p "$work/cache"
     # every function of the bin, without the code that runs at the top level
     awk '/^[a-zA-Z_][a-zA-Z0-9_]*\(\) \{/{p=1} p{print} p&&/^\}/{p=0}' "$bin" > "$work/funcs.sh"
 
-    cat > "$work/netshift" << 'CF'
+    cat > "$work/postq" << 'CF'
 config settings 'settings'
 	option dns_type 'doh'
 
@@ -25208,7 +25192,7 @@ FJ
         . "$lib/filterpreview.sh"
         log() { :; }
         redact_url_for_log() { printf 'redacted'; }
-        NETSHIFT_CONFIG="$work/netshift"
+        POSTQ_CONFIG="$work/postq"
         SUBSCRIPTION_CACHE_FOLDER="$work/cache"
         is_sing_box_extended() { return 1; }
 
@@ -25234,7 +25218,7 @@ FJ
         echo "kept-zero=$(preview_subscription_filter main '{"subscription_filter_include_keywords":["Nowhere"]}' | jq -c '[.total, .kept, .error, .names]')"
         # the preview counts what the start keeps: the real apply function on the same merged file
         (
-            UCI_CONFIG_DIR="$work" config_load netshift
+            UCI_CONFIG_DIR="$work" config_load postq
             inc="$(build_subscription_filter_json main subscription_filter_include_keywords subscription_filter_include_countries)"
             exc="$(build_subscription_filter_json main subscription_filter_exclude_keywords subscription_filter_exclude_countries)"
             SUBSCRIPTION_PARAM_FILTER="$(build_subscription_param_filter_json main)"
@@ -25251,9 +25235,9 @@ FJ
         echo "log-after-preview=$(wc -l < "$work/pv.log" | tr -d ' ')"
         # a section that is not saved, and a disabled one, are not "no subscription yet"
         echo "no-section=$(preview_subscription_filter nosuch '{}' | jq -c '.error')"
-        uci -q -c "$work" set netshift.main.disabled=1; uci -q -c "$work" commit netshift
+        uci -q -c "$work" set postq.main.disabled=1; uci -q -c "$work" commit postq
         echo "disabled=$(preview_subscription_filter main '{}' | jq -c '.error')"
-        uci -q -c "$work" delete netshift.main.disabled; uci -q -c "$work" commit netshift
+        uci -q -c "$work" delete postq.main.disabled; uci -q -c "$work" commit postq
 
         # a large feed: the batches are far over the 128 KiB a command argument may hold
         # (500 VLESS Reality gRPC servers are ~225 KB), and the preview still counts them
@@ -25280,12 +25264,12 @@ FJ
         unset -f curl
 
         # what LuCI has staged is not consumed by the preview (the preview has a save directory of its own)
-        uci -q -c "$work" set netshift.main.marker=1
+        uci -q -c "$work" set postq.main.marker=1
         preview_subscription_filter main '{"subscription_filter_include_keywords":["Finland"]}' > /dev/null
-        echo "staged-change-kept=$(uci -q -c "$work" changes netshift | grep -c marker)"
-        uci -q -c "$work" revert netshift
-        echo "config-untouched=$(grep -c "Germany" "$work/netshift")"
-        echo "tmp-left=$(ls -d "${TMPDIR:-/tmp}"/netshift-preview.* 2> /dev/null | wc -l | tr -d ' ')"
+        echo "staged-change-kept=$(uci -q -c "$work" changes postq | grep -c marker)"
+        uci -q -c "$work" revert postq
+        echo "config-untouched=$(grep -c "Germany" "$work/postq")"
+        echo "tmp-left=$(ls -d "${TMPDIR:-/tmp}"/postq-preview.* 2> /dev/null | wc -l | tr -d ' ')"
     )"
 
     _fp() {
@@ -25325,22 +25309,22 @@ FJ
 test_section_own_dns() {
     header "Own DNS servers of a routing section (own_dns_server)"
 
-    local lib="${NETSHIFT_LIB_DIR}"
-    local bin="${NETSHIFT_SRC}/usr/bin/netshift"
+    local lib="${POSTQ_LIB_DIR}"
+    local bin="${POSTQ_SRC}/usr/bin/postq"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
     fi
     if [ ! -r "$bin" ] || [ ! -r "$lib/sing_box_config_manager.sh" ]; then
-        fail "netshift bin / config manager not found"
+        fail "postq bin / config manager not found"
         return
     fi
 
-    mkdir -p /usr/lib/netshift
-    ln -sf "$lib/helpers.jq" /usr/lib/netshift/helpers.jq
-    ln -sf "$lib/helpers.sh" /usr/lib/netshift/helpers.sh
+    mkdir -p /usr/lib/postq
+    ln -sf "$lib/helpers.jq" /usr/lib/postq/helpers.jq
+    ln -sf "$lib/helpers.sh" /usr/lib/postq/helpers.sh
 
-    local work="/tmp/netshift-owndns-test-$$"
+    local work="/tmp/postq-owndns-test-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -25360,7 +25344,7 @@ test_section_own_dns() {
         OD_VERSION="1.14.3"
         is_sing_box_at_least() { is_min_package_version "$OD_VERSION" "$1"; }
         get_sing_box_version() { echo "$OD_VERSION"; }
-        netshift_ipv6_enabled() { return 0; }
+        postq_ipv6_enabled() { return 0; }
         config_get() { eval "$1=\"\${OD_${2}_${3}:-$4}\""; }
         config_get_bool() { eval "$1=\"\${OD_${2}_${3}:-$4}\""; }
         config_list_foreach() { local _l _d; eval "_l=\"\${OD_${1}_${2}:-}\""; for _d in $_l; do "$3" "$_d"; done; }
@@ -25580,10 +25564,75 @@ RJ
     rm -rf "$work"
 }
 
+test_logkeep() {
+    header "Log on flash: size limit, old lines, no rewrite without a change, safe stop"
+
+    local src="${POSTQ_LIB_DIR}/logkeep.sh"
+    local work="/tmp/postq-logkeep-test-$$"
+    if [ ! -r "$src" ]; then
+        fail "logkeep.sh not found"
+        return
+    fi
+    rm -rf "$work"
+    mkdir -p "$work"
+
+    cat > "$work/constants.sh" << CEOF
+POSTQ_LOG_FILE="$work/postq.log"
+POSTQ_LOG_KEEP_DAYS=4
+POSTQ_LOG_MAX_KB=128
+CEOF
+    sed "s#^\. /usr/lib/postq/constants.sh#. $work/constants.sh#" "$src" > "$work/logkeep.sh"
+
+    awk -v now="$(date '+%Y-%m-%d %H:%M:%S')" 'BEGIN {
+        print "2020-01-01 00:00:00 daemon.err postq: OLD"
+        for (i = 1; i <= 3000; i++) printf "%s daemon.err postq: line %d %0100d\n", now, i, 0
+    }' > "$work/postq.log"
+
+    sh "$work/logkeep.sh" trim
+
+    if [ "$(wc -c < "$work/postq.log")" -le 65536 ]; then
+        pass "the file is cut to half of the limit"
+    else
+        fail "the file is $(wc -c < "$work/postq.log") bytes, over half of the limit"
+    fi
+    if grep -q OLD "$work/postq.log"; then
+        fail "a line older than the limit stayed"
+    else
+        pass "a line older than the limit is dropped"
+    fi
+    if tail -n 1 "$work/postq.log" | grep -q "line 3000 "; then
+        pass "the newest line is kept"
+    else
+        fail "the newest line is lost"
+    fi
+    if head -n 1 "$work/postq.log" | grep -q '^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} '; then
+        pass "the cut does not leave half a line on top"
+    else
+        fail "the file starts with half a line"
+    fi
+
+    touch -t 202001010000 "$work/postq.log"
+    sh "$work/logkeep.sh" trim
+    if [ "$(date -r "$work/postq.log" +%Y)" = "2020" ]; then
+        pass "a file with nothing to drop is not written again"
+    else
+        fail "a file with nothing to drop was written again"
+    fi
+
+    # procd's children share the process group of PID 1, for which SIGTERM is a reboot.
+    if grep -v '^[[:space:]]*#' "$src" | grep -q 'kill 0'; then
+        fail "logkeep.sh uses kill 0, which reaches PID 1"
+    else
+        pass "logkeep.sh does not signal its process group"
+    fi
+
+    rm -rf "$work"
+}
+
 test_support_report() {
     header "Support report: what is masked, what is kept, the crash log"
 
-    local lib="${NETSHIFT_LIB_DIR}"
+    local lib="${POSTQ_LIB_DIR}"
     if ! command -v jq > /dev/null 2>&1; then
         skip "jq not available"
         return
@@ -25593,7 +25642,7 @@ test_support_report() {
         return
     fi
 
-    local work="/tmp/netshift-support-test-$$"
+    local work="/tmp/postq-support-test-$$"
     rm -rf "$work"
     mkdir -p "$work"
 
@@ -25684,14 +25733,14 @@ CJ
         get_sing_box_tags() { echo "with_quic,with_utls"; }
         naive_binary() { return 1; }
         get_config_warnings() { echo '[{"kind":"shadowed","section":"main","domain":"secretdomain.example"}]'; }
-        nft() { printf 'table inet NetShiftTable\ntable inet NetShiftGuard\ntable inet other\n'; }
-        logread() { printf 'Thu Oct 15 17:00:00 2026 daemon.info netshift: dial srv.example.org:443 via https://panel.example.net/sub/TOKENVALUE\nThu Oct 15 17:00:00 2026 daemon.info netshift: EDNS Client Subnet detected from the WAN: 203.0.113.0/24\nThu Oct 15 17:00:01 2026 daemon.err sing-box[1]: ERROR connection to secret-domain.example:443\n'; }
-        NFT_TABLE_NAME="NetShiftTable"
+        nft() { printf 'table inet PostQTable\ntable inet PostQGuard\ntable inet other\n'; }
+        logread() { printf 'Thu Oct 15 17:00:00 2026 daemon.info postq: dial srv.example.org:443 via https://panel.example.net/sub/TOKENVALUE\nThu Oct 15 17:00:00 2026 daemon.info postq: EDNS Client Subnet detected from the WAN: 203.0.113.0/24\nThu Oct 15 17:00:01 2026 daemon.err sing-box[1]: ERROR connection to secret-domain.example:443\n'; }
+        NFT_TABLE_NAME="PostQTable"
         # without the log kept on flash the report shows the system log (PostQ)
-        NETSHIFT_LOG_FILE="$work/no-such.log"
+        POSTQ_LOG_FILE="$work/no-such.log"
         support_report > "$work/report.txt" 2>&1
         echo "report-warnings-masked=$(grep -c 'secretdomain.example' "$work/report.txt") hidden=$(grep -c '"domain":"<hidden>"' "$work/report.txt")"
-        echo "report-nft-only-ours=$(grep -c 'NetShiftTable' "$work/report.txt") guard=$(grep -c 'NetShiftGuard' "$work/report.txt")"
+        echo "report-nft-only-ours=$(grep -c 'PostQTable' "$work/report.txt") guard=$(grep -c 'PostQGuard' "$work/report.txt")"
         echo "report-no-server-name=$(grep -c 'srv.example.org\|zhost.example.net' "$work/report.txt")"
         echo "report-tags=$(grep -c 'Tags: with_quic,with_utls' "$work/report.txt")"
         echo "report-no-secret=$(grep -c 'PUBKEYVALUE\|TOKENVALUE\|hunter2\|supportuser\|11111111-2222' "$work/report.txt")"
@@ -25699,11 +25748,11 @@ CJ
         echo "report-complete=$(grep -c '===== Errors of sing-box' "$work/report.txt")"
         echo "report-no-dns-ids=$(grep -c 'pk_abc123secret\|myid123\|mydns\|front.example.org\|wspathsecret\|secret-domain' "$work/report.txt")"
         # PostQ: with the log kept on flash, that log is the last section, masked the same way
-        NETSHIFT_LOG_FILE="$work/netshift.log"
-        printf '2026-10-15 17:00:00 daemon.info netshift: dial srv.example.org:443 via https://panel.example.net/sub/TOKENVALUE\n2026-10-15 17:00:01 daemon.err sing-box[1]: ERROR connection failed\n' > "$NETSHIFT_LOG_FILE"
+        POSTQ_LOG_FILE="$work/postq.log"
+        printf '2026-10-15 17:00:00 daemon.info postq: dial srv.example.org:443 via https://panel.example.net/sub/TOKENVALUE\n2026-10-15 17:00:01 daemon.err sing-box[1]: ERROR connection failed\n' > "$POSTQ_LOG_FILE"
         support_report > "$work/report-log.txt" 2>&1
-        echo "report-kept-log=$(grep -c '===== Log of NetShift and sing-box (last' "$work/report-log.txt") system-log=$(grep -c '===== Errors of sing-box' "$work/report-log.txt") secrets=$(grep -c 'TOKENVALUE\|srv.example.org' "$work/report-log.txt") lines=$(grep -c 'ERROR connection failed' "$work/report-log.txt")"
-        NETSHIFT_LOG_FILE="$work/no-such.log"
+        echo "report-kept-log=$(grep -c '===== Log of PostQ VPN and sing-box (last' "$work/report-log.txt") system-log=$(grep -c '===== Errors of sing-box' "$work/report-log.txt") secrets=$(grep -c 'TOKENVALUE\|srv.example.org' "$work/report-log.txt") lines=$(grep -c 'ERROR connection failed' "$work/report-log.txt")"
+        POSTQ_LOG_FILE="$work/no-such.log"
         # without a readable configuration the header does not promise host-N
         SR_config_path="$work/none.json"; support_report > "$work/report2.txt" 2>&1; SR_config_path="$work/config.json"
         echo "report-header-no-config=$(grep -c 'NOT replaced' "$work/report2.txt") promise=$(grep -c 'are shown as host-N' "$work/report2.txt")"
@@ -25731,7 +25780,7 @@ Thu Oct 15 17:03:00 2026 daemon.err sing-box[2]: second.trace()
 LR
         }
         CR="$(get_sing_box_crash_log)"
-        # `netshift get_crash_log` uses the server map of the report too
+        # `postq get_crash_log` uses the server map of the report too
         logread() { printf 'Thu Oct 15 17:01:00 2026 daemon.err sing-box[1]: panic: dial tcp srv.example.org:443\n'; }
         echo "crash-cli-hosts=$(support_crash_log_masked | sed 's/.*panic: //')"
         logread() {
@@ -25810,7 +25859,7 @@ LR
     _sr "a name that is a part of another is replaced after the longer one" "sed-suffix-host=dial host-2:443 and host-1"
     _sr "...and the settings use the same N" 'uci-suffix-host="host-2 and host-1"'
     _sr "the report: the domains of the warnings are hidden" 'report-warnings-masked=0 hidden=1'
-    _sr "the report: only the NetShift table of nft (not the guard or other tables)" "report-nft-only-ours=1 guard=0"
+    _sr "the report: only the PostQ table of nft (not the guard or other tables)" "report-nft-only-ours=1 guard=0"
     _sr "the report: no server name anywhere" "report-no-server-name=0"
     _sr "the report: the tags of the core are listed" "report-tags=1"
     _sr "the report: no secret anywhere" "report-no-secret=0"
@@ -25825,8 +25874,8 @@ LR
 }
 
 main() {
-    printf "${BOLD}Netshift Evolution — Smoke Test Suite${NC}\n"
-    printf "Source: %s\n" "$NETSHIFT_SRC"
+    printf "${BOLD}Postq Evolution — Smoke Test Suite${NC}\n"
+    printf "Source: %s\n" "$POSTQ_SRC"
     printf "OpenWrt: %s\n" "$(grep OPENWRT_RELEASE /etc/os-release 2>/dev/null | cut -d'"' -f2 || echo 'unknown')"
     printf "Kernel: %s\n" "$(uname -r 2>/dev/null || echo 'unknown')"
     printf "\n"
@@ -25879,10 +25928,10 @@ main() {
         extcheck)    test_check_update_extended ;;
         sbextarch)   test_sing_box_extended_arm_arch ;;
         sbextlite)   test_sing_box_lite ;;
-        netshiftcheck) test_check_update_netshift ;;
-        latesttag)   test_netshift_latest_tag ;;
+        postqcheck) test_check_update_postq ;;
+        latesttag)   test_postq_latest_tag ;;
         ghredirect)  test_github_redirect_tag ;;
-        selfupdate)  test_self_update_netshift ;;
+        selfupdate)  test_self_update_postq ;;
         backupguard) test_backup_integrity ;;
         hotreload)   test_hot_reload ;;
         domsep)      test_domain_separators ;;

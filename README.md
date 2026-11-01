@@ -125,7 +125,7 @@ DNS-запросы идут в зашифрованном виде (DoH, 1.1.1.1
 ## 🗑 Удаление
 
 ```sh
-opkg remove luci-i18n-netshift-ru luci-app-netshift netshift
+opkg remove luci-i18n-postq-ru luci-app-postq postq
 ```
 
 На OpenWrt 25.12 вместо `opkg remove` — `apk del`. При удалении VPN останавливается, а настройки DNS роутера
@@ -151,17 +151,17 @@ opkg remove sing-box; rm -f /usr/bin/sing-box /usr/libexec/sing-box-core
 
 ## 🛠 Для разработчиков
 
-Внутри — [NetShift](https://github.com/yandexru45/netshift): бэкенд на shell + jq (`netshift/`), LuCI-приложение
-(`luci-app-netshift/`) и интерфейс на TypeScript (`fe-app-netshift/`). Настройки PostQ задаёт профиль
-`netshift/files/etc/uci-defaults/60_netshift-postq`: он применяется при каждой установке и обновлении и оставляет
+Внутри — [NetShift](https://github.com/yandexru45/netshift): бэкенд на shell + jq (`postq/`), LuCI-приложение
+(`luci-app-postq/`) и интерфейс на TypeScript (`fe-app-postq/`). Настройки PostQ задаёт профиль
+`postq/files/etc/uci-defaults/60_postq-profile`: он применяется при каждой установке и обновлении и оставляет
 от пользовательского конфига только ссылки на подписку.
 
-- Проверки: `shellcheck -S error -s sh install.sh netshift/files/usr/bin/netshift netshift/files/usr/lib/*.sh`,
-  `yarn ci` в `fe-app-netshift/`, smoke-тесты — `docker compose -f tests/docker-compose.yml run --rm netshift-test all`
-- Релиз: поднять `PKG_VERSION` в `netshift/Makefile`, поставить тег и запустить сборку —
+- Проверки: `shellcheck -S error -s sh install.sh postq/files/usr/bin/postq postq/files/usr/lib/*.sh`,
+  `yarn ci` в `fe-app-postq/`, smoke-тесты — `docker compose -f tests/docker-compose.yml run --rm postq-test all`
+- Релиз: поднять `PKG_VERSION` в `postq/Makefile`, поставить тег и запустить сборку —
   `gh workflow run build.yml -R postq-vpn/postq-OW --ref <тег>`. CI прогонит тесты, соберёт пакеты ipk и apk
   и создаст релиз; описание релиза пишется вручную
-- Обновления роутеры получают из релизов этого репозитория (`NETSHIFT_REPO_UPSTREAM` в `constants.sh`)
+- Обновления роутеры получают из релизов этого репозитория (`POSTQ_REPO_UPSTREAM` в `constants.sh`)
 
 &nbsp;
 

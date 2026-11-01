@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 # ──────────────────────────────────────────────────────────────────
-# Netshift Evolution — OpenWrt Smoke Test Container
+# Postq Evolution — OpenWrt Smoke Test Container
 #
 # Purpose:
-#   Run netshift in an OpenWrt rootfs container to verify functionality
+#   Run postq in an OpenWrt rootfs container to verify functionality
 #   BEFORE deploying to a physical router.
 #
 # What this tests:
@@ -25,7 +25,7 @@
 #
 # Usage:
 #   docker compose -f tests/docker-compose.yml up --build
-#   docker compose -f tests/docker-compose.yml run --rm netshift-test
+#   docker compose -f tests/docker-compose.yml run --rm postq-test
 # ──────────────────────────────────────────────────────────────────
 
 # ── Stage 1: Загрузка официального чистого rootfs ─────────────────
@@ -66,8 +66,8 @@ FROM scratch
 # Переносим настоящую систему OpenWrt
 COPY --from=builder /rootfs /
 
-LABEL org.opencontainers.image.title="Netshift Evolution Test"
-LABEL org.opencontainers.image.description="Official OpenWrt 24.10.6 rootfs for Netshift testing"
+LABEL org.opencontainers.image.title="Postq Evolution Test"
+LABEL org.opencontainers.image.description="Official OpenWrt 24.10.6 rootfs for Postq testing"
 
 # Для корректной работы opkg внутри пустого Docker нужна эта директория
 RUN mkdir -p /var/lock
@@ -83,20 +83,20 @@ RUN opkg update && \
         nftables \
     && rm -rf /var/opkg-lists/*
 
-# ── Create netshift directory structure ───────────────────────────
-RUN mkdir -p /usr/lib/netshift \
+# ── Create postq directory structure ───────────────────────────
+RUN mkdir -p /usr/lib/postq \
     /tmp/sing-box/rulesets \
     /tmp/sing-box/subscriptions \
     /var/run
 
-# ── Copy netshift source files ────────────────────────────────────
+# ── Copy postq source files ────────────────────────────────────
 # All shell scripts, config, and init files are mounted at runtime
 # via docker-compose volumes. This image contains only the base OS
 # and dependencies. See docker-compose.yml for bind mounts.
 
-# ── Prepare a minimal /etc/config/netshift for testing ────────────
+# ── Prepare a minimal /etc/config/postq for testing ────────────
 # (real config will be mounted by docker-compose or entrypoint)
-COPY netshift/files/etc/config/netshift /etc/config/netshift.test
+COPY postq/files/etc/config/postq /etc/config/postq.test
 
 # ── Pre-create /lib/functions paths (OpenWrt UCI stubs) ───────────
 # The rootfs image may not include the full UCI subsystem.
@@ -106,6 +106,6 @@ COPY netshift/files/etc/config/netshift /etc/config/netshift.test
 COPY tests/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-WORKDIR /netshift
+WORKDIR /postq
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["all"]

@@ -12,14 +12,14 @@ on:
       - main
       - 'rc/**'
     paths:
-      - 'fe-app-netshift/**'
-      - 'luci-app-netshift/po/**'
-      - 'luci-app-netshift/htdocs/luci-static/resources/view/netshift/**'
+      - 'fe-app-postq/**'
+      - 'luci-app-postq/po/**'
+      - 'luci-app-postq/htdocs/luci-static/resources/view/postq/**'
       - '.github/workflows/frontend-ci.yml'
   pull_request:
     paths:
-      - 'fe-app-netshift/**'
-      - 'luci-app-netshift/po/**'
+      - 'fe-app-postq/**'
+      - 'luci-app-postq/po/**'
       - '.github/workflows/frontend-ci.yml'
 
 jobs:
@@ -41,14 +41,14 @@ jobs:
       # translation is left over from a string that no longer exists, or when the
       # copy the LuCI package compiles has drifted from the source catalogue.
       - name: Check translations
-        run: node fe-app-netshift/check-locales.js
+        run: node fe-app-postq/check-locales.js
 
-      # The views in luci-app-netshift are written by hand and never built, so a stray
+      # The views in luci-app-postq are written by hand and never built, so a stray
       # line in one of them (it once left section.js unparsable) breaks the whole page
       # and no other gate notices.
       - name: Syntax-check the hand-written views
         run: |
-          for f in luci-app-netshift/htdocs/luci-static/resources/view/netshift/*.js; do
+          for f in luci-app-postq/htdocs/luci-static/resources/view/postq/*.js; do
             node --check "$f"
           done
 
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        working-directory: fe-app-netshift
+        working-directory: fe-app-postq
 
     steps:
       - name: Checkout code
@@ -73,14 +73,14 @@ jobs:
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        working-directory: fe-app-netshift
+        working-directory: fe-app-postq
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
       - name: Cache yarn dependencies
         uses: actions/cache@v4.3.0
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('fe-app-netshift/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('fe-app-postq/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
 

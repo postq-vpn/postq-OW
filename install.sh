@@ -10,7 +10,7 @@ REPO="https://api.github.com/repos/postq-vpn/postq-OW/releases/latest"
 # local test server; the defaults are the GitHub releases of the PostQ fork.
 RELEASES_LATEST_REDIRECT="${RELEASES_LATEST_REDIRECT:-https://github.com/postq-vpn/postq-OW/releases/latest}"
 RELEASES_DOWNLOAD_BASE="${RELEASES_DOWNLOAD_BASE:-https://github.com/postq-vpn/postq-OW/releases/download}"
-DOWNLOAD_DIR="/tmp/netshift"
+DOWNLOAD_DIR="/tmp/postq"
 COUNT=3
 # Seconds of silence after which a download is given up (a stalled connection used to hang the
 # installer for good), and the longest a single download may take (curl).
@@ -73,32 +73,6 @@ pkg_install() {
     fi
 }
 
-update_config() {
-    printf "\033[48;5;196m\033[1m╔══════════════════════════════════════════════════════════════════════╗\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ ! Обнаружена старая версия NetShift.                                 ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Если продолжите обновление, вам потребуется настроить NetShift заново.║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Старая конфигурация будет сохранена в /etc/config/netshift-070       ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Подробности: https://github.com/yandexru45/netshift                  ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Точно хотите продолжить?                                             ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m╚══════════════════════════════════════════════════════════════════════╝\033[0m\n"
-
-    echo ""
-
-    printf "\033[48;5;196m\033[1m╔══════════════════════════════════════════════════════════════════════╗\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ ! Detected old NetShift version.                                     ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ If you continue the update, you will need to RECONFIGURE NetShift.   ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Your old configuration will be saved to /etc/config/netshift-070     ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Details: https://github.com/yandexru45/netshift                      ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Are you sure you want to continue?                                   ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m╚══════════════════════════════════════════════════════════════════════╝\033[0m\n"
-
-    # PostQ: no question — the PostQ profile configures everything again anyway
-    # (the old config is kept as a backup).
-    mv /etc/config/netshift /etc/config/netshift-070
-    fetch_url https://raw.githubusercontent.com/postq-vpn/postq-OW/refs/heads/main/netshift/files/etc/config/netshift /etc/config/netshift
-    msg "NetShift config has been reset to default. Your old config saved in /etc/config/netshift-070"
-}
-
 # Detect whether an OLD podkop install is present on this router.
 # Returns 0 (true) if any podkop artifact is found.
 podkop_is_installed() {
@@ -114,7 +88,7 @@ podkop_is_installed() {
     return 1
 }
 
-# Migrate an existing podkop (< 0.8.0) install to NetShift.
+# Migrate an existing podkop (< 0.8.0) install to PostQ.
 # podkop never reached 0.8.0, so any old podkop install triggers this.
 # Every step is guarded by existence checks, POSIX, and idempotent so that
 # re-running install.sh is safe.
@@ -124,22 +98,22 @@ migrate_from_podkop() {
 
     # 1. Bilingual banner (RU first, EN second) + confirmation prompt.
     printf "\033[48;5;196m\033[1m╔══════════════════════════════════════════════════════════════════════╗\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ ! Обнаружена установка podkop. Она будет перенесена в NetShift.      ║\033[0m\n"
+    printf "\033[48;5;196m\033[1m║ ! Обнаружена установка podkop. Она будет перенесена в PostQ VPN.     ║\033[0m\n"
     printf "\033[48;5;196m\033[1m║ Ваша конфигурация будет перенесена автоматически.                   ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Старая конфигурация сохранится в /etc/config/podkop.bak.pre-netshift║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Старый пакет podkop будет удалён, NetShift будет установлен.         ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Подробности: https://github.com/yandexru45/netshift                  ║\033[0m\n"
+    printf "\033[48;5;196m\033[1m║ Старая конфигурация сохранится в /etc/config/podkop.bak.pre-postq║\033[0m\n"
+    printf "\033[48;5;196m\033[1m║ Старый пакет podkop будет удалён, PostQ VPN будет установлен.        ║\033[0m\n"
+    printf "\033[48;5;196m\033[1m║ Подробности: https://github.com/postq-vpn/postq-OW                   ║\033[0m\n"
     printf "\033[48;5;196m\033[1m║ Точно хотите продолжить?                                             ║\033[0m\n"
     printf "\033[48;5;196m\033[1m╚══════════════════════════════════════════════════════════════════════╝\033[0m\n"
 
     echo ""
 
     printf "\033[48;5;196m\033[1m╔══════════════════════════════════════════════════════════════════════╗\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ ! Detected a podkop install. It will be migrated to NetShift.        ║\033[0m\n"
+    printf "\033[48;5;196m\033[1m║ ! Detected a podkop install. It will be migrated to PostQ VPN.       ║\033[0m\n"
     printf "\033[48;5;196m\033[1m║ Your configuration will be carried over automatically.              ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Old config will be backed up to /etc/config/podkop.bak.pre-netshift ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ The old podkop package will be removed, NetShift installed.          ║\033[0m\n"
-    printf "\033[48;5;196m\033[1m║ Details: https://github.com/yandexru45/netshift                      ║\033[0m\n"
+    printf "\033[48;5;196m\033[1m║ Old config will be backed up to /etc/config/podkop.bak.pre-postq ║\033[0m\n"
+    printf "\033[48;5;196m\033[1m║ The old podkop package will be removed, PostQ VPN installed.         ║\033[0m\n"
+    printf "\033[48;5;196m\033[1m║ Details: https://github.com/postq-vpn/postq-OW                       ║\033[0m\n"
     printf "\033[48;5;196m\033[1m║ Are you sure you want to continue?                                   ║\033[0m\n"
     printf "\033[48;5;196m\033[1m╚══════════════════════════════════════════════════════════════════════╝\033[0m\n"
 
@@ -148,7 +122,7 @@ migrate_from_podkop() {
     fi
 
     # PostQ: the migration runs without a question (the old config is backed up below).
-    msg "Migrating podkop to NetShift..."
+    msg "Migrating podkop to PostQ VPN..."
 
     # 2. Stop the old service if running. The old 'stop' restores dnsmasq
     #    (podkop_server/noresolv/cachesize keys in /etc/config/dhcp), removes
@@ -168,39 +142,39 @@ migrate_from_podkop() {
     # 4. Migrate config (copy first, then remove the original — we keep a
     #    backup). Schema is compatible.
     if [ -f "/etc/config/podkop" ]; then
-        if [ ! -f "/etc/config/netshift" ]; then
-            msg "Migrating config /etc/config/podkop -> /etc/config/netshift..."
-            cp /etc/config/podkop /etc/config/netshift 2>/dev/null || true
+        if [ ! -f "/etc/config/postq" ]; then
+            msg "Migrating config /etc/config/podkop -> /etc/config/postq..."
+            cp /etc/config/podkop /etc/config/postq 2>/dev/null || true
         else
-            msg "/etc/config/netshift already exists, keeping it."
+            msg "/etc/config/postq already exists, keeping it."
         fi
-        if [ ! -f "/etc/config/podkop.bak.pre-netshift" ]; then
-            cp /etc/config/podkop /etc/config/podkop.bak.pre-netshift 2>/dev/null || true
+        if [ ! -f "/etc/config/podkop.bak.pre-postq" ]; then
+            cp /etc/config/podkop /etc/config/podkop.bak.pre-postq 2>/dev/null || true
         fi
         # Remove the original /etc/config/podkop so a re-run does not keep
         # detecting an "old podkop install" (podkop_is_installed checks this
         # path). opkg/apk never delete user config, so we must do it here.
         # Only remove once the backup is confirmed present, to avoid data loss.
-        if [ -f "/etc/config/podkop.bak.pre-netshift" ]; then
-            msg "Removing migrated /etc/config/podkop (backup kept at podkop.bak.pre-netshift)..."
+        if [ -f "/etc/config/podkop.bak.pre-postq" ]; then
+            msg "Removing migrated /etc/config/podkop (backup kept at podkop.bak.pre-postq)..."
             rm -f /etc/config/podkop 2>/dev/null || true
         fi
     fi
 
     # 5. Migrate state dir (preserves subscription cache). Best-effort.
-    if [ -d "/etc/podkop" ] && [ ! -d "/etc/netshift" ]; then
-        msg "Migrating state dir /etc/podkop -> /etc/netshift..."
-        cp -r /etc/podkop /etc/netshift 2>/dev/null || true
+    if [ -d "/etc/podkop" ] && [ ! -d "/etc/postq" ]; then
+        msg "Migrating state dir /etc/podkop -> /etc/postq..."
+        cp -r /etc/podkop /etc/postq 2>/dev/null || true
     fi
 
     # 6. Clean leftover OLD persistent system state that opkg/apk remove won't.
-    #    rt_tables: remove old '105 podkop' line (NetShift adds '105 netshift'
+    #    rt_tables: remove old '105 podkop' line (PostQ adds '105 postq'
     #    itself on start).
     if [ -f "/etc/iproute2/rt_tables" ] && grep -q "105 podkop" /etc/iproute2/rt_tables 2>/dev/null; then
         msg "Removing old '105 podkop' rt_tables entry..."
         sed -i "/105 podkop/d" /etc/iproute2/rt_tables 2>/dev/null || true
     fi
-    #    Old cron lines: strip entries that call the old binary (NetShift re-adds
+    #    Old cron lines: strip entries that call the old binary (PostQ re-adds
     #    its own on start).
     if crontab -l >/dev/null 2>&1; then
         if crontab -l 2>/dev/null | grep -q "/usr/bin/podkop"; then
@@ -227,8 +201,48 @@ migrate_from_podkop() {
     fi
 
     # 8. Done.
-    msg "Migration complete. NetShift will now be installed."
-    msg "Your old config is preserved at /etc/config/podkop.bak.pre-netshift"
+    msg "Migration complete. PostQ VPN will now be installed."
+    msg "Your old config is preserved at /etc/config/podkop.bak.pre-postq"
+}
+
+# Stock NetShift (the project PostQ VPN is derived from) uses the same ports, marks
+# and DNS, so it cannot stay next to PostQ VPN. Returns 0 if it is on this router.
+netshift_is_installed() {
+    [ -f "/etc/init.d/netshift" ] || [ -x "/usr/bin/netshift" ]
+}
+
+# Replaces it: its configuration goes on as /etc/config/postq (same schema), and the
+# first install of PostQ VPN then keeps a copy and the page asks about bringing it back.
+migrate_from_netshift() {
+    msg "NetShift found: it will be replaced by PostQ VPN."
+
+    if [ -x "/etc/init.d/netshift" ]; then
+        # block_leaks would keep DNS closed after the stop, and the packages could
+        # not be downloaded: release it for this stop only.
+        (export NETSHIFT_BLOCK_LEAKS_RELEASE=1 && /etc/init.d/netshift stop) 2>/dev/null || true
+        /etc/init.d/netshift disable 2>/dev/null || true
+    fi
+    [ -x "/etc/init.d/netshift-log" ] && { /etc/init.d/netshift-log stop; /etc/init.d/netshift-log disable; } 2>/dev/null
+
+    if [ -f "/etc/config/netshift" ]; then
+        [ -f "/etc/config/postq" ] || cp /etc/config/netshift /etc/config/postq
+        mv /etc/config/netshift /etc/config/netshift.bak.pre-postq
+    fi
+
+    if [ -f "/etc/iproute2/rt_tables" ]; then
+        sed -i "/105 netshift/d" /etc/iproute2/rt_tables 2>/dev/null || true
+    fi
+    if crontab -l 2>/dev/null | grep -q "/usr/bin/netshift"; then
+        crontab -l 2>/dev/null | grep -v "/usr/bin/netshift" | crontab - 2>/dev/null || true
+    fi
+
+    pkg_is_installed luci-i18n-netshift && pkg_remove luci-i18n-netshift*
+    pkg_is_installed luci-app-netshift && pkg_remove luci-app-netshift
+    pkg_is_installed "^netshift" && pkg_remove netshift
+    # the cache holds the account tokens of the subscriptions and takes flash; the
+    # snapshots of its settings stay
+    rm -rf /etc/netshift/subscriptions /etc/netshift/netshift.log
+    msg "NetShift removed. Its settings are saved in /etc/config/netshift.bak.pre-postq"
 }
 
 # One download attempt of $1 into the file $2, with timeouts: wget first, then curl when the
@@ -345,7 +359,7 @@ sing_box_is_lite() {
 # the backend component action — the same one the LuCI component manager
 # calls — so the download, the sha256 verification, the tmpfs backup/rollback
 # and the lite artifact cleanup are not duplicated here. By this point the
-# package install has already pulled the stock core in as a netshift
+# package install has already pulled the stock core in as a postq
 # dependency, so the stock choice is a no-op unless an extended (or lite)
 # build is currently in place.
 apply_sing_box_core() {
@@ -374,7 +388,7 @@ apply_sing_box_core() {
         ;;
     stock)
         if ! command -v sing-box >/dev/null 2>&1; then
-            msg "sing-box is not installed; the stock core comes with the NetShift package"
+            msg "sing-box is not installed; the stock core comes with the PostQ VPN package"
             return 0
         fi
         if ! sing_box_is_extended; then
@@ -388,13 +402,13 @@ apply_sing_box_core() {
         ;;
     esac
 
-    if [ ! -x /usr/bin/netshift ]; then
-        msg "NetShift binary not found; skipping the sing-box core switch"
+    if [ ! -x /usr/bin/postq ]; then
+        msg "PostQ VPN binary not found; skipping the sing-box core switch"
         return 1
     fi
 
     msg "Switching the sing-box core ($action)..."
-    result=$(/usr/bin/netshift component_action sing_box "$action" 2>&1)
+    result=$(/usr/bin/postq component_action sing_box "$action" 2>&1)
 
     case "$result" in
     *'"success":true'*)
@@ -409,7 +423,7 @@ apply_sing_box_core() {
     # build is the next core that can run XHTTP.
     if [ "$action" = "install_extended_lite" ]; then
         msg "Trying the full sing-box-extended build instead..."
-        result=$(/usr/bin/netshift component_action sing_box install_extended 2>&1)
+        result=$(/usr/bin/postq component_action sing_box install_extended 2>&1)
         case "$result" in
         *'"success":true'*)
             msg "sing-box-extended installed"
@@ -419,7 +433,7 @@ apply_sing_box_core() {
         msg "Failed to install sing-box-extended: $result"
     fi
 
-    msg "NetShift keeps the stock sing-box core: servers with XHTTP will not work."
+    msg "PostQ VPN keeps the stock sing-box core: servers with XHTTP will not work."
     return 1
 }
 
@@ -432,10 +446,10 @@ main() {
 
     pkg_list_update || { echo "Packages list update failed"; exit 1; }
 
-    if [ -f "/etc/init.d/netshift" ]; then
-        msg "NetShift is already installed. Upgrading..."
+    if [ -f "/etc/init.d/postq" ]; then
+        msg "PostQ VPN is already installed. Upgrading..."
     else
-        msg "Installing NetShift..."
+        msg "Installing PostQ VPN..."
     fi
 
     local ext release_tag redirect_url
@@ -451,7 +465,7 @@ main() {
     release_tag=""
     if command -v curl >/dev/null 2>&1; then
         redirect_url=$(curl -sI -o /dev/null -w '%{redirect_url}' \
-            --connect-timeout 5 -m 15 -A 'netshift-installer' \
+            --connect-timeout 5 -m 15 -A 'postq-installer' \
             "$RELEASES_LATEST_REDIRECT" 2>/dev/null)
         case "$redirect_url" in
         */releases/tag/*)
@@ -462,8 +476,8 @@ main() {
     fi
 
     if [ -n "$release_tag" ]; then
-        msg "Latest NetShift release: $release_tag (direct download, no GitHub API)"
-        for pkg in netshift luci-app-netshift; do
+        msg "Latest PostQ VPN release: $release_tag (direct download, no GitHub API)"
+        for pkg in postq luci-app-postq; do
             if [ "$ext" = "ipk" ]; then
                 filename="${pkg}-${release_tag}-r1-all.${ext}"
             else
@@ -475,7 +489,7 @@ main() {
         # already installed and otherwise asks whether to install it. Skipping the
         # download on a fresh install silently dropped that prompt. A failed
         # download is not fatal (download_release_asset only returns 1).
-        filename="luci-i18n-netshift-ru-${release_tag}.${ext}"
+        filename="luci-i18n-postq-ru-${release_tag}.${ext}"
         download_release_asset "$RELEASES_DOWNLOAD_BASE/$release_tag/$filename" "$filename"
     else
         # FALLBACK: scrape the api.github.com release JSON for .ipk/.apk URLs.
@@ -497,29 +511,31 @@ main() {
         done
     fi
 
-    # Check if any files were downloaded
-    if ! ls "$DOWNLOAD_DIR"/*netshift* >/dev/null 2>&1; then
-        msg "No packages were downloaded successfully"
-        exit 1
-    fi
-
-    for pkg in netshift luci-app-netshift; do
-        file=""
-        for f in "$DOWNLOAD_DIR"/"$pkg"*; do
-            if [ -f "$f" ]; then
-                file=$(basename "$f")
-                break
-            fi
-        done
-        if [ -n "$file" ]; then
-            msg "Installing $file..."
-            pkg_install "$DOWNLOAD_DIR/$file"
-            sleep 3
+    # PostQ: both packages are needed, one without the other is not a working
+    # install. Nothing is installed unless both are here.
+    for pkg in postq luci-app-postq; do
+        if ! ls "$DOWNLOAD_DIR"/"$pkg"* >/dev/null 2>&1; then
+            msg "Package $pkg was not downloaded. Nothing has been installed."
+            exit 1
         fi
     done
 
+    for pkg in postq luci-app-postq; do
+        for f in "$DOWNLOAD_DIR"/"$pkg"*; do
+            file=$(basename "$f")
+            break
+        done
+        msg "Installing $file..."
+        if ! pkg_install "$DOWNLOAD_DIR/$file"; then
+            msg "Ошибка: не удалось установить $file. Установка PostQ VPN не завершена."
+            msg "Error: $file could not be installed. The PostQ VPN install is not complete."
+            exit 1
+        fi
+        sleep 3
+    done
+
     ru=""
-    for f in "$DOWNLOAD_DIR"/luci-i18n-netshift-ru*; do
+    for f in "$DOWNLOAD_DIR"/luci-i18n-postq-ru*; do
         if [ -f "$f" ]; then
             ru=$(basename "$f")
             break
@@ -527,24 +543,34 @@ main() {
     done
     # PostQ: the Russian interface is always installed (no question).
     if [ -n "$ru" ]; then
-        if pkg_is_installed luci-i18n-netshift-ru; then
+        if pkg_is_installed luci-i18n-postq-ru; then
             msg "Upgrading Russian translation..."
         else
             msg "Installing Russian translation..."
         fi
-        pkg_remove luci-i18n-netshift*
-        pkg_install "$DOWNLOAD_DIR/$ru"
+        pkg_remove luci-i18n-postq*
+        pkg_install "$DOWNLOAD_DIR/$ru" || msg "The Russian translation could not be installed: the page stays in English."
     fi
 
-    apply_sing_box_core
+    local core_ok=1
+    apply_sing_box_core || core_ok=0
 
-    find "$DOWNLOAD_DIR" -type f -name '*netshift*' -exec rm {} \;
+    find "$DOWNLOAD_DIR" -type f -name '*postq*' -exec rm {} \;
 
     local lan_ip
     lan_ip="$(uci -q get network.lan.ipaddr | cut -d/ -f1)"
+    if [ "$core_ok" -eq 0 ]; then
+        msg "Внимание: ядро sing-box не заменено, серверы XHTTP работать не будут. Его можно обновить на странице PostQ VPN."
+        msg "Warning: the sing-box core was not replaced, XHTTP servers will not work. It can be updated on the PostQ VPN page."
+    fi
     msg "Готово! Откройте http://${lan_ip:-192.168.1.1}/cgi-bin/luci/admin/services/postq"
-    msg "вставьте ссылку на подписку и нажмите «Сохранить и применить» — VPN заработает сразу."
-    msg "Done! Open the page above, paste the subscription link and press Save & Apply."
+    if [ -n "$(uci -q get postq.main.subscription_url)" ]; then
+        msg "Подписка уже перенесена, VPN можно запустить на этой странице."
+        msg "Done! Your subscription has been moved: open the page above to check the VPN."
+    else
+        msg "вставьте ссылку на подписку и нажмите «Подключить» — VPN заработает сразу."
+        msg "Done! Open the page above, paste the subscription link and press Connect."
+    fi
 }
 
 check_system() {
@@ -555,8 +581,8 @@ check_system() {
     # Check OpenWrt version
     openwrt_version=$(cat /etc/openwrt_release | grep DISTRIB_RELEASE | cut -d"'" -f2 | cut -d'.' -f1)
     if [ "$openwrt_version" = "23" ]; then
-        msg "OpenWrt 23.05 не поддерживается начиная с NetShift 0.8.0"
-        msg "Для OpenWrt 23.05 устанавливайте зависимости и NetShift вручную"
+        msg "OpenWrt 23.05 не поддерживается"
+        msg "Для OpenWrt 23.05 устанавливайте зависимости и пакеты вручную"
         msg "Подробности: https://podkop.net/docs/install/#%d1%83%d1%81%d1%82%d0%b0%d0%bd%d0%be%d0%b2%d0%ba%d0%b0-%d0%bd%d0%b0-2305"
         exit 1
     fi
@@ -579,43 +605,19 @@ check_system() {
         exit 1
     fi
 
-    # Old podkop install detected -> migrate to NetShift before installing the
+    # Old podkop install detected -> migrate to PostQ before installing the
     # new packages. podkop never reached 0.8.0, so ANY old podkop triggers this.
     if podkop_is_installed; then
         migrate_from_podkop
         return
     fi
 
-    # Otherwise check existing NetShift version (just upgrading NetShift).
-    if command -v netshift > /dev/null 2>&1; then
-        local version
-        version=$(/usr/bin/netshift show_version 2> /dev/null)
-        if [ -n "$version" ]; then
-            version=$(echo "$version" | sed 's/^v//')
-            local major
-            local minor
-            local patch
-            major=$(echo "$version" | cut -d. -f1)
-            minor=$(echo "$version" | cut -d. -f2)
-            patch=$(echo "$version" | cut -d. -f3)
-
-            # Compare version: must be >= 0.8.0
-            if [ "$major" -gt 0 ] ||
-                { [ "$major" -eq 0 ] && [ "$minor" -gt 8 ]; } ||
-                { [ "$major" -eq 0 ] && [ "$minor" -eq 8 ] && [ "$patch" -ge 0 ]; }; then
-                msg "NetShift version >= 0.8.0"
-            else
-                msg "NetShift version < 0.8.0"
-                update_config
-            fi
-        else
-            msg "Unknown NetShift version"
-            update_config
-        fi
+    if netshift_is_installed; then
+        migrate_from_netshift
     fi
 
     # PostQ: the conflicting package is removed without a question (it takes over
-    # the router's DNS, which NetShift has to own).
+    # the router's DNS, which PostQ has to own).
     if pkg_is_installed https-dns-proxy; then
         msg "Conflicting package detected: https-dns-proxy. Removing it..."
         pkg_remove luci-app-https-dns-proxy
@@ -638,7 +640,7 @@ sing_box() {
         # block_leaks would keep DNS and the guard table closed after the stop,
         # and the packages below could not be downloaded: release it for this
         # stop only (the next start arms it again).
-        (export NETSHIFT_BLOCK_LEAKS_RELEASE=1 && service netshift stop) 2>/dev/null || service podkop stop 2>/dev/null || true
+        (export POSTQ_BLOCK_LEAKS_RELEASE=1 && service postq stop) 2>/dev/null || service podkop stop 2>/dev/null || true
         pkg_remove sing-box
     fi
 }

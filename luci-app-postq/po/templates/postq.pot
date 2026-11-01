@@ -1,0 +1,3545 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the POSTQ package.
+# PostqVPN <postq.space>, 2026.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: POSTQ\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-01 20:29+0300\n"
+"PO-Revision-Date: 2026-11-01 20:29+0300\n"
+"Last-Translator: PostqVPN <postq.space>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:345
+msgid "(disabled)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:895
+msgid "%d servers cannot be used by this core whatever the filters say."
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:568
+msgid "✔ Enabled"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:579
+msgid "✔ Running"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:569
+msgid "✘ Disabled"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:580
+msgid "✘ Stopped"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:554
+msgid "10 to 64 Latin letters, digits, = or -"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:87
+msgid "77.88.8.8 (Yandex)"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:796
+msgid "A dead server was left"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1033
+msgid "A few minutes after the router has started."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:383
+msgid "A new version is available"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:713
+msgid "A newer version is available"
+msgstr ""
+
+#: src/validators/validateDnsPool.ts:37
+msgid "A path is only allowed for doh and doh3"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1497
+msgid "A section cannot be chained through itself"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:324
+msgid "Active"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:530
+msgid "Active Connections"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:512
+msgid "Add"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1359
+msgid "Add a DNS server above first"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:451
+msgid "Add a server: pick one or type scheme://host"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:323
+msgid "Add feeds from a list"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:296
+msgid "Add one or more subscription URLs to fetch proxy configurations from. All feeds are downloaded and merged."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:483
+msgid "Add subscription"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:399
+msgid "Add the feeds"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:451
+msgid "Add the PostQ routing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1696
+msgid "Add your own domains: choose Dynamic List (one per row) or Text List (free-form), or Disabled to skip"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1786
+msgid "Add your own subnets or IPs: choose Dynamic List (one per row) or Text List (free-form), or Disabled to skip"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:110
+msgid "Additional DNS servers"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:99
+msgid "Additional marking rules found"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:816
+msgid "Adds UDP ports 500 and 4500 (the IKE and NAT-T tunnel of the operator's ePDG) to the ports that go out directly. A call over Wi-Fi is not accepted by the operator from a foreign exit address of a tunnel. Added to the list above; nothing else changes."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1929
+msgid "Ads (sing-geosite category-ads, for a Block section)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1925
+msgid "Ads and trackers (sing-geosite category-ads-all, for a Block section)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:39
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:41
+msgid "Advanced"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:42
+msgid "after boot"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:88
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:153
+msgid "Age"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1320
+msgid "All QUIC (UDP/443)"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:329
+msgid "All subscriptions updated"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:445
+msgid "Allow insecure TLS for subscription fetch"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1276
+msgid "Allows access to YACD from the WAN. Make sure to open the appropriate port in your firewall."
+msgstr ""
+
+#: src/postq/services/core.service.ts:42
+msgid "And more errors"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:110
+msgid "Another build is available"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1185
+msgid "Applicable for SOCKS and Shadowsocks proxy"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:279
+msgid "Apply"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2127
+msgid "Ask for a user name and a password. Without a login anyone in your network can use this proxy. If the login is not complete the proxy is not created at all."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1318
+msgid "Ask these DNS servers through this section"
+msgstr ""
+
+#: src/validators/validateProxyUrlList.ts:39
+msgid "At least one proxy link must be specified."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1758
+msgid "At least one valid domain must be specified. Comments-only content is not allowed."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1847
+msgid "At least one valid subnet or IP must be specified. Comments-only content is not allowed."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:435
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:533
+msgid "Auto"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:676
+msgid "Automatic (first working)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:996
+msgid "Automatic updates"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:45
+msgid "Available actions"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1933
+msgid "BitTorrent public trackers (sing-geosite, for a Block section)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:54
+msgid "Block"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:550
+msgid "Block and DNS rules"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1329
+msgid "Block direct connections to known public DoH servers (Cloudflare, Google, Quad9, OpenDNS, AdGuard, Yandex) so apps cannot bypass router DNS filtering."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1328
+msgid "Block DoH Servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1340
+msgid "Block Leaks When Tunnel Is Down"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:20
+msgid "Blocked by a rule"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runDnsCheck.ts:65
+msgid "Bootsrap DNS"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:325
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:338
+msgid "Bootstrap DNS"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:564
+msgid "Bootstrap DNS server"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:69
+msgid "Bring back the settings of"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runFakeIPCheck.ts:58
+msgid "Browser is not using FakeIP"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runFakeIPCheck.ts:57
+msgid "Browser is using FakeIP correctly"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:45
+msgid "By address"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:657
+msgid "By country flag"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:658
+msgid "By name prefix"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1405
+msgid "Bypass sing-box"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1155
+msgid "Bypass sing-box for excluded IPs"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1438
+msgid "Cache File Path"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1452
+msgid "Cache file path cannot be empty"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:254
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:391
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:369
+msgid "Cancel"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runDnsCheck.ts:27
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:28
+#: src/postq/tabs/diagnostic/checks/runSectionsCheck.ts:40
+#: src/postq/tabs/diagnostic/checks/runSingBoxCheck.ts:25
+msgid "Cannot receive checks result"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1466
+msgid "Chain the connection (double hop): this section's servers are reached through the outbound of the selected section. If the chain cannot be built, this section's traffic is rejected rather than sent directly."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:439
+msgid "Change the link"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:243
+msgid "Change the static lease"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:68
+msgid "Check"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1032
+msgid "Check after boot"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1043
+msgid "Check on schedule"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:379
+msgid "Check servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:909
+msgid "Check the filters"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:214
+#: src/postq/tabs/manager/cards.ts:253
+#: src/postq/tabs/manager/cards.ts:299
+#: src/postq/tabs/manager/cards.ts:354
+#: src/postq/tabs/manager/cards.ts:417
+msgid "Check update"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runDnsCheck.ts:15
+#: src/postq/tabs/diagnostic/checks/runEnvironmentCheck.ts:13
+#: src/postq/tabs/diagnostic/checks/runFakeIPCheck.ts:15
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:13
+#: src/postq/tabs/diagnostic/checks/runSectionsCheck.ts:28
+#: src/postq/tabs/diagnostic/checks/runSingBoxCheck.ts:13
+msgid "Checking, please wait"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:34
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:145
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:260
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:379
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:858
+msgid "Checking..."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getCheckTitle.ts:2
+msgid "checks"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runEnvironmentCheck.ts:48
+#: src/postq/tabs/diagnostic/helpers/getMeta.ts:26
+msgid "Checks failed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:997
+msgid "Checks for new releases of PostQ VPN and sing-box and installs them by itself. Before the update and after it, PostQ VPN checks that it works (sing-box answers and a proxy or VPN section reaches the internet). If it stops working after an update, the previous version is installed again and the release that broke it is skipped from then on. Nothing is updated while PostQ VPN does not work."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runEnvironmentCheck.ts:51
+#: src/postq/tabs/diagnostic/helpers/getMeta.ts:13
+msgid "Checks passed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:380
+msgid "Choose how traffic of a device in your network is handled. A device can be sent completely through one section (all its traffic) or directly, ignoring the lists. The change is stored with the page's Save & Apply, like the other settings."
+msgstr ""
+
+#: src/validators/validateSubnet.ts:25
+msgid "CIDR must be between 0 and 32"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:127
+msgid "Clear subscription cache"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/initController.ts:340
+msgid "Clearing subscription cache and re-downloading… this may take a minute"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:431
+msgid "Client for naive+https:// links (~4 MB), used beside sing-box; not needed with a core that has the naive outbound"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:528
+msgid "Client User-Agent"
+msgstr ""
+
+#: src/partials/modal/renderModal.ts:26
+#: src/postq/tabs/dashboard/initController.ts:791
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:93
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:292
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:74
+msgid "Close"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:142
+msgid "Close all"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:58
+msgid "Close all connections? Active downloads and calls will be interrupted."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:91
+msgid "cloudflare-dns.com/dns-query (Cloudflare DoH)"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:90
+msgid "Collects the versions, settings, configuration, state and logs in one text, with passwords, keys, links and server addresses hidden. Send it when you ask for help."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:803
+msgid "Combined with the other filters: a server has to pass all of them."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:89
+msgid "common.dns.yandex.net/dns-query (Yandex DoH)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:88
+msgid "common.dot.dns.yandex.net (Yandex DoT)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1602
+msgid "Community Lists"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:381
+msgid "Compressed build: uses more RAM at startup"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1424
+msgid "Config File Path"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:103
+msgid "Configuration snapshots"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:222
+msgid "Configuration Type"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:423
+msgid "Configure DNS"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:494
+msgid "Connect"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1465
+msgid "Connect through another section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:24
+msgid "Connection"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:47
+msgid "Connection Type"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:25
+msgid "Connection type, transport and DNS resolver for this section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:225
+msgid "Connection URL"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:74
+msgid "Connections"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:32
+msgid "Copied"
+msgstr ""
+
+#: src/partials/modal/renderModal.ts:20
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:78
+msgid "Copy"
+msgstr ""
+
+#: src/postq/methods/shell/index.ts:319
+#: src/postq/methods/shell/pollSingBoxComponentAction.ts:93
+msgid "Core switch failed"
+msgstr ""
+
+#: src/postq/methods/shell/pollSingBoxComponentAction.ts:112
+msgid "Core switch timed out"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:302
+msgid "Could not check for updates: %s"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2084
+msgid "Could not duplicate the section: %s"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:362
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:392
+msgid "Could not read the list"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderWidget.ts:22
+msgid "Currently unavailable"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1695
+msgid "Custom domains"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1785
+msgid "Custom subnets"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:24
+msgid "d"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:36
+msgid "Dashboard"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:75
+msgid "Dashboard currently unavailable"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:37
+msgid "Dashboard tiles, YACD web dashboard access and remote-access protection"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:181
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:105
+msgid "day|days|days"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:304
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:347
+msgid "default"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:158
+msgid "Default (by the lists)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:979
+msgid "Delay in milliseconds before reloading PostQ VPN after interface UP"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:986
+msgid "Delay value cannot be empty"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:443
+msgid "Delete subscription"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:447
+msgid "Delete the subscription «%s»?"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:448
+msgid "Delete the subscription «%s»? The VPN stops until a subscription is added."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:79
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:148
+msgid "Destination"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1171
+msgid "Detect country by IP (GeoIP)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:660
+msgid "Detect the EDNS Client Subnet from the WAN"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:168
+msgid "Dev"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:352
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:400
+msgid "Device"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:542
+msgid "Device ID sent to the panel (X-HWID). Copy it from the app on a device the subscription is bound to. Empty uses the router's own ID."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:589
+msgid "Device model"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:562
+msgid "Device OS"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runDnsCheck.ts:93
+msgid "DHCP has DNS server"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:277
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:283
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:289
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:403
+msgid "DHCP lease"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:28
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:147
+msgid "Diagnostics"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:57
+msgid "did not work, rolled back to"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:162
+msgid "Direct (excluded from routing)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1479
+msgid "Direct (no chaining)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:541
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:546
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:201
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:226
+msgid "Directly"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:81
+msgid "Disable autostart"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1313
+msgid "Disable QUIC"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2036
+msgid "Disable section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1314
+msgid "Disable the QUIC protocol to improve compatibility or fix issues with video streaming. Only the QUIC that goes through the tunnel: the app falls back to TCP, traffic that goes out directly is not touched. All QUIC: also the QUIC that goes out directly, every UDP/443 packet from the network is refused."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1700
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1790
+msgid "Disabled"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:446
+msgid "Disables TLS certificate verification when downloading the subscription."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:21
+msgid "DNS"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:56
+msgid "DNS (own DNS server for the domains)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:588
+msgid "DNS forwarding by zone"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runDnsCheck.ts:88
+msgid "DNS on router"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:69
+msgid "DNS over HTTP/3 (DoH3)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:68
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1568
+msgid "DNS over HTTPS (DoH)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:70
+msgid "DNS over QUIC (DoQ)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:67
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1569
+msgid "DNS over TLS (DoT)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:62
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1565
+msgid "DNS Protocol Type"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:613
+msgid "DNS Rewrite TTL"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:39
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:295
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:404
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:410
+msgid "DNS server"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:79
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1579
+msgid "DNS Server"
+msgstr ""
+
+#: src/validators/validateDns.ts:7
+msgid "DNS server address cannot be empty"
+msgstr ""
+
+#: src/validators/validateDnsPool.ts:10
+msgid "DNS server cannot be empty"
+msgstr ""
+
+#: src/validators/validateDnsPool.ts:42
+msgid "DNS server must not contain spaces"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:171
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1295
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:541
+msgid "DNS server timeout"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:56
+msgid "DNS servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1247
+msgid "DNS servers of this section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1333
+msgid "DNS speed test"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:34
+msgid "DNS: answered with a FakeIP address, the traffic enters the tunnel path"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:93
+msgid "dns.adguard-dns.com/dns-query (AdGuard DoH)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:90
+msgid "dns.google/dns-query (Google DoH)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:92
+msgid "dns.quad9.net/dns-query (Quad9 DoH)"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderWikiDisclaimer.ts:27
+msgid "Do not panic, everything can be fixed, just..."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:35
+msgid "Domain and subnet lists that decide which traffic uses this section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1554
+msgid "Domain Resolver"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:531
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:541
+msgid "Domains"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1380
+msgid "Dont Touch My DHCP!"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:464
+#: src/postq/tabs/dashboard/initController.ts:498
+msgid "Downlink"
+msgstr ""
+
+#: src/partials/modal/renderModal.ts:15
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:80
+msgid "Download"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1240
+msgid "Download components via Proxy/VPN"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1193
+msgid "Download Lists via Proxy/VPN"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1203
+msgid "Download Lists via specific proxy section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:607
+msgid "Download log"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1241
+msgid "Download sing-box, PostQ VPN packages and release information through the proxy section selected below. Useful when GitHub is blocked; a failed download falls back to a direct connection."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1194
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1204
+msgid "Downloading all lists via specific Proxy/VPN"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:352
+msgid "Downloading the list..."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:796
+msgid "Drop servers that connect this way."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:727
+msgid "Drop servers whose name carries the flag of one of these countries. Two-letter codes, for example RU or US."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:696
+msgid "Drop subscription servers whose name contains any of these keywords (case-insensitive). Several words can be written in one line, separated by | without spaces (test|expired)."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2055
+msgid "Duplicate"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2050
+msgid "Duplicate this section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:284
+msgid "Dynamic"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1701
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1791
+msgid "Dynamic List"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:291
+msgid "Edit"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:698
+msgid "EDNS Client Subnet"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:91
+msgid "Enable autostart"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1555
+msgid "Enable built-in DNS resolver for domains handled by this section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2176
+msgid "Enable DNS resolve to get real IP when routing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1300
+msgid "Enable IPv6 Support"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1301
+msgid "Enable IPv6 TProxy routing, IPv6 DNS inbound, and IPv6 FakeIP support."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2094
+msgid "Enable Mixed Proxy"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:881
+msgid "Enable Output Network Interface"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2095
+msgid "Enable the mixed proxy, allowing this section to route traffic through both HTTP and SOCKS proxies"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1265
+msgid "Enable YACD"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1275
+msgid "Enable YACD WAN Access"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:75
+msgid "Enter a domain or an IP address to see which section, DNS server or block handles it."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2168
+msgid "Enter a password"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2149
+msgid "Enter a user name"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:272
+msgid "Enter complete outbound configuration in JSON format"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1740
+msgid "Enter domain names separated by commas, spaces, or newlines. You can add comments using //. Prefixes: full: (exact host), keyword: (part of the name), regex: (regular expression, no spaces or commas)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1711
+msgid "Enter domain names without protocols, e.g. example.com or sub.example.com. Prefixes: full: (exact host), keyword: (part of the name), regex: (regular expression)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1801
+msgid "Enter subnets in CIDR notation (e.g. 103.21.244.0/22) or single IP addresses"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:19
+msgid "Established connections can skip the marks PostQ VPN sets: turn it off in Network - Firewall"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1033
+msgid "Every 1 minute"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1036
+msgid "Every 10 minutes"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:608
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1046
+msgid "Every 12 hours"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1037
+msgid "Every 20 minutes"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1041
+msgid "Every 24 hours"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:606
+msgid "Every 3 hours"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1034
+msgid "Every 3 minutes"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:604
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1038
+msgid "Every 30 minutes"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1032
+msgid "Every 30 seconds"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1035
+msgid "Every 5 minutes"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:607
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1040
+msgid "Every 6 hours"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:609
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1047
+msgid "Every day"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:605
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1039
+msgid "Every hour"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1048
+msgid "Every week (Sunday)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:165
+msgid "Everything through: %s"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1368
+msgid "Exclude BitTorrent"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1356
+msgid "Exclude NTP"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1357
+msgid "Exclude NTP protocol traffic from the tunnel to prevent it from being routed through the proxy or VPN"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:726
+msgid "Exclude servers by country"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:695
+msgid "Exclude servers by keyword"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:746
+msgid "Exclude servers by protocol"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:773
+msgid "Exclude servers by security"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:760
+msgid "Exclude servers by transport"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:55
+msgid "Exclusion"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:178
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:109
+msgid "Expired"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:195
+msgid "Expires"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:315
+msgid "Extended core with all features (~105 MB)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1341
+msgid "Fail-closed kill switch: while PostQ VPN is not intercepting traffic — service restart or sing-box crash/recovery — traffic bound for proxied destinations is blocked instead of leaking straight to the internet, and DNS is not handed back to the direct resolvers, so proxied domains wait too. Boot before PostQ VPN's first start is not covered."
+msgstr ""
+
+#: src/postq/methods/shell/index.ts:478
+#: src/postq/tabs/diagnostic/initController.ts:355
+#: src/postq/tabs/diagnostic/initController.ts:359
+msgid "Failed to clear subscription cache"
+msgstr ""
+
+#: src/helpers/copyToClipboard.ts:12
+msgid "Failed to copy!"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/initController.ts:240
+#: src/postq/tabs/diagnostic/initController.ts:244
+#: src/postq/tabs/diagnostic/initController.ts:274
+#: src/postq/tabs/diagnostic/initController.ts:278
+#: src/postq/tabs/diagnostic/initController.ts:315
+#: src/postq/tabs/diagnostic/initController.ts:319
+#: src/postq/tabs/manager/initController.ts:144
+#: src/postq/tabs/manager/initController.ts:154
+#: src/postq/tabs/manager/initController.ts:172
+#: src/postq/tabs/manager/initController.ts:187
+#: src/postq/tabs/manager/initController.ts:220
+#: src/postq/tabs/manager/initController.ts:237
+#: src/postq/tabs/manager/initController.ts:251
+#: src/postq/tabs/manager/initController.ts:261
+#: src/postq/tabs/manager/initController.ts:293
+#: src/postq/tabs/manager/initController.ts:297
+#: src/postq/tabs/manager/initController.ts:330
+#: src/postq/tabs/manager/initController.ts:334
+msgid "Failed to execute!"
+msgstr ""
+
+#: src/postq/methods/shell/index.ts:78
+msgid "Failed to read the subscription update status"
+msgstr ""
+
+#: src/postq/methods/shell/index.ts:48
+msgid "Failed to start the task"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:310
+#: src/postq/tabs/dashboard/initController.ts:316
+msgid "Failed to update subscription"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:337
+#: src/postq/tabs/dashboard/initController.ts:343
+msgid "Failed to update subscriptions"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1200
+msgid "FakeIP (same route as IPv4)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1196
+msgid "FakeIP: IPv6 goes through sing-box like IPv4, the same way as the section's IPv4 traffic. Real addresses: the domains of this section are answered with their real IPv6 addresses, so their IPv6 traffic goes out directly, outside the tunnel (their IPv4 traffic keeps the section's route). Needs IPv6 enabled in the settings."
+msgstr ""
+
+#: src/postq/methods/custom/buildSubscriptionOutboundGroup.ts:74
+#: src/postq/methods/custom/buildSubscriptionOutboundGroup.ts:103
+#: src/postq/methods/custom/buildSubscriptionOutboundGroup.ts:111
+#: src/postq/methods/custom/getDashboardSections.ts:209
+#: src/postq/tabs/diagnostic/checks/runSectionsCheck.ts:56
+msgid "Fastest"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:463
+msgid "Fills the five fields below the way the chosen app on the chosen platform sends them, with a new HWID. A HWID copied from a real device the subscription is bound to does not take one more device slot."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:817
+msgid "Filter preview"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:327
+msgid "Finds the address of a DNS server given by name (AdGuard, Yandex DoT). It must answer too."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:160
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1280
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:531
+msgid "First server only"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:18
+msgid "Flow offloading is enabled"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:26
+msgid "Flow offloading is off"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1172
+msgid "For servers whose name has no flag, look the country up once by the server address and show its flag: in front of the name in a subscription (so grouping and the country filters work for it too), on the dashboard for your own links. The server addresses are sent to api.country.is over HTTPS; results are cached on the router."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:386
+msgid "Found %d feeds, added %d. Save and apply to keep them."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:83
+msgid "From the device (optional)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:257
+msgid "from the router"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1009
+msgid "From the update source chosen above."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2008
+msgid "Fully Routed IPs"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:514
+msgid "Generate"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:462
+msgid "Generate a client"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:100
+msgid "Get global check"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1111
+msgid "GitHub mirrors for downloads"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/initController.ts:235
+msgid "Global check"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1444
+msgid "Global Proxy"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1158
+msgid "Go direct if all servers are down"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:22
+msgid "Goes directly, not through any section"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:16
+msgid "Goes through the section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:652
+msgid "Group subscription proxies into URLTest groups. 'By country flag' uses the flag emoji at the start of each name; 'By name prefix' groups by the first N characters."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:24
+msgid "h"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1058
+msgid "HH:MM, router time. Every 12 hours: at this time and twelve hours later."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:251
+msgid "Host name"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:172
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1296
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:542
+msgid "How long one DNS server may take before the next one is tried (priority) or its answer is dropped (parallel). Examples: 500ms, 2s"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:416
+msgid "How many servers of one feed are used (the first ones). Published lists hold thousands of servers: each is processed one by one and the group of them is tested by the router, which is too much for it. 0 uses all of them."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:602
+msgid "How often to automatically update the subscription"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:284
+msgid "How the router finds the addresses of sites. If sites do not open, check the servers and pick one that answers."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:156
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1274
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:524
+msgid "How the servers of the list are used together when there are several. Needs sing-box 1.14 or newer; on an older core only the first server is used."
+msgstr ""
+
+#: src/postq/api.ts:27
+msgid "HTTP error"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:541
+msgid "HWID"
+msgstr ""
+
+#: src/validators/validateProxyUrl.ts:50
+msgid "Hysteria2 needs a sing-box core built with QUIC"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:707
+msgid "Include servers by country"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:683
+msgid "Include servers by keyword"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:745
+msgid "Include servers by protocol"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:772
+msgid "Include servers by security"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:759
+msgid "Include servers by transport"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:402
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:332
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:370
+msgid "Install"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:203
+#: src/postq/tabs/manager/cards.ts:246
+#: src/postq/tabs/manager/cards.ts:292
+#: src/postq/tabs/manager/cards.ts:347
+#: src/postq/tabs/manager/cards.ts:410
+msgid "Install %s"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:376
+msgid "Installed"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:114
+msgid "Installed version is newer than release"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:274
+msgid "Installing the NaiveProxy client, this may take a minute…"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:944
+msgid "Interface Monitoring"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:978
+msgid "Interface Monitoring Delay"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:945
+msgid "Interface monitoring for Bad WAN"
+msgstr ""
+
+#: src/validators/validateDnsForward.ts:48
+msgid "Invalid DNS server"
+msgstr ""
+
+#: src/validators/validateDns.ts:39
+msgid "Invalid DNS server format. Examples: 8.8.8.8, [::1], dns.example.com, or dns.example.com/dns-query for DoH"
+msgstr ""
+
+#: src/validators/validateDomain.ts:18
+#: src/validators/validateDomain.ts:27
+#: src/validators/validateDomain.ts:48
+msgid "Invalid domain address"
+msgstr ""
+
+#: src/validators/validateSubnet.ts:57
+msgid "Invalid format. Use X.X.X.X/Y or IPv6/Y"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:191
+msgid "Invalid host name: letters, digits and dashes only"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:90
+msgid "Invalid HY2 URL: insecure must be 0 or 1"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:77
+msgid "Invalid HY2 URL: invalid port number"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:30
+msgid "Invalid HY2 URL: missing credentials/server"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:47
+msgid "Invalid HY2 URL: missing host"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:41
+msgid "Invalid HY2 URL: missing host & port"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:36
+msgid "Invalid HY2 URL: missing password"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:50
+msgid "Invalid HY2 URL: missing port"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:18
+msgid "Invalid HY2 URL: must not contain spaces"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:12
+msgid "Invalid HY2 URL: must start with hysteria2:// or hy2://"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:108
+msgid "Invalid HY2 URL: obfs-password required when obfs is set"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:122
+msgid "Invalid HY2 URL: parsing failed"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:116
+msgid "Invalid HY2 URL: sni cannot be empty"
+msgstr ""
+
+#: src/validators/validateHysteriaUrl.ts:98
+msgid "Invalid HY2 URL: unsupported obfs type"
+msgstr ""
+
+#: src/validators/validateIp.ts:11
+msgid "Invalid IP address"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:190
+msgid "Invalid IPv4 address"
+msgstr ""
+
+#: src/validators/validateIp.ts:66
+msgid "Invalid IPv6 address"
+msgstr ""
+
+#: src/validators/validateOutboundJson.ts:9
+msgid "Invalid JSON format"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:189
+msgid "Invalid MAC address"
+msgstr ""
+
+#: src/validators/validateNaiveUrl.ts:69
+msgid "Invalid NaiveProxy URL: invalid host"
+msgstr ""
+
+#: src/validators/validateNaiveUrl.ts:60
+msgid "Invalid NaiveProxy URL: invalid port"
+msgstr ""
+
+#: src/validators/validateNaiveUrl.ts:33
+#: src/validators/validateNaiveUrl.ts:43
+msgid "Invalid NaiveProxy URL: login and password are required"
+msgstr ""
+
+#: src/validators/validateNaiveUrl.ts:50
+msgid "Invalid NaiveProxy URL: missing host"
+msgstr ""
+
+#: src/validators/validateNaiveUrl.ts:24
+msgid "Invalid NaiveProxy URL: must not contain spaces"
+msgstr ""
+
+#: src/validators/validatePath.ts:22
+msgid "Invalid path format. Path must start with \"/\" and contain valid characters"
+msgstr ""
+
+#: src/validators/validateDnsForward.ts:57
+msgid "Invalid port number. Must be 1-65535"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:85
+msgid "Invalid port number. Must be between 1 and 65535"
+msgstr ""
+
+#: src/validators/validatePortList.ts:19
+#: src/validators/validatePortList.ts:26
+msgid "Invalid port or port range"
+msgstr ""
+
+#: src/validators/validateDomain.ts:88
+msgid "Invalid regular expression"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:37
+msgid "Invalid Shadowsocks URL: decoded credentials must contain method:password"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:27
+msgid "Invalid Shadowsocks URL: missing credentials"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:46
+msgid "Invalid Shadowsocks URL: missing method and password separator \":\""
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:76
+msgid "Invalid Shadowsocks URL: missing port"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:67
+msgid "Invalid Shadowsocks URL: missing server"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:58
+msgid "Invalid Shadowsocks URL: missing server address"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:16
+msgid "Invalid Shadowsocks URL: must not contain spaces"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:8
+msgid "Invalid Shadowsocks URL: must start with ss://"
+msgstr ""
+
+#: src/validators/validateShadowsocksUrl.ts:91
+msgid "Invalid Shadowsocks URL: parsing failed"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:73
+msgid "Invalid SOCKS URL: invalid host format"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:63
+msgid "Invalid SOCKS URL: invalid port number"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:42
+msgid "Invalid SOCKS URL: missing host and port"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:51
+msgid "Invalid SOCKS URL: missing hostname or IP"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:56
+msgid "Invalid SOCKS URL: missing port"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:34
+msgid "Invalid SOCKS URL: missing username"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:19
+msgid "Invalid SOCKS URL: must not contain spaces"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:10
+msgid "Invalid SOCKS URL: must start with socks4://, socks4a://, or socks5://"
+msgstr ""
+
+#: src/validators/validateSocksUrl.ts:77
+msgid "Invalid SOCKS URL: parsing failed"
+msgstr ""
+
+#: src/validators/validateTime.ts:21
+msgid "Invalid time format. Use HH:MM from 00:00 to 23:59"
+msgstr ""
+
+#: src/validators/validateDnsPool.ts:62
+msgid "Invalid timeout. Examples: 500ms, 2s"
+msgstr ""
+
+#: src/validators/validateTrojanUrl.ts:15
+msgid "Invalid Trojan URL: must not contain spaces"
+msgstr ""
+
+#: src/validators/validateTrojanUrl.ts:8
+msgid "Invalid Trojan URL: must start with trojan://"
+msgstr ""
+
+#: src/validators/validateTrojanUrl.ts:56
+msgid "Invalid Trojan URL: parsing failed"
+msgstr ""
+
+#: src/validators/validateUrl.ts:49
+#: src/validators/validateUrl.ts:66
+#: src/validators/validateUrl.ts:78
+msgid "Invalid URL format"
+msgstr ""
+
+#: src/validators/validateVlessUrl.ts:110
+msgid "Invalid VLESS URL: parsing failed"
+msgstr ""
+
+#: src/validators/validateVmessUrl.ts:82
+msgid "Invalid VMess URL: invalid port"
+msgstr ""
+
+#: src/validators/validateVmessUrl.ts:40
+msgid "Invalid VMess URL: malformed base64"
+msgstr ""
+
+#: src/validators/validateVmessUrl.ts:50
+#: src/validators/validateVmessUrl.ts:57
+msgid "Invalid VMess URL: malformed JSON"
+msgstr ""
+
+#: src/validators/validateVmessUrl.ts:66
+msgid "Invalid VMess URL: missing address"
+msgstr ""
+
+#: src/validators/validateVmessUrl.ts:73
+msgid "Invalid VMess URL: missing id"
+msgstr ""
+
+#: src/validators/validateVmessUrl.ts:25
+msgid "Invalid VMess URL: must not contain spaces"
+msgstr ""
+
+#: src/validators/validateVmessUrl.ts:7
+msgid "Invalid VMess URL: must start with vmess://"
+msgstr ""
+
+#: src/validators/validateDnsForward.ts:42
+msgid "Invalid zone"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:250
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:355
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:401
+msgid "IP address"
+msgstr ""
+
+#: src/validators/validateSubnet.ts:11
+msgid "IP address 0.0.0.0 is not allowed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1195
+msgid "IPv6 addresses of this section's domains"
+msgstr ""
+
+#: src/validators/validateSubnet.ts:47
+msgid "IPv6 CIDR must be between 0 and 128"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:65
+msgid "IPv6 handling matches the network"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:58
+msgid "IPv6 traffic goes around the tunnel: enable IPv6 in the settings"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runEnvironmentCheck.ts:50
+#: src/postq/tabs/diagnostic/helpers/getMeta.ts:20
+msgid "Issues detected"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:795
+msgid "Keep only servers that connect this way."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:708
+msgid "Keep only servers whose name carries the flag of one of these countries. Two-letter codes, for example NL or DE. Combined with the keywords above (any match keeps a server)."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:684
+msgid "Keep only subscription servers whose name contains at least one of these keywords (case-insensitive). Leave empty to keep all. Several words can be written in one line, separated by | without spaces (NL|DE|Finland)."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:469
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:478
+msgid "Keep the old settings"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:882
+msgid "Kept"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:20
+msgid "Kept before a restore"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2160
+msgid "Kept in the configuration file as it is typed."
+msgstr ""
+
+#: src/validators/validateDomain.ts:69
+msgid "Keyword may contain only letters, digits, dots, dashes and underscores"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1076
+msgid "Last automatic update"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:89
+msgid "Last run"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1390
+msgid "Latency test URL"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getPostqVersionRow.ts:46
+#: src/postq/tabs/manager/cards.ts:153
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:377
+msgid "Latest"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:121
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:371
+msgid "Latest version is installed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1126
+msgid "Leave a dead server chosen by hand"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:370
+msgid "Light build of the extended core for low-flash devices (~10 MB instead of ~105 MB)"
+msgstr ""
+
+#: src/validators/validateProxyUrlList.ts:31
+msgid "Line"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:389
+msgid "List"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1167
+msgid "List Update Frequency"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:32
+msgid "List update schedule and the way lists and components are downloaded"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:526
+msgid "Lists"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:31
+msgid "Lists & Updates"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1084
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:28
+msgid "Loading..."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1869
+msgid "Local Domain Lists"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1893
+msgid "Local Subnet Lists"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1475
+msgid "Log Level"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:249
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:356
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:402
+msgid "MAC address"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:198
+msgid "main"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:27
+msgid "Main"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runDnsCheck.ts:72
+msgid "Main DNS"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runDnsCheck.ts:81
+msgid "Main DNS via outbound"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2051
+msgid "Makes a copy of the section with all its settings under a new name. The copy is switched off and has no Mixed Proxy, so nothing changes until you review and enable it. The copy is saved at once; Save and apply puts it into effect."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:26
+msgid "Matched list"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:15
+msgid "Matches no list, goes through the global proxy section"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:534
+msgid "Memory Usage"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:44
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:24
+msgid "min"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:40
+msgid "Mixed proxy and DNS resolution tuning"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2159
+msgid "Mixed Proxy password"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2108
+msgid "Mixed Proxy Port"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2141
+msgid "Mixed Proxy user name"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:954
+msgid "Monitored Interfaces"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:111
+msgid "More servers for this section, any mix of udp, tcp, dot, doh, doh3 and doq: scheme://host[:port][/path]. Used together with the server above as the mode below says. Pick a ready-made server or type your own."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:44
+msgid "Most traffic first"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:338
+msgid "Move down"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:325
+msgid "Move up"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1233
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1381
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:259
+msgid "ms"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1079
+msgid "Must be a number in the range of 50 - 1000"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:285
+msgid "NaiveProxy client installed, version:"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:286
+msgid "NaiveProxy client removed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:26
+msgid "Network"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1507
+msgid "Network Interface"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:18
+msgid "newest"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:43
+msgid "Newest first"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:683
+msgid "no address"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:201
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1233
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1381
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:252
+msgid "no answer"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:777
+msgid "No encryption layer"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:98
+msgid "No other marking rules found"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1087
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1099
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1102
+msgid "No run yet"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:887
+msgid "No server is left: the section would have no connection."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:41
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:13
+msgid "No snapshots yet"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2152
+msgid "No spaces or colons in the user name"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:99
+msgid "No subscription yet"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:122
+msgid "None of the sections has a connection, so PostQ VPN is not running. Open the Sections tab, paste a server link or a subscription URL into a section (or choose the interface of a VPN section) and press Save & Apply."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runEnvironmentCheck.ts:31
+msgid "Not available"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:379
+msgid "Not available for your architecture"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderCheckSection.ts:179
+msgid "Not implement yet"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:161
+#: src/postq/tabs/manager/cards.ts:270
+#: src/postq/tabs/manager/cards.ts:316
+#: src/postq/tabs/manager/cards.ts:373
+#: src/postq/tabs/manager/cards.ts:438
+#: src/postq/tabs/manager/initController.ts:118
+msgid "Not installed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:353
+msgid "Not on the network"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:338
+msgid "Not recommended: slower than the others, Auto does not pick them"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runSectionsCheck.ts:75
+#: src/postq/tabs/diagnostic/checks/runSectionsCheck.ts:90
+msgid "Not responding"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:62
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:70
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:78
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:86
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:94
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:102
+msgid "Not running"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:33
+msgid "not updated: a development build"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:30
+msgid "not updated: the stock sing-box comes from the firmware packages and cannot be rolled back"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:36
+msgid "nothing was updated: PostQ VPN did not work before the update"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:38
+msgid "nothing was updated: the Components manager was installing something"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1181
+msgid "Notify about new versions"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:256
+msgid "now"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:288
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:331
+msgid "Now"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:668
+msgid "Number of leading characters of each proxy name to group by."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:656
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1045
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1318
+msgid "Off"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:563
+msgid "Old settings"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:43
+msgid "on schedule"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:589
+msgid "One entry per line: \"zone server\", for example \"ru 77.88.8.8\" sends the zone .ru and all its subdomains to that DNS server directly, the way a \"server=/ru/77.88.8.8\" line does in the dnsmasq config. The server is an IP address, optionally with #port. The names of these zones get their real addresses, not FakeIP, so they are not routed by domain; the entries are applied to dnsmasq unless \"Dont Touch My DHCP\" is on."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1042
+msgid "Only at start, never again"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1453
+msgid "Only one section can be global at a time."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1319
+msgid "Only QUIC through the tunnel"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:827
+msgid "Only these TCP ports take the tunnel"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:848
+msgid "Only these UDP ports take the tunnel"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:127
+msgid "Open Sections"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:97
+msgid "Open snapshots"
+msgstr ""
+
+#: src/helpers/withTimeout.ts:7
+msgid "Operation timed out"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:223
+msgid "Optional"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1248
+msgid "Optional: DNS servers for this section only, instead of the global ones: scheme://host[:port][/path], where scheme is udp, tcp, dot, doh, doh3 or doq. A VPN or exclusion section resolves its direct connections through the first server; with real IPv6 addresses (above) all the servers answer the AAAA queries of its domains. A proxy section is resolved by its proxy server. Empty: the global DNS."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1112
+msgid "Optional: https:// addresses of GitHub mirrors, for when GitHub is hard to reach. A mirror is tried only after the direct download failed, and is put in front of the full GitHub address (for example https://gh-proxy.com/). What a mirror returns is not signed, so list only a mirror you trust: it supplies the downloaded packages (checksum lists are always read from GitHub itself). Empty: no mirror."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:191
+msgid "Optional: query this DNS server through the outbound of another section. If that outbound is not usable the queries go out directly."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:577
+msgid "OS version"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:165
+msgid "Other build"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:231
+msgid "Outbound Config"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:271
+msgid "Outbound Configuration"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getPostqVersionRow.ts:36
+#: src/postq/tabs/manager/cards.ts:157
+msgid "Outdated"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:891
+msgid "Output Network Interface"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:361
+msgid "Own bootstrap DNS"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:320
+msgid "Own DNS server"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:314
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:355
+msgid "Own server"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:162
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1279
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:533
+msgid "Parallel: the first usable answer wins"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:328
+msgid "Paste the subscription link https://…"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:103
+msgid "Paste the subscription link into the field above and press Connect: the servers will appear here."
+msgstr ""
+
+#: src/validators/validatePath.ts:7
+msgid "Path cannot be empty"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1456
+msgid "Path must be absolute (start with /)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1465
+msgid "Path must contain at least one directory (like /tmp/cache.db)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1460
+msgid "Path must end with cache.db"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:118
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:126
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:134
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:142
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:150
+#: src/postq/tabs/diagnostic/diagnostic.store.ts:158
+msgid "Pending"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:285
+msgid "Pin address"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:243
+msgid "Pin the address"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:473
+msgid "Ping servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:870
+msgid "Plain DNS (port 53) of the devices in the source interfaces is redirected to the router even when a device asks another server, such as a hard-coded 8.8.8.8. Without it such devices never get the FakeIP answers that routing by domain depends on. DNS over TLS/HTTPS is not touched."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:176
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:462
+msgid "Please wait..."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:567
+msgid "PostQ settings"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:566
+#: src/postq/tabs/dashboard/initController.ts:707
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:112
+msgid "PostQ VPN"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:348
+msgid "PostQ VPN has been updated"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:118
+msgid "PostQ VPN is not set up yet"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:322
+msgid "PostQ VPN updated, version:"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1381
+msgid "PostQ VPN will not modify your DHCP configuration"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1141
+msgid "Prefer servers in list order"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:667
+msgid "Prefix length"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:95
+msgid "Prepare the report"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:46
+msgid "Preparing the report..."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:402
+msgid "Preparing..."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:161
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1278
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:532
+msgid "Priority: next server if the previous one fails"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:80
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:149
+msgid "Protocol"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:63
+msgid "Protocol of this section's own DNS server"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:42
+msgid "Protocol toggles, file paths and logging. Block DoH only after switching upstream DNS to UDP or DoT."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:52
+msgid "Proxy"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:48
+msgid "Proxy and VPN send the traffic of the lists through a tunnel, Block drops it, Exclusion sends it out directly, DNS answers the domains of the lists from its own DNS server."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:239
+msgid "Proxy Configuration URL"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runFakeIPCheck.ts:66
+msgid "Proxy traffic is not routed via FakeIP"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runFakeIPCheck.ts:65
+msgid "Proxy traffic is routed via FakeIP"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:65
+msgid "Read it before you send it: servers are shown as host-N and links, passwords and lists are hidden, but check that nothing of yours is left."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1201
+msgid "Real addresses (IPv6 goes out directly)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1418
+msgid "Reality: post-quantum key share (X25519MLKEM768)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:212
+msgid "Refresh"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSectionsToolbar.ts:31
+msgid "Refresh all subscriptions"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:243
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:425
+msgid "Refresh subscription"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1636
+msgid "Regional options cannot be used together"
+msgstr ""
+
+#: src/validators/validateDomain.ts:81
+msgid "Regular expression must not contain spaces or commas"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:293
+msgid "Release"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:262
+msgid "Release the static lease of this device? It will get an address from the pool."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1917
+msgid "Remote Domain Lists"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1984
+msgid "Remote Subnet Lists"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:424
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:351
+msgid "Remove"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:275
+msgid "Removing the NaiveProxy client…"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:183
+msgid "renew it"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:86
+msgid "Report for support"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2126
+msgid "Require a login for the Mixed Proxy"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1419
+msgid "Required by REALITY servers on Xray-core 26.9.8 or newer, which reject clients without it. Older servers may fail the handshake, so keep it off for them. Needs sing-box-extended 2.7.2 or newer and the chrome fingerprint; ignored on other cores"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2175
+msgid "Resolve real IP for routing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:152
+msgid "Restart"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:51
+msgid "Restart PostQ VPN"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:55
+msgid "Restore"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:83
+msgid "Restored, restarting the service..."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:86
+msgid "Restored. Reload the page to see the settings."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:82
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:151
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:297
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:476
+msgid "Route"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1445
+msgid "Route all unmatched traffic through this section's outbound."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1369
+msgid "Route BitTorrent traffic directly, bypassing the proxy or VPN. Some providers block subscriptions when they detect torrent traffic."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runFakeIPCheck.ts:51
+msgid "Router DNS is not routed through sing-box"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runFakeIPCheck.ts:50
+msgid "Router DNS is routed through sing-box"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:546
+msgid "Router's own"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:358
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:404
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:34
+msgid "Routing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1131
+msgid "Routing Excluded IPs"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:77
+msgid "Rules mangle counters"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:72
+msgid "Rules mangle exist"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:82
+msgid "Rules mangle output exist"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:92
+msgid "Rules proxy counters"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:87
+msgid "Rules proxy exist"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderRunAction.ts:15
+msgid "Run Diagnostic"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1655
+msgid "Russia inside restrictions"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:24
+msgid "s"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:48
+msgid "same as now"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:256
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:385
+msgid "Save"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:114
+msgid "Save a snapshot now"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:16
+msgid "Saved at a successful start"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:18
+msgid "Saved by hand"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:452
+msgid "scheme://host[:port][/path], then Enter"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:57
+msgid "scheme://host[:port][/path], where scheme is udp, tcp, dot, doh, doh3 or doq. The first server is the main one. Choose for each server whether its queries go directly or through the proxy/VPN of a section (bootstrap DNS always stays direct). The time is measured from the router, through the tunnel for the servers that go through one, with the routes saved last."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:36
+msgid "Search by address, section or list"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:389
+msgid "Search by name, address or MAC"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1289
+msgid "Secret key for authenticating remote access to YACD when WAN access is enabled."
+msgstr ""
+
+#: src/postq/services/core.service.ts:42
+msgid "See the log"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1603
+msgid "Select a predefined list for routing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1168
+msgid "Select how often the domain or subnet lists are updated automatically"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:223
+msgid "Select how to configure the proxy"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1508
+msgid "Select network interface for VPN connection"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1580
+msgid "Select or enter DNS server address"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1439
+msgid "Select or enter path for sing-box cache file. Change this ONLY if you know what you are doing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1425
+msgid "Select path for sing-box config file. Change this ONLY if you know what you are doing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1566
+msgid "Select the DNS protocol type for the domain resolver"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1476
+msgid "Select the log level for sing-box"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:736
+msgid "Select the network interface from which the traffic will originate"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:892
+msgid "Select the network interface to which the traffic will originate"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:36
+msgid "Select the text and copy it"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:955
+msgid "Select the WAN interfaces to be monitored"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:226
+msgid "Selector"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:228
+msgid "Selector (text list)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:919
+msgid "Selector Proxy Links"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:945
+msgid "Selector Proxy Links (one per line)"
+msgstr ""
+
+#: src/postq/methods/shell/index.ts:553
+msgid "Self-update failed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:190
+msgid "Send DNS queries through section"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:869
+msgid "Send LAN DNS queries to the router"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:699
+msgid "Send this IP address or prefix with every DNS query (EDNS Client Subnet, RFC 7871), so geo-distributed services resolve to the node closest to you. Leave empty to disable. The detected WAN subnets are offered in the list."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:590
+msgid "Sent to the panel as X-Device-Model, e.g. Pixel 8 or iPhone 15. Empty sends the router's model."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:563
+msgid "Sent to the panel as X-Device-OS. Empty sends OpenWrt Linux."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:578
+msgid "Sent to the panel as X-Ver-OS, e.g. 14 for Android or 18.3 for iOS. Empty sends the router's kernel version."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:279
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:475
+msgid "Server"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:126
+msgid "server|servers|servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:415
+msgid "Servers per feed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:118
+msgid "Service"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:563
+msgid "Services info"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:570
+msgid "Settings of the previous install"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:60
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:85
+msgid "Settings snapshots"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:155
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1273
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:523
+msgid "Several DNS servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1182
+msgid "Show a notice on the dashboard when a newer PostQ VPN or sing-box-extended version is out. When the dashboard is opened and the last check is more than a day old, the router asks GitHub once in the background; nothing is installed."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/initController.ts:303
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:118
+msgid "Show sing-box config"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:409
+msgid "Show the servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1252
+msgid "Show the tiles on the dashboard"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:818
+msgid "Shows how many servers of the downloaded subscription the filters above keep, and which. Nothing is saved or changed."
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:577
+#: src/postq/tabs/dashboard/initController.ts:708
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:437
+msgid "Sing-box"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runSingBoxCheck.ts:77
+msgid "Sing-box autostart disabled"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:213
+msgid "Sing-box core changed, version:"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runSingBoxCheck.ts:62
+msgid "Sing-box installed"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runSingBoxCheck.ts:87
+msgid "Sing-box listening ports"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runSingBoxCheck.ts:82
+msgid "Sing-box process running"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runSingBoxCheck.ts:72
+msgid "Sing-box service exist"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runSingBoxCheck.ts:67
+msgid "Sing-box version is compatible (newer than 1.12.4)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1020
+msgid "sing-box-extended and its lite build. The stock sing-box comes from the firmware packages and cannot be rolled back, so it is not updated automatically."
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:97
+msgid "Skipped after a rollback"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:34
+msgid "skipped: this release was rolled back earlier"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:94
+msgid "Snapshot saved"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:18
+msgid "Snapshots"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:45
+msgid "Some rules depend on the client address, traffic type or lists that are not available here and were skipped. Enter the address of the device for a precise answer."
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:393
+msgid "Sort by ping"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:81
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:150
+msgid "Source"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:27
+msgid "Source and output interfaces, Bad WAN interface monitoring and devices excluded from routing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:735
+msgid "Source Network Interface"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1132
+msgid "Specify a local IP address to be excluded from routing"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2009
+msgid "Specify local IP addresses or subnets whose traffic will always be routed through the configured route"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1918
+msgid "Specify remote URLs to download and use domain lists"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1985
+msgid "Specify remote URLs to download and use subnet lists"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1870
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1894
+msgid "Specify the path to the list file located on the router filesystem"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:146
+msgid "Start"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:71
+msgid "Start PostQ VPN"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:44
+msgid "started by hand"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:290
+msgid "Static"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:149
+msgid "Stop"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:61
+msgid "Stop PostQ VPN"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:799
+msgid "stopped answering, the automatic choice is on again"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:536
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:546
+msgid "Subnets"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:29
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:230
+msgid "Subscription"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:481
+msgid "Subscription and servers"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/initController.ts:348
+msgid "Subscription cache cleared and re-downloaded"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:179
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:105
+msgid "Subscription ends in"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:30
+msgid "Subscription feeds, server filters and URLTest tuning"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:430
+msgid "Subscription format"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:651
+msgid "Subscription grouping"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:329
+msgid "Subscription link"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:601
+msgid "Subscription Update Interval"
+msgstr ""
+
+#: src/postq/methods/shell/index.ts:79
+msgid "Subscription update timed out"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:306
+msgid "Subscription updated"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:295
+msgid "Subscription URLs"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSectionsToolbar.ts:28
+msgid "Subscriptions"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:579
+msgid "Subscriptions moved to PostQ VPN"
+msgstr ""
+
+#: src/helpers/copyToClipboard.ts:10
+msgid "Successfully copied!"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:203
+msgid "Switch to %s"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:307
+msgid "Switch to extended"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:362
+msgid "Switch to lite"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:262
+msgid "Switch to stable"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:198
+msgid "Switching sing-box core, this may take a few minutes…"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:527
+msgid "System info"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSystemInfo.ts:24
+msgid "System information"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/checks/runNftCheck.ts:67
+msgid "Table exist"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:661
+msgid "Take the subnet from a WAN interface: its public address, or, when the interface has a private (NAT) address, the address the internet sees (looked up once and remembered). The value below is used when no address can be determined. IPv4 only, the /24 of the address."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:66
+msgid "TCP"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:773
+msgid "TCP ports that always go directly"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:400
+msgid "Test latency"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1395
+msgid "Test the servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1365
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:373
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:388
+msgid "Testing..."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1702
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1792
+msgid "Text List"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:193
+msgid "The address is already given to another device"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:192
+msgid "The address is outside the local networks"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:324
+msgid "The address of a published list of subscriptions: a text file with a feed address per line, or a JSON object whose keys are the addresses. The feeds found are added to the list above (the ones already there are skipped); save and apply to keep them. A feed with thousands of servers is cut to the number below."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:529
+msgid "The app the subscription is fetched as, e.g. Happ/4.7.1/Android/<number> or INCY/3.7.9/android Dalvik/2.1.0 (the generator above fills it in). Only this User-Agent is used then. Empty tries well-known clients."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:259
+msgid "The bootstrap DNS is an IP address, for example 77.88.8.8"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:43
+#: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:47
+#: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:55
+msgid "The check could not be completed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:869
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:879
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:902
+msgid "The check could not be run"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:73
+msgid "The connection list is not available: is the service running?"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:133
+msgid "The connections the router is carrying right now. A closed connection is opened again by the application if it still needs it."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:245
+msgid "The device always gets this address from the router (a static DHCP lease, the same as in Network - DHCP and DNS). The change applies at once."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/describeRouteCheck.ts:31
+msgid "The DNS query is blocked"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:565
+msgid "The DNS server used to look up the IP address of an upstream DNS server"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:80
+msgid "The domains of this section's lists are resolved by this server instead of the main one and are not sent through any tunnel (split DNS). Address, address:port or host/path for DoH"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1426
+msgid "The installed core (%s) does not know this option, so it is ignored."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:529
+msgid "The installed core (%s) is older: only the first server is used."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1030
+msgid "The interval between connectivity tests. A longer interval means less traffic through every server of the group; \"Only at start\" tests once when the service starts."
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:55
+msgid "the latest version"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:384
+msgid "The latest version is installed"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1053
+msgid "The maximum difference in response times (ms) allowed when comparing servers"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:194
+msgid "The name is already used by another device"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:56
+#: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:71
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:409
+msgid "The report could not be prepared"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:34
+msgid "The router clock is not set"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:43
+msgid "The router clock is off"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:49
+msgid "The router clock is right"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:182
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/devices.js:197
+msgid "The router did not answer"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:57
+msgid "The router has a global IPv6 address, IPv6 handling is off"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:470
+msgid "The saved settings could not be applied"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:2037
+msgid "The section is completely ignored (routing, lists, subscriptions), but its settings are kept. Clear the checkbox to enable it again"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:877
+msgid "The section is disabled: it gives no servers."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:875
+msgid "The section is not saved yet: save it first."
+msgstr ""
+
+#: src/validators/validateDnsForward.ts:70
+msgid "The server must be an IP address, optionally with #port"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1319
+msgid "The servers above are reached through the outbound of this section (a resolver that exists only inside the VPN or tunnel). If the outbound is not usable they are asked directly."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:498
+msgid "The servers appear here a few seconds after connecting."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:161
+msgid "The servers could not be checked"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:69
+msgid "The service will restart."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:107
+msgid "The settings are kept every time the service starts successfully (the last ten). A snapshot brings them back after a change that broke the service."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:359
+msgid "The sing-box core has been updated to %s"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:78
+msgid "The snapshot could not be restored"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderSnapshots.ts:95
+msgid "The snapshot could not be saved"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1406
+msgid "The subnets of this exclusion section never enter sing-box: the router sends them out directly, which saves CPU, especially with Global Proxy. Only subnets and IP lists are bypassed; domains still pass through sing-box."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1384
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1388
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:408
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:411
+msgid "The test could not be run"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1253
+msgid "The tiles with the traffic, the total traffic, the system information and the services above the lists of servers. Turn them off to leave only the servers."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1391
+msgid "The URL the dashboard uses to measure server latency. Change it if the default is slow or blocked in your region."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1087
+msgid "The URL used to test server connectivity"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:871
+msgid "There is no downloaded subscription yet: save the settings and restart the service first."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:65
+msgid "This core is built without QUIC: DoH3 and DoQ servers are replaced by DoH and DoT."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:450
+msgid "This is a security trade-off: an attacker could intercept the fetch."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:575
+msgid "This router had its own NetShift settings."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:432
+msgid "This server is already in the list"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:230
+msgid "Through %s"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:231
+msgid "Through %s (not available)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:526
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:531
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:536
+msgid "Through the VPN"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:389
+msgid "Tiles"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:316
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:477
+msgid "Time"
+msgstr ""
+
+#: src/validators/validateTime.ts:8
+msgid "Time cannot be empty"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:614
+msgid "Time in seconds for DNS record caching (default: 60)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1057
+msgid "Time of the check"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:618
+msgid "Time of the daily update, HH:MM (00:00-23:59) in the router's local time. Avoid minutes shared with other update intervals, such as :00 and :30 if a 30-minute section exists"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1334
+msgid "Times every DNS server of the list (UDP, TCP, DoT and DoH; DoH3 and DoQ cannot be timed). Nothing is changed: use it to decide the order of the servers."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:35
+msgid "TLS and Reality fail with a wrong time: check NTP"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:118
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:119
+msgid "traffic"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:461
+#: src/postq/tabs/dashboard/partials/renderSections.ts:168
+#: src/postq/tabs/dashboard/partials/renderSections.ts:169
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:85
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/connections.js:152
+msgid "Traffic"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1156
+msgid "Traffic of the IP addresses listed above never enters sing-box: the router sends it out directly, which saves CPU (a streaming TV, a game console). They also skip Fully Routed IPs and Global Proxy."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:774
+msgid "Traffic to these TCP ports never takes the tunnel, even for a domain or a subnet that is routed through it. Ports and ranges, separated by commas, for example: 22, 25, 6881-6889."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:795
+msgid "Traffic to these UDP ports never takes the tunnel (voice calls, games, NTP). Ports and ranges, separated by commas."
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:491
+msgid "Traffic Total"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderWikiDisclaimer.ts:26
+msgid "Troubleshooting"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:625
+msgid "TTL must be a positive number"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:620
+msgid "TTL value cannot be empty"
+msgstr ""
+
+#: src/validators/validateProxyUrl.ts:61
+msgid "TUIC needs a sing-box core built with QUIC"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:65
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1570
+msgid "UDP (Unprotected DNS)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1184
+msgid "UDP over TCP"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:794
+msgid "UDP ports that always go directly"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/helpers/getPostqVersionRow.ts:7
+#: src/postq/tabs/diagnostic/initController.ts:47
+#: src/postq/tabs/diagnostic/initController.ts:48
+#: src/postq/tabs/diagnostic/initController.ts:49
+#: src/postq/tabs/diagnostic/initController.ts:50
+#: src/postq/tabs/diagnostic/initController.ts:51
+#: src/postq/tabs/diagnostic/initController.ts:52
+#: src/postq/tabs/manager/cards.ts:436
+#: src/postq/tabs/manager/initController.ts:45
+#: src/postq/tabs/manager/initController.ts:46
+#: src/postq/tabs/manager/initController.ts:47
+#: src/postq/tabs/manager/initController.ts:48
+#: src/postq/tabs/manager/initController.ts:49
+#: src/postq/tabs/manager/initController.ts:50
+msgid "unknown"
+msgstr ""
+
+#: src/validators/validateDnsPool.ts:30
+msgid "Unknown DNS scheme. Use udp, tcp, dot, doh, doh3 or doq"
+msgstr ""
+
+#: src/postq/api.ts:40
+msgid "Unknown error"
+msgstr ""
+
+#: src/postq/tabs/dashboard/partials/renderSections.ts:186
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:112
+msgid "Unlimited subscription"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:246
+#: src/postq/tabs/manager/cards.ts:292
+#: src/postq/tabs/manager/cards.ts:347
+#: src/postq/tabs/manager/cards.ts:411
+msgid "Update"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:337
+msgid "Update failed: %s"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:106
+msgid "Update is available"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:722
+msgid "Update it in the Component Manager tab."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:266
+msgid "Update of PostQ VPN"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:267
+msgid "Update of the sing-box core"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:207
+msgid "Update PostQ VPN"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1008
+msgid "Update PostQ VPN automatically"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1019
+msgid "Update sing-box automatically"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:617
+msgid "Update time"
+msgstr ""
+
+#: src/helpers/autoUpdateStatus.ts:53
+msgid "updated"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:90
+msgid "updated %d d ago"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:87
+msgid "updated %d h ago"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:84
+msgid "updated %d min ago"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/subscription.js:81
+msgid "updated just now"
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:323
+msgid "Updating all subscriptions… this may take a minute"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:313
+msgid "Updating PostQ VPN, this may take a few minutes; the page will reload…"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:322
+msgid "Updating, do not close the page..."
+msgstr ""
+
+#: src/postq/tabs/dashboard/initController.ts:463
+#: src/postq/tabs/dashboard/initController.ts:494
+msgid "Uplink"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:22
+msgid "Upstream and bootstrap DNS resolvers, and optional DNS-over-proxy"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:377
+msgid "UPX"
+msgstr ""
+
+#: src/postq/tabs/manager/cards.ts:133
+msgid "UPX-compressed core: a RAM spike is possible at startup; on devices with less than 256 MB of RAM, enable zram swap"
+msgstr ""
+
+#: src/validators/validateProxyUrl.ts:78
+msgid "URL must start with vless://, vmess://, ss://, trojan://, socks4/5://, hysteria2://hy2://, tuic://, anytls:// or naive+https://"
+msgstr ""
+
+#: src/validators/validateUrl.ts:58
+msgid "URL must use one of the following protocols:"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:227
+msgid "URLTest"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:229
+msgid "URLTest (text list)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1029
+msgid "URLTest Check Interval"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:974
+msgid "URLTest Proxy Links"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1000
+msgid "URLTest Proxy Links (one per line)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1086
+msgid "URLTest Testing URL"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1052
+msgid "URLTest Tolerance"
+msgstr ""
+
+#: src/validators/validateDnsForward.ts:31
+msgid "Use \"zone server\", for example: ru 77.88.8.8"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:719
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:738
+msgid "Use a two-letter country code, for example NL"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1124
+msgid "Use an https:// address, for example https://gh-proxy.com/"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1069
+msgid "Use HH:MM, for example 04:30"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:448
+msgid "Use only for IP-host panels that serve an invalid or self-signed certificate."
+msgstr ""
+
+#: src/validators/validateDnsPool.ts:18
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:511
+msgid "Use scheme://host[:port][/path], where scheme is udp, tcp, dot, doh, doh3 or doq. Example: doh://dns.google/dns-query"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1142
+msgid "Use the first server of the list that works and go back to a higher one as soon as it recovers (checked every 30 seconds). Unlike URLTest this ignores speed. Grouped subscriptions are not supported."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1303
+msgid "Use this only when the router has working IPv6 connectivity."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1451
+msgid "Use with Exclusion sections to route specific domains directly."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1710
+msgid "User Domains"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1739
+msgid "User Domains List"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1800
+msgid "User Subnets"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1827
+msgid "User Subnets List"
+msgstr ""
+
+#: src/validators/validateDns.ts:26
+#: src/validators/validateDns.ts:30
+#: src/validators/validateDns.ts:34
+#: src/validators/validateDnsForward.ts:74
+#: src/validators/validateDnsPool.ts:51
+#: src/validators/validateDnsPool.ts:57
+#: src/validators/validateDomain.ts:13
+#: src/validators/validateDomain.ts:30
+#: src/validators/validateDomain.ts:75
+#: src/validators/validateDomain.ts:91
+#: src/validators/validateHysteriaUrl.ts:120
+#: src/validators/validateIp.ts:8
+#: src/validators/validateIp.ts:91
+#: src/validators/validateIp.ts:97
+#: src/validators/validateNaiveUrl.ts:72
+#: src/validators/validateOutboundJson.ts:7
+#: src/validators/validatePath.ts:16
+#: src/validators/validatePortList.ts:12
+#: src/validators/validatePortList.ts:30
+#: src/validators/validateShadowsocksUrl.ts:95
+#: src/validators/validateSocksUrl.ts:80
+#: src/validators/validateSubnet.ts:30
+#: src/validators/validateSubnet.ts:52
+#: src/validators/validateTime.ts:15
+#: src/validators/validateTrojanUrl.ts:59
+#: src/validators/validateTuicAnytlsUrl.ts:54
+#: src/validators/validateUrl.ts:75
+#: src/validators/validateVlessUrl.ts:108
+#: src/validators/validateVmessUrl.ts:86
+msgid "Valid"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1772
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1859
+msgid "Validation errors:"
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:437
+msgid "Version"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:217
+msgid "Version %s is available"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:257
+msgid "via the tunnel"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/initController.ts:269
+#: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:109
+msgid "View logs"
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderWikiDisclaimer.ts:32
+msgid "Visit Wiki"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:240
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:920
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:975
+msgid "vless://, vmess://, ss://, trojan://, socks4/5://, hy2/hysteria2://, tuic://, anytls://, naive+https:// links"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:946
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1001
+msgid "vless://, vmess://, ss://, trojan://, socks4/5://, hy2/hysteria2://, tuic://, anytls://, naive+https:// links — one per line"
+msgstr ""
+
+#: src/validators/validateProxyUrl.ts:32
+msgid "VMess needs the sing-box-extended core"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:166
+msgid "VPN is running"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:169
+msgid "VPN is stopped"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:168
+msgid "VPN is stopped: add a subscription below"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:672
+msgid "WAN interface for the EDNS Client Subnet"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1638
+msgid "Warning: %s cannot be used together with %s. Previous selections have been removed."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1657
+msgid "Warning: Russia inside can only be used with %s. %s already in Russia inside and have been removed from selection."
+msgstr ""
+
+#: src/postq/tabs/manager/initController.ts:477
+msgid "What is new in this build"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1127
+msgid "When a server picked by hand stops answering (three checks in a row, every 30 seconds), go back to the automatic choice (the fastest server) and say so on the dashboard. Needs the automatic group, so it works with URLTest lists and subscriptions; it does nothing together with the list-order mode."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1447
+msgid "When enabled, traffic not matching any other section's lists will go through this proxy."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:1159
+msgid "When no server of this section answers (three checks in a row, at the check interval of the priority mode), its traffic goes out directly, where zapret or another tool for direct traffic can pick it up, and returns to the section as soon as a server answers. Every switch is written to the log. Off by default."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:828
+msgid "When set, TCP traffic to every other port goes directly. For example 80, 443 keeps mail and torrents out of the tunnel. A port in the list above still goes directly."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:849
+msgid "When set, UDP traffic to every other port goes directly. For example 443 leaves only QUIC to the tunnel. A port in the list above still goes directly."
+msgstr ""
+
+#: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:71
+msgid "Where will a request go"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:431
+msgid "Which subscription format (client) to fetch first. Auto uses the default order. Choose Xray JSON (Happ) when your panel only exposes some nodes (e.g. xhttp) under a Happ-like client, or Sing-box to prefer the sing-box format."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1345
+msgid "While sing-box is down, DNS (and therefore name resolution) is unavailable until it recovers. Direct non-proxied traffic is unaffected while sing-box is up."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:815
+msgid "Wi-Fi Calling directly"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:592
+msgid "Will be added (marked with +)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:673
+msgid "With several WAN interfaces choose the one whose address represents you. Automatic uses the first working one."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:243
+msgid "Write the server as scheme://address, for example doh://dns.example.com/dns-query"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/section.js:436
+msgid "Xray JSON (Happ)"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:1288
+msgid "YACD Secret Key"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:27
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:30
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:36
+msgid "Yandex"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:585
+msgid "You can add your routing and DNS to the PostQ settings. Nothing else is carried over."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/settings.js:882
+msgid "You can select Output Network Interface, by default autodetect"
+msgstr ""

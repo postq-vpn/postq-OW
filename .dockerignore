@@ -1,13 +1,13 @@
-# Netshift Evolution — .dockerignore for Docker builds
+# Postq Evolution — .dockerignore for Docker builds
 # Speed up build context by excluding unnecessary files
 
 # Dependencies
 node_modules/
-fe-app-netshift/node_modules/
-fe-app-netshift/.yarn/
+fe-app-postq/node_modules/
+fe-app-postq/.yarn/
 
 # Build artifacts
-fe-app-netshift/dist/
+fe-app-postq/dist/
 *.ipk
 *.apk
 

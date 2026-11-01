@@ -23276,7 +23276,7 @@ DRVEOF
         KC_V="1.12.22"; echo "stock:$(unsupported_links_hint)"
         KC_V="1.14.3-extended-2.7.3"; echo "extended:$(unsupported_links_hint)"
     )"
-    if printf '%s\n' "$hint" | grep -qF 'stock: Installed core: stock sing-box 1.12.22. Links with XHTTP, VMess or VLESS Encryption need sing-box-extended: install it in Services - PostQ - Components manager.'; then
+    if printf '%s\n' "$hint" | grep -qF 'stock: Installed core: stock sing-box 1.12.22. Links with XHTTP, VMess or VLESS Encryption need sing-box-extended: run the PostQ VPN install command again, it installs sing-box extended lite.'; then
         pass "unsupported links on a stock core: the core and the way to sing-box-extended are named"
     else
         fail "unsupported links on a stock core: the core and the way to sing-box-extended are named" "$hint"

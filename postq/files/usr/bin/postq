@@ -600,7 +600,7 @@ unsupported_links_hint() {
     version="$(get_sing_box_version 2> /dev/null)"
     variant="$(get_sing_box_variant "$version" 2> /dev/null)"
     case "$variant" in
-    stock) printf ' Installed core: stock sing-box %s. Links with XHTTP, VMess or VLESS Encryption need sing-box-extended: install it in Services - PostQ VPN - Components manager.' "$version" ;;
+    stock) printf ' Installed core: stock sing-box %s. Links with XHTTP, VMess or VLESS Encryption need sing-box-extended: run the PostQ VPN install command again, it installs sing-box extended lite.' "$version" ;;
     *) printf ' Installed core: sing-box %s (%s). The errors before this one say what each link needs.' "$version" "$variant" ;;
     esac
 }

@@ -11109,6 +11109,60 @@ test_global_proxy() {
 #   - a broken tree fails instead of producing a package that cannot load;
 # plus the backend lookup of the installed LuCI app version (get_luci_app_version),
 # which has to find main.js in the hashed directory.
+# luci-app-postq/minify.sh shrinks the views and the stylesheet at package build.
+# 1.0.7 ran jsmin over the generated main.js too, which esbuild had already
+# minified: jsmin broke a regex next to a template literal and the page did not
+# load. A stand-in jsmin that marks what it touched shows the bundle is skipped,
+# the hand-written views are minified, and the stylesheet loses its comments.
+test_luci_minify() {
+    header "LuCI package minify"
+
+    local src="${POSTQ_LUCI_SRC:-/luci-app-postq}"
+    if [ ! -r "$src/minify.sh" ] || [ ! -d "$src/htdocs" ]; then
+        fail "minify" "luci-app-postq source not mounted at $src"
+        return
+    fi
+
+    local work="/tmp/postq-minify-$$"
+    rm -rf "$work"
+    mkdir -p "$work/bin"
+    cp -R "$src/htdocs" "$work/htdocs"
+    printf '#!/bin/sh\necho "/*jsmin*/"\ncat\n' > "$work/bin/jsmin"
+    chmod +x "$work/bin/jsmin"
+
+    local views="$work/htdocs/luci-static/resources/view/postq"
+    local css="$work/htdocs/luci-static/resources/postq/postq.css"
+    local bundle_before
+    bundle_before="$(md5sum < "$views/main.js")"
+
+    if PATH="$work/bin:$PATH" sh "$src/minify.sh" "$work/htdocs" > /dev/null 2>&1; then
+        pass "minify.sh succeeds on the source tree"
+    else
+        fail "minify.sh succeeds on the source tree"
+    fi
+    if [ "$(md5sum < "$views/main.js")" = "$bundle_before" ]; then
+        pass "the generated, already minified main.js is left as it is"
+    else
+        fail "the generated, already minified main.js is left as it is"
+    fi
+    if head -n 1 "$views/home.js" | grep -q 'jsmin'; then
+        pass "a hand-written view goes through jsmin"
+    else
+        fail "a hand-written view goes through jsmin"
+    fi
+    if [ -s "$css" ] && ! grep -q '/\*' "$css" && grep -q '@font-face' "$css"; then
+        pass "the stylesheet keeps its rules and loses its comments"
+    else
+        fail "the stylesheet keeps its rules and loses its comments"
+    fi
+    if ! find "$work/htdocs" -name '*.min' | grep -q .; then
+        pass "no temporary files are left"
+    else
+        fail "no temporary files are left"
+    fi
+    rm -rf "$work"
+}
+
 test_luci_cache_bust() {
     header "LuCI views cache busting"
 

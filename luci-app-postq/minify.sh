@@ -1,0 +1,69 @@
+#!/bin/sh
+# Shrinks the LuCI app's web files for the router's small flash: the views and
+# the stylesheet are installed without comments and indentation.
+#
+# luci.mk minifies in its own Package/install (jsmin, csstidy), which this
+# package replaces (see Makefile), so the same is done here:
+#   - *.js with jsmin from luci-base/host (staging_dir/hostpkg/bin, built by the SDK image, see
+#     Dockerfile-ipk / Dockerfile-apk); without jsmin the views stay as they are;
+#   - *.css with awk: comments, indentation and blank lines go. The stylesheet
+#     has no "/*" inside a string, so a comment is everything between "/*" and "*/".
+# A file is replaced only when its minified copy is not empty.
+#
+# Usage: minify.sh <htdocs dir>
+
+set -eu
+export LC_ALL=C
+
+HTDOCS="${1:?usage: minify.sh <htdocs dir>}"
+RES="$HTDOCS/luci-static/resources"
+
+JSMIN="$(command -v jsmin 2> /dev/null || true)"
+
+before="$(find "$RES" -type f \( -name '*.js' -o -name '*.css' \) -exec cat {} + | wc -c)"
+
+if [ -n "$JSMIN" ]; then
+    find "$RES" -type f -name '*.js' | while read -r src; do
+        if "$JSMIN" < "$src" > "$src.min" 2> /dev/null && [ -s "$src.min" ]; then
+            mv "$src.min" "$src"
+        else
+            rm -f "$src.min"
+        fi
+    done
+else
+    echo "minify: jsmin not found, the views are installed as they are" >&2
+fi
+
+find "$RES" -type f -name '*.css' | while read -r src; do
+    awk '
+        {
+            line = $0
+            out = ""
+            while (line != "") {
+                if (incomment) {
+                    end = index(line, "*/")
+                    if (end == 0) { line = ""; break }
+                    line = substr(line, end + 2)
+                    incomment = 0
+                } else {
+                    start = index(line, "/*")
+                    if (start == 0) { out = out line; line = ""; break }
+                    out = out substr(line, 1, start - 1)
+                    line = substr(line, start + 2)
+                    incomment = 1
+                }
+            }
+            sub(/^[ \t]+/, "", out)
+            sub(/[ \t]+$/, "", out)
+            if (out != "") print out
+        }
+    ' "$src" > "$src.min"
+    if [ -s "$src.min" ]; then
+        mv "$src.min" "$src"
+    else
+        rm -f "$src.min"
+    fi
+done
+
+after="$(find "$RES" -type f \( -name '*.js' -o -name '*.css' \) -exec cat {} + | wc -c)"
+echo "minify: views and styles $before -> $after bytes"

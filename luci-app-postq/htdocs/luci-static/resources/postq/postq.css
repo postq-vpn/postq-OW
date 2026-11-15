@@ -1,1226 +1,1703 @@
 /*
- * PostQ: the look of the PostQ XKeen panel for the PostQvpn page only.
- * Everything is scoped to the page (body.pq-page / #cbi-postq), so the rest
- * of LuCI keeps its theme. Colours follow the light and the dark theme of the
- * XKeen UI; the dark set is used when LuCI is dark (html[data-darkmode="true"])
- * or, for themes that do not say, when the system is.
+ * PostQ VPN page. The look of the PostQ XKeen panel (and of postq.space and the
+ * personal account): the same --rd-* tokens, type and shapes. Everything is
+ * scoped to body.pq-page; the dark set is used when LuCI is dark
+ * (html[data-darkmode="true"]) or, without that attribute, when the system is.
  */
 
+/* GT Eesti Pro: Display for the titles and values, Text for the rest. The flags
+   come from Twemoji: Windows draws no flag emoji of its own. */
+@font-face {
+  font-family: "PQ Text";
+  src: url("gt-eesti-text-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PQ Text";
+  src: url("gt-eesti-text-medium.woff2") format("woff2");
+  font-weight: 500 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PQ Display";
+  src: url("gt-eesti-display-bold.woff2") format("woff2");
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PQ Flags";
+  src: url("twemoji-flags.woff2") format("woff2");
+  unicode-range: U+1F1E0-1F1FF;
+}
+
+/* ── Tokens ──────────────────────────────────────────────────── */
+
 body.pq-page {
-  --pq-fg: #212023;
-  --pq-muted-fg: #77757a;
-  --pq-card: #ffffff;
-  --pq-muted: #f8f8f8;
-  --pq-muted-hover: #f2f2f3;
-  --pq-border: #ececee;
-  --pq-input: #e4e4e7;
-  --pq-primary: #ff2181;
-  --pq-primary-hover: #e81574;
-  --pq-primary-bg: #ff2181;
-  --pq-secondary: #ffe9f2;
-  --pq-accent: rgba(255, 33, 129, 0.08);
-  --pq-ring: rgba(255, 33, 129, 0.5);
-  --pq-shadow: 0 1px 2px rgba(16, 8, 34, 0.04), 0 4px 16px rgba(16, 8, 34, 0.04);
-  --pq-green: #16a34a;
-  --pq-yellow: #ca8a04;
-  --pq-orange: #ea580c;
-  --pq-red: #dc2626;
-  --pq-warn-fg: #c2410c;
-  --pq-warn-bg: rgba(249, 115, 22, 0.1);
-  --pq-warn-border: rgba(249, 115, 22, 0.25);
-  --pq-radius: 12px;
-  --pq-radius-sm: 8px;
+  --rd-page: #f8f8f8;
+  --rd-surface: #ffffff;
+  --rd-field: #f8f8f8;
+  --rd-chip: #f4f4f4;
+  --rd-chip-hover: #e9e9e9;
+  --rd-help: #fff4f9;
+
+  --rd-action: #ff2181;
+  --rd-action-hover: #e61a72;
+  --rd-action-soft: #ffe9f2;
+  --rd-action-soft-hover: #ffdaea;
+  --rd-on-action: #ffffff;
+  --rd-on-soft: #ff2181;
+
+  --rd-heading: #212023;
+  --rd-body: #4d4d4f;
+  --rd-caption: #7a797b;
+  --rd-placeholder: #a6a6a7;
+
+  --rd-border: #e9e9e9;
+  --rd-border-accent: #ffd3e6;
+
+  --rd-error: #ff3e3e;
+  --rd-error-bg: #ffeded;
+  --rd-error-text: #d92626;
+  --rd-success: #23b26d;
+  --rd-success-text: #1f9e5f;
+  --rd-warn-bg: #fff9e5;
+  --rd-warn-icon: #cca000;
+  --rd-warn-text: #8a6c00;
+
+  --rd-nav-bg: rgba(255, 255, 255, 0.7);
+  --rd-icon-btn: rgba(0, 0, 0, 0.05);
+  --rd-divider: rgba(33, 32, 35, 0.05);
+  --rd-shadow: 0 4px 40px rgba(0, 0, 0, 0.05);
+  --rd-overlay: rgba(33, 32, 35, 0.32);
+
+  --rd-space-head: 24px;
+  --rd-space-grid: 12px;
+  --rd-space-card: 24px;
+  --rd-space-group: 16px;
+  --rd-space-item: 8px;
+  --rd-space-title: 4px;
+  --rd-space-tile: 16px;
+
+  --rd-radius-md: 24px;
+  --rd-radius-control: 20px;
+  --rd-radius-btn: 16px;
+  --rd-radius-sm: 12px;
+
+  --rd-font-text: "PQ Flags", "PQ Text", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --rd-font-display: "PQ Flags", "PQ Display", "PQ Text", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --rd-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
   --pq-logo: url("postq-logo.svg");
+
+  /* the older names the diagnostics' rules below use */
+  --pq-fg: var(--rd-heading);
+  --pq-muted-fg: var(--rd-caption);
+  --pq-card: var(--rd-surface);
+  --pq-muted: var(--rd-field);
+  --pq-muted-hover: var(--rd-chip-hover);
+  --pq-border: var(--rd-border);
+  --pq-input: var(--rd-border);
+  --pq-primary: var(--rd-action);
+  --pq-accent: var(--rd-help);
+  --pq-ring: var(--rd-border-accent);
+  --pq-green: var(--rd-success-text);
+  --pq-yellow: var(--rd-warn-icon);
+  --pq-orange: #ea580c;
+  --pq-red: var(--rd-error-text);
 }
 
 :root[data-darkmode="true"] body.pq-page {
-  --pq-fg: #f4eefc;
-  --pq-muted-fg: rgba(215, 194, 240, 0.66);
-  --pq-card: rgba(16, 8, 34, 0.72);
-  --pq-muted: rgba(255, 255, 255, 0.06);
-  --pq-muted-hover: rgba(255, 255, 255, 0.09);
-  --pq-border: rgba(255, 255, 255, 0.09);
-  --pq-input: rgba(255, 255, 255, 0.09);
-  --pq-primary: #cf00a3;
-  --pq-primary-hover: #e01bb4;
-  --pq-primary-bg: linear-gradient(135deg, #cf00a3 0%, #931b79 100%);
-  --pq-secondary: rgba(255, 255, 255, 0.06);
-  --pq-accent: rgba(207, 0, 163, 0.15);
-  --pq-ring: rgba(207, 0, 163, 0.6);
-  --pq-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
-  --pq-green: #4ade80;
-  --pq-yellow: #facc15;
-  --pq-orange: #fb923c;
-  --pq-red: #f87171;
-  --pq-warn-fg: #fb923c;
+  --rd-page: #1a1a1c;
+  --rd-surface: #212023;
+  --rd-field: #2b2a2d;
+  --rd-chip: #2b2a2d;
+  --rd-chip-hover: #373639;
+  --rd-help: #660d34;
+  --rd-action-soft: #660d34;
+  --rd-action-soft-hover: #7a1040;
+  --rd-on-soft: #ffd3e6;
+  --rd-heading: #f8f8f8;
+  --rd-body: #d3d2d3;
+  --rd-caption: #a6a6a7;
+  --rd-placeholder: #908f91;
+  --rd-border: #373639;
+  --rd-border-accent: #99144d;
+  --rd-error-bg: #5c1a1a;
+  --rd-error-text: #ff9a9a;
+  --rd-success-text: #6fdc8c;
+  --rd-warn-bg: #4d3d00;
+  --rd-warn-icon: #ffde66;
+  --rd-warn-text: #ffde66;
+  --rd-nav-bg: rgba(26, 26, 28, 0.7);
+  --rd-icon-btn: rgba(255, 255, 255, 0.05);
+  --rd-divider: rgba(255, 255, 255, 0.06);
+  --rd-shadow: 0 4px 40px rgba(0, 0, 0, 0.3);
+  --rd-overlay: rgba(0, 0, 0, 0.55);
   --pq-logo: url("postq-logo-dark.svg");
+  --pq-orange: #fb923c;
+  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-darkmode]) body.pq-page {
-    --pq-fg: #f4eefc;
-    --pq-muted-fg: rgba(215, 194, 240, 0.66);
-    --pq-card: rgba(16, 8, 34, 0.72);
-    --pq-muted: rgba(255, 255, 255, 0.06);
-    --pq-muted-hover: rgba(255, 255, 255, 0.09);
-    --pq-border: rgba(255, 255, 255, 0.09);
-    --pq-input: rgba(255, 255, 255, 0.09);
-    --pq-primary: #cf00a3;
-    --pq-primary-hover: #e01bb4;
-    --pq-primary-bg: linear-gradient(135deg, #cf00a3 0%, #931b79 100%);
-    --pq-secondary: rgba(255, 255, 255, 0.06);
-    --pq-accent: rgba(207, 0, 163, 0.15);
-    --pq-ring: rgba(207, 0, 163, 0.6);
-    --pq-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
-    --pq-green: #4ade80;
-    --pq-yellow: #facc15;
-    --pq-orange: #fb923c;
-    --pq-red: #f87171;
-    --pq-warn-fg: #fb923c;
+    --rd-page: #1a1a1c;
+    --rd-surface: #212023;
+    --rd-field: #2b2a2d;
+    --rd-chip: #2b2a2d;
+    --rd-chip-hover: #373639;
+    --rd-help: #660d34;
+    --rd-action-soft: #660d34;
+    --rd-action-soft-hover: #7a1040;
+    --rd-on-soft: #ffd3e6;
+    --rd-heading: #f8f8f8;
+    --rd-body: #d3d2d3;
+    --rd-caption: #a6a6a7;
+    --rd-placeholder: #908f91;
+    --rd-border: #373639;
+    --rd-border-accent: #99144d;
+    --rd-error-bg: #5c1a1a;
+    --rd-error-text: #ff9a9a;
+    --rd-success-text: #6fdc8c;
+    --rd-warn-bg: #4d3d00;
+    --rd-warn-icon: #ffde66;
+    --rd-warn-text: #ffde66;
+    --rd-nav-bg: rgba(26, 26, 28, 0.7);
+    --rd-icon-btn: rgba(255, 255, 255, 0.05);
+    --rd-divider: rgba(255, 255, 255, 0.06);
+    --rd-shadow: 0 4px 40px rgba(0, 0, 0, 0.3);
+    --rd-overlay: rgba(0, 0, 0, 0.55);
     --pq-logo: url("postq-logo-dark.svg");
+    --pq-orange: #fb923c;
+    color-scheme: dark;
   }
 }
 
-/* ── Page: logo in place of the title, sections as cards ───────── */
+/* ── The page: no LuCI header and footer, the panel's background ── */
 
-.pq-page #cbi-postq {
-  max-width: 980px;
-  margin: 0 auto;
-  color: var(--pq-fg);
+body.pq-page {
+  background: var(--rd-page);
+  color: var(--rd-heading);
+  font-family: var(--rd-font-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.pq-page #cbi-postq > h2 {
-  height: 40px;
-  margin: 8px 0 20px;
-  overflow: hidden;
-  color: transparent;
-  font-size: 0;
-  white-space: nowrap;
-  background: var(--pq-logo) center / contain no-repeat;
+html:has(body.pq-page) {
+  background: var(--rd-page);
 }
 
-.pq-page #cbi-postq > .cbi-section {
-  margin: 0 0 16px;
-  padding: 16px 20px;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius);
-  background: var(--pq-card);
-  box-shadow: var(--pq-shadow);
-}
-
-.pq-page #cbi-postq > .cbi-section > h3 {
-  margin: 0 0 12px;
-  padding: 0;
-  border: none;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--pq-fg);
-}
-
-.pq-page #cbi-postq .cbi-section-node {
-  padding: 0;
-  border: none;
-  background: none;
-}
-
-.pq-page #cbi-postq .cbi-value {
-  padding: 0;
-  border: none;
-}
-
-.pq-page #cbi-postq .cbi-value-description {
-  color: var(--pq-muted-fg);
-  font-size: 12px;
-}
-
-/* ── Buttons and fields ───────────────────────────────────────── */
-
-.pq-page #cbi-postq .btn,
-.pq-page #cbi-postq .cbi-button,
-.pq-page .cbi-page-actions .btn,
-.pq-page .cbi-page-actions .cbi-button {
-  height: 34px;
-  padding: 0 14px;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-muted);
-  color: var(--pq-fg);
-  font-weight: 500;
-  box-shadow: none;
-  text-shadow: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-.pq-page #cbi-postq .btn:hover,
-.pq-page #cbi-postq .cbi-button:hover,
-.pq-page .cbi-page-actions .btn:hover,
-.pq-page .cbi-page-actions .cbi-button:hover {
-  background: var(--pq-muted-hover);
-  border-color: var(--pq-ring);
-}
-
-/* the main action: pink like the brand button of the XKeen UI */
-.pq-page .cbi-page-actions .cbi-button-apply,
-.pq-page .cbi-page-actions .cbi-button-apply + .cbi-dropdown,
-.pq-page #cbi-postq .pq-control .cbi-button-save {
-  border-color: transparent;
-  background: var(--pq-primary-bg);
-  color: #ffffff;
-}
-
-.pq-page .cbi-page-actions .cbi-button-apply:hover,
-.pq-page #cbi-postq .pq-control .cbi-button-save:hover {
-  background: var(--pq-primary-hover);
-  border-color: transparent;
-}
-
-.pq-page #cbi-postq .pq-control .cbi-button-remove {
-  color: var(--pq-red);
-}
-
-.pq-page #cbi-postq input[type="text"],
-.pq-page #cbi-postq .cbi-input-text {
-  height: 34px;
-  border: 1px solid var(--pq-input);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-muted);
-  color: var(--pq-fg);
-  box-shadow: none;
-}
-
-.pq-page #cbi-postq input[type="text"]:focus {
-  border-color: var(--pq-primary);
-  outline: 2px solid var(--pq-ring);
-  outline-offset: -1px;
-}
-
-.pq-page .cbi-page-actions {
-  max-width: 980px;
-  margin: 0 auto 24px;
-  padding: 12px 20px;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius);
-  background: var(--pq-card);
-}
-
-/* ── Service card ─────────────────────────────────────────────── */
-
-.pq-page .pq-control {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.pq-page .pq-control__status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-}
-
-.pq-page .pq-control__dot {
-  width: 10px;
-  height: 10px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--pq-red);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pq-red) 20%, transparent);
-}
-
-.pq-page .pq-control__dot--on {
-  background: var(--pq-green);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pq-green) 20%, transparent);
-}
-
-.pq-page .pq-control__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.pq-page .pq-control__update {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: var(--pq-muted-fg);
-}
-
-.pq-page .pq-control__update-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-/* an update on offer is the action to notice: the brand button */
-.pq-page #cbi-postq .pq-control__update-row .cbi-button-action {
-  border-color: transparent;
-  background: var(--pq-primary-bg);
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.pq-page #cbi-postq .pq-control__update-row .cbi-button-action:hover {
-  background: var(--pq-primary-hover);
-}
-
-.pq-page .pq-control__update:empty {
+body.pq-page > header,
+body.pq-page > footer,
+body.pq-page #maincontent > .cbi-page-actions,
+body.pq-page .pq-hidden-tabs {
   display: none;
 }
 
-/* ── Servers ──────────────────────────────────────────────────── */
-
-.pq-page .pdk_dashboard-page__sections-toolbar {
-  display: none;
-}
-
-.pq-page .pdk_dashboard-page__outbound-section {
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  box-shadow: none;
-}
-
-.pq-page .pdk_dashboard-page__outbound-section__title-section {
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.pq-page .pdk_dashboard-page__outbound-section__title-section__title {
-  font-weight: 600;
-  color: var(--pq-fg);
-}
-
-.pq-page .pdk_dashboard-page__outbound-section__controls .btn,
-.pq-page .pdk_dashboard-page__outbound-section__controls .cbi-button {
-  height: 30px;
-  padding: 0 10px;
-  font-size: 12px;
-}
-
-.pq-page .pdk_dashboard-page__subscription-info__text {
-  color: var(--pq-muted-fg);
-  font-size: 12px;
-}
-
-.pq-page .pdk_dashboard-page__subscription-info__text--soon {
-  color: var(--pq-warn-fg);
-}
-
-/* one column of rows in a rounded box, like the server list of the XKeen UI */
-.pq-page .pdk_dashboard-page__outbound-list {
-  display: block;
-  max-height: none;
-  margin-top: 10px;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-muted);
-}
-
-.pq-page .pdk_dashboard-page__outbound-row {
-  gap: 12px;
-  min-height: 40px;
-  padding: 8px 16px;
-  border: none;
-  border-bottom: 1px solid var(--pq-border);
-  border-radius: 0;
-  background: var(--pq-card);
-  font-size: 13px;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.pq-page .pdk_dashboard-page__outbound-row:last-child {
-  border-bottom: none;
-}
-
-.pq-page .pdk_dashboard-page__outbound-row--selectable:hover {
-  border-color: var(--pq-border);
-  background: var(--pq-muted-hover);
-  box-shadow: inset 2px 0 0 var(--pq-ring);
-}
-
-.pq-page .pdk_dashboard-page__outbound-row--active,
-.pq-page .pdk_dashboard-page__outbound-row--active:hover {
-  border-color: var(--pq-border);
-  background: var(--pq-accent);
-  box-shadow: inset 2px 0 0 var(--pq-primary);
-}
-
-/* a radio circle in front of every server; filled for the chosen one */
-.pq-page .pdk_dashboard-page__outbound-row::before {
-  content: "";
-  width: 16px;
-  height: 16px;
-  flex: none;
-  box-sizing: border-box;
-  border: 1.5px solid var(--pq-input);
-  border-radius: 50%;
-  background: var(--pq-card);
-}
-
-.pq-page .pdk_dashboard-page__outbound-row--active::before {
-  border: 5px solid var(--pq-primary);
-  background: #ffffff;
-}
-
-.pq-page .pdk_dashboard-page__outbound-row__name {
-  font-weight: 500;
-}
-
-.pq-page .pdk_dashboard-page__outbound-current {
-  color: var(--pq-muted-fg);
-  font-size: 11px;
-}
-
-/* the radio says which server is chosen: no "Active" badge */
-.pq-page .pdk_dashboard-page__outbound-row__badge,
-.pq-page .pdk_dashboard-page__outbound-row__badge-space {
-  display: none;
-}
-
-.pq-page .pdk_dashboard-page__outbound-row__latency {
-  min-width: 64px;
-  text-align: right;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-
-.pq-page .pdk_dashboard-page__outbound-grid__item__latency--green {
-  color: var(--pq-green);
-}
-
-.pq-page .pdk_dashboard-page__outbound-grid__item__latency--yellow {
-  color: var(--pq-yellow);
-}
-
-.pq-page .pdk_dashboard-page__outbound-grid__item__latency--red {
-  color: var(--pq-orange);
-}
-
-.pq-page .pdk_dashboard-page__outbound-grid__item__latency--empty {
-  color: var(--pq-muted-fg);
-}
-
-/* "Not recommended": an orange band across the list, as in the XKeen UI */
-.pq-page .pdk_dashboard-page__not-recommended {
-  margin: 0;
-  padding: 6px 16px;
-  border: none;
-  border-top: 1px solid var(--pq-warn-border);
-  border-bottom: 1px solid var(--pq-warn-border);
-  border-radius: 0;
-  background: var(--pq-warn-bg);
-  color: var(--pq-warn-fg);
-  font-size: 12px;
-  font-weight: 500;
-}
-
-/* notices on the page */
-.pq-page .pdk_dashboard-page__pin-guard,
-.pq-page .pdk_dashboard-page__update-notice,
-.pq-page .pdk_dashboard-page__setup {
-  margin: 0 0 12px;
-  border: 1px solid var(--pq-warn-border);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-warn-bg);
-  box-shadow: none;
-}
-
-.pq-page .pdk_dashboard-page__setup {
-  border-color: var(--pq-border);
-  background: var(--pq-muted);
-}
-
-/* tiles view: the same colours */
-.pq-page .pdk_dashboard-page__outbound-grid__item {
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-card);
-  box-shadow: none;
-}
-
-.pq-page .pdk_dashboard-page__outbound-grid__item--active {
-  background: var(--pq-accent);
-  box-shadow: inset 2px 0 0 var(--pq-primary);
-}
-
-/* ── Tabs: Main / Diagnostics (a segmented switch under the logo) ── */
-
-.pq-page #cbi-postq > .pq-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 4px;
-  width: fit-content;
-  margin: 0 auto 20px;
-  padding: 4px;
-  border: 1px solid var(--pq-border);
-  border-radius: 10px;
-  background: var(--pq-muted);
-  list-style: none;
-}
-
-.pq-page #cbi-postq > .pq-tabs > li {
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-}
-
-.pq-page #cbi-postq > .pq-tabs > li > a {
-  display: block;
-  padding: 6px 18px;
-  border: none;
-  border-radius: 7px;
-  background: none;
-  color: var(--pq-muted-fg);
-  font-weight: 500;
-  text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
-}
-
-.pq-page #cbi-postq > .pq-tabs > li > a:hover {
-  color: var(--pq-fg);
-}
-
-.pq-page #cbi-postq > .pq-tabs > li.cbi-tab > a {
-  background: var(--pq-card);
-  color: var(--pq-fg);
-  box-shadow: 0 1px 3px rgba(16, 8, 34, 0.12);
-}
-
-/* nothing to save on the diagnostics tab */
-.pq-page--diagnostic .cbi-page-actions {
-  display: none;
-}
-
-/* the diagnostics: its cards in the colours of the page */
-.pq-page #cbi-postq-diagnostic .card {
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-muted);
-  box-shadow: none;
-  color: var(--pq-fg);
-}
-
-/* the theme caps a tab at half the menu and cuts its name */
-.pq-page #cbi-postq > .pq-tabs > li {
-  max-width: none;
+body.pq-page #maincontent {
   width: auto;
-  flex: none;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
-.pq-page #cbi-postq > .pq-tabs > li > a {
-  overflow: visible;
-  text-overflow: clip;
-  white-space: nowrap;
+body.pq-page #view {
+  min-height: 100vh;
 }
 
-/* the troubleshooting block links to the PostQ wiki, not to PostQ */
-.pq-page #pdk_diagnostic-page-wiki {
+/* LuCI's own messages (apply, errors) over the panel */
+body.pq-page #maincontent > .alert-message,
+body.pq-page #maincontent > div > .alert-message,
+body.pq-page .alert-message {
+  max-width: 1240px;
+  margin: 12px auto 0;
+  border: none;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-surface);
+  color: var(--rd-heading);
+  box-shadow: var(--rd-shadow);
+  font-family: var(--rd-font-text);
+}
+
+body.pq-page .alert-message.warning,
+body.pq-page .alert-message.error {
+  background: var(--rd-error-bg);
+  color: var(--rd-error-text);
+}
+
+body.pq-page .pq-app {
+  box-sizing: border-box;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--rd-space-grid) 16px 48px;
+}
+
+@media (min-width: 640px) {
+  body.pq-page .pq-app {
+    padding: var(--rd-space-head) 24px 64px;
+  }
+}
+
+body.pq-page .pq-app *,
+body.pq-page .pq-app *::before,
+body.pq-page .pq-app *::after,
+body.pq-page .pq-modal *,
+body.pq-page .pq-modal *::before,
+body.pq-page .pq-modal *::after {
+  box-sizing: border-box;
+}
+
+body.pq-page .pq-screen[hidden] {
   display: none;
 }
 
-/* ── Subscription and servers (variant A: the subscription line over the list) ── */
+/* ── Type ────────────────────────────────────────────────────── */
 
-/* the subscription saves and applies by itself: no form buttons on the page */
-.pq-page .cbi-page-actions {
-  display: none;
-}
-
-/* the dashboard's own header and subscription line: replaced by the card */
-.pq-page .pdk_dashboard-page__outbound-section__title-section,
-.pq-page .pdk_dashboard-page__subscription-info,
-.pq-page .pdk_dashboard-page__setup {
-  display: none;
-}
-
-.pq-page .pq-sub {
-  display: flex;
-  flex-direction: column;
-}
-
-.pq-page .pq-sub__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.pq-page .pq-sub__head h3 {
+body.pq-page .pq-title,
+body.pq-page .pq-section,
+body.pq-page .pq-value,
+body.pq-page .pq-head__title {
   margin: 0;
   padding: 0;
   border: none;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--pq-fg);
+  color: var(--rd-heading);
+  font-family: var(--rd-font-display);
+  font-weight: 700;
 }
 
-.pq-page .pq-icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  flex: none;
-  padding: 0;
-  border: none;
-  border-radius: 6px;
-  background: none;
-  color: var(--pq-muted-fg);
-  cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+body.pq-page .pq-title {
+  font-size: 28px;
+  line-height: 32px;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
-.pq-page .pq-icon-btn:hover {
-  background: var(--pq-muted-hover);
-  color: var(--pq-fg);
+@media (min-width: 768px) {
+  body.pq-page .pq-title {
+    font-size: 32px;
+    line-height: 36px;
+  }
 }
 
-.pq-page .pq-icon-btn:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.pq-page .pq-sub__head .pq-icon-btn {
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-muted);
-  color: var(--pq-fg);
-}
-
-/* the subscription lines and the server list make one rounded box */
-.pq-page .pq-sub__list {
-  border: 1px solid var(--pq-border);
-  border-bottom: none;
-  border-radius: var(--pq-radius-sm) var(--pq-radius-sm) 0 0;
-  overflow: hidden;
-}
-
-.pq-page .pq-sub__list + * {
-  margin: 0;
-}
-
-.pq-page .pq-servers .pdk_dashboard-page__outbound-list {
-  margin-top: 0;
-  border-radius: 0 0 var(--pq-radius-sm) var(--pq-radius-sm);
-}
-
-.pq-page .pq-sub__row {
+body.pq-page .pq-section,
+body.pq-page .pq-head__title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 6px 12px 6px 16px;
-  border-bottom: 1px solid var(--pq-border);
-  background: var(--pq-muted);
-  font-size: 13px;
+  gap: var(--rd-space-item);
+  font-size: 20px;
+  line-height: 24px;
 }
 
-.pq-page .pq-sub__name {
-  margin-right: 4px;
-  font-weight: 600;
-  white-space: nowrap;
+body.pq-page .pq-value {
+  font-size: 22px;
+  line-height: 28px;
 }
 
-.pq-page .pq-sub__info {
-  flex: 1;
-  min-width: 0;
-  padding: 0 8px;
+@media (min-width: 640px) {
+  body.pq-page .pq-value {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}
+
+body.pq-page .pq-body {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+body.pq-page .pq-meta {
+  margin: 0;
+  color: var(--rd-caption);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+body.pq-page .pq-strong {
+  color: var(--rd-heading);
+  font-weight: 500;
+}
+
+body.pq-page .pq-heading {
+  color: var(--rd-heading);
+}
+
+body.pq-page .pq-text {
+  color: var(--rd-body);
+}
+
+body.pq-page .pq-caption {
+  color: var(--rd-caption);
+}
+
+body.pq-page .pq-accent {
+  color: var(--rd-action);
+}
+
+body.pq-page .pq-text-error {
+  color: var(--rd-error-text);
+}
+
+body.pq-page .pq-text-warn {
+  color: var(--rd-warn-text);
+}
+
+body.pq-page .pq-truncate {
   overflow: hidden;
-  color: var(--pq-muted-fg);
-  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.pq-page .pq-sub__info--soon {
-  color: var(--pq-warn-fg);
-  font-weight: 600;
+body.pq-page .pq-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-.pq-page .pq-sub__ping {
+body.pq-page .pq-icon {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
-  gap: 4px;
-  flex: none;
-  height: 28px;
-  padding: 0 8px;
-  border: none;
-  border-radius: 6px;
-  background: none;
-  color: var(--pq-muted-fg);
-  font: inherit;
-  font-size: 12px;
-  cursor: pointer;
+  justify-content: center;
 }
 
-.pq-page .pq-sub__ping:hover {
-  background: var(--pq-muted-hover);
-  color: var(--pq-fg);
+body.pq-page .pq-icon svg {
+  display: block;
 }
 
-.pq-page .pq-sub__ping-icon svg {
-  width: 13px;
-  height: 13px;
+/* ── Header: a frosted pill with the logo, pills on the right ── */
+
+body.pq-page .pq-head {
+  position: sticky;
+  top: var(--rd-space-grid);
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--rd-space-grid);
+  margin-bottom: var(--rd-space-head);
 }
 
-.pq-page .pq-sub__row--edit {
-  padding: 8px 12px;
-}
-
-.pq-page .pq-sub__form-wrap {
+body.pq-page .pq-head__spacer {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
-.pq-page .pq-sub__form {
-  display: flex;
+body.pq-page .pq-head__title {
+  margin-left: 8px;
+}
+
+body.pq-page .pq-pill {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  height: 56px;
+  margin: 0;
+  padding: 0 20px;
+  border: none;
+  border-radius: 25px;
+  background: var(--rd-nav-bg);
+  color: var(--rd-body);
+  font-family: var(--rd-font-text);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: var(--rd-shadow);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
 }
 
-.pq-page #cbi-postq .pq-sub__input {
-  flex: 1;
-  min-width: 0;
-  height: 36px;
-  box-sizing: border-box;
-  padding: 0 12px;
-  border: 1px solid var(--pq-input);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-card);
-  color: var(--pq-fg);
-  font: inherit;
-  font-size: 13px;
+body.pq-page .pq-pill:hover {
+  color: var(--rd-heading);
+  text-decoration: none;
 }
 
-.pq-page #cbi-postq .pq-sub__submit {
-  border-color: transparent;
-  background: var(--pq-primary-bg);
-  color: #ffffff;
-  font-weight: 600;
+body.pq-page .pq-pill:active {
+  transform: scale(0.98);
 }
 
-.pq-page #cbi-postq .pq-sub__submit:hover {
-  background: var(--pq-primary-hover);
+body.pq-page .pq-pill--icon {
+  width: 56px;
+  padding: 0;
 }
 
-.pq-page .pq-sub__error {
-  color: var(--pq-red);
-  font-size: 12px;
+body.pq-page .pq-pill--logo {
+  padding: 0 24px;
 }
 
-.pq-page .pq-sub__error:empty {
+body.pq-page .pq-logo {
+  display: block;
+  width: 159px;
+  height: 32px;
+  background: var(--pq-logo) left center / contain no-repeat;
+}
+
+body.pq-page .pq-pill__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--rd-action);
+}
+
+body.pq-page .pq-pill__dot[hidden] {
   display: none;
 }
 
-.pq-page .pq-sub__hint {
-  margin: 8px 0 0;
-  color: var(--pq-muted-fg);
-  font-size: 12px;
-}
-
-@media (max-width: 640px) {
-  .pq-page .pq-sub__row {
-    flex-wrap: wrap;
+@media (max-width: 767.98px) {
+  body.pq-page .pq-pill__label {
+    display: none;
   }
 
-  .pq-page .pq-sub__info {
-    flex-basis: 100%;
-    order: 9;
-    padding: 0 0 4px;
-    text-align: left;
-    white-space: normal;
+  body.pq-page .pq-pill:not(.pq-pill--logo) {
+    width: 56px;
+    padding: 0;
+  }
+
+  body.pq-page .pq-pill__dot {
+    position: absolute;
+    top: 12px;
+    right: 12px;
   }
 }
 
-/* ── DNS server: the card in Diagnostics and its dialog ── */
+@media (max-width: 639.98px) {
+  body.pq-page .pq-head {
+    gap: 8px;
+  }
 
-/* the card in the diagnostics' right column, like its neighbours */
-.pq-page .pq-dns-card {
+  body.pq-page .pq-pill {
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 24px;
+  }
+
+  body.pq-page .pq-pill--logo {
+    min-width: 0;
+    padding: 0 16px;
+  }
+
+  body.pq-page .pq-logo {
+    width: 129px;
+    height: 26px;
+  }
+
+  body.pq-page .pq-pill--icon,
+  body.pq-page .pq-pill:not(.pq-pill--logo) {
+    width: 48px;
+  }
+
+  :root[data-darkmode="true"] body.pq-page .pq-pill {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+@media (max-width: 420px) {
+  body.pq-page .pq-head a.pq-pill--icon {
+    display: none;
+  }
+}
+
+/* ── Layout: the subscription and the router beside the VPN ── */
+
+body.pq-page .pq-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--rd-space-grid);
+}
+
+body.pq-page .pq-col {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--rd-space-grid);
+}
+
+@media (min-width: 1024px) {
+  body.pq-page .pq-grid {
+    grid-template-columns: 440px minmax(0, 1fr);
+  }
+
+  body.pq-page .pq-col--side {
+    position: sticky;
+    top: calc(56px + var(--rd-space-grid) + var(--rd-space-head));
+  }
+}
+
+@media (min-width: 1280px) {
+  body.pq-page .pq-grid {
+    grid-template-columns: 480px minmax(0, 1fr);
+  }
+}
+
+/* on a phone the VPN comes first, the router last */
+@media (max-width: 1023.98px) {
+  body.pq-page .pq-col--side {
+    display: contents;
+  }
+
+  body.pq-page .pq-col--main {
+    order: -1;
+  }
+}
+
+body.pq-page .pq-stack {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--rd-space-grid);
+}
+
+body.pq-page .pq-stack--card {
+  gap: var(--rd-space-card);
+}
+
+body.pq-page .pq-stack--group {
+  gap: var(--rd-space-group);
+}
+
+body.pq-page .pq-stack--item {
+  gap: var(--rd-space-item);
+}
+
+body.pq-page .pq-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rd-space-group);
+  min-width: 0;
+}
+
+body.pq-page .pq-row--top {
+  align-items: flex-start;
+}
+
+body.pq-page .pq-row--baseline {
+  align-items: baseline;
+}
+
+body.pq-page .pq-titles {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--rd-space-title);
+}
+
+body.pq-page .pq-titles--item {
+  gap: var(--rd-space-item);
+}
+
+/* ── Cards and tiles ─────────────────────────────────────────── */
+
+body.pq-page .pq-card {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--rd-space-card);
+  padding: var(--rd-space-card);
+  border-radius: var(--rd-radius-md);
+  background: var(--rd-surface);
+  color: var(--rd-heading);
+}
+
+body.pq-page .pq-card p {
+  margin: 0;
+}
+
+body.pq-page .pq-tile {
+  display: flex;
+  min-height: 112px;
+  min-width: 0;
+  flex-direction: column;
+  gap: 12px;
+  padding: var(--rd-space-tile);
+  border-radius: var(--rd-radius-md);
+  background: var(--rd-field);
+}
+
+@media (min-width: 640px) {
+  body.pq-page .pq-tile {
+    min-height: 124px;
+  }
+}
+
+body.pq-page .pq-tile__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rd-space-title);
+}
+
+body.pq-page .pq-tile__foot {
+  margin-top: auto;
+}
+
+body.pq-page .pq-tile__end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+body.pq-page .pq-infinity {
+  display: inline-flex;
+  color: var(--rd-action);
+}
+
+body.pq-page .pq-progress {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-help);
+}
+
+body.pq-page .pq-progress__bar {
+  height: 100%;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-action);
+  transition: width 0.5s ease;
+}
+
+body.pq-page .pq-dl,
+body.pq-page .pq-dl dt,
+body.pq-page .pq-dl dd {
+  margin: 0;
+  padding: 0;
+  font-weight: inherit;
+}
+
+body.pq-page .pq-dl dd {
+  font-weight: 500;
+}
+
+body.pq-page .pq-core {
+  padding-top: var(--rd-space-card);
+  border-top: 1px solid var(--rd-divider);
+}
+
+body.pq-page .pq-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rd-space-group);
+  padding: var(--rd-space-group);
+  border-radius: var(--rd-radius-md);
+}
+
+body.pq-page .pq-notice--error {
+  background: var(--rd-error-bg);
+}
+
+body.pq-page .pq-notice--warning {
+  background: var(--rd-warn-bg);
+}
+
+body.pq-page .pq-notice--error .pq-notice__icon {
+  color: var(--rd-error);
+}
+
+body.pq-page .pq-notice--warning .pq-notice__icon {
+  color: var(--rd-warn-icon);
+}
+
+body.pq-page .pq-notice__text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--rd-space-title);
+}
+
+body.pq-page .pq-notice__title {
+  color: var(--rd-heading);
+  font-weight: 500;
+}
+
+body.pq-page .pq-notice--error .pq-notice__title {
+  color: var(--rd-error-text);
+}
+
+body.pq-page .pq-notice .pq-meta {
+  color: var(--rd-body);
+}
+
+body.pq-page .pq-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--rd-space-group);
+  padding: var(--rd-space-card);
+  border-radius: var(--rd-radius-md);
+  background: var(--rd-field);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+
+body.pq-page .pq-btn,
+body.pq-page .pq-btn-tile,
+body.pq-page .pq-icon-btn,
+body.pq-page .pq-link-action,
+body.pq-page .pq-server,
+body.pq-page .pq-power,
+body.pq-page .pq-menu__item {
+  margin: 0;
+  border: none;
+  font-family: var(--rd-font-text);
+  text-shadow: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body.pq-page .pq-btn,
+body.pq-page .pq-btn-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+body.pq-page .pq-btn:active:not(:disabled),
+body.pq-page .pq-btn-tile:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+body.pq-page .pq-btn:disabled,
+body.pq-page .pq-btn-tile:disabled,
+body.pq-page .pq-icon-btn:disabled,
+body.pq-page .pq-link-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* the main action: 56px, radius 16 */
+body.pq-page .pq-btn {
+  min-height: 56px;
+  padding: 0 24px;
+  border-radius: var(--rd-radius-btn);
+  background: var(--rd-action);
+  color: var(--rd-on-action);
+  white-space: nowrap;
+}
+
+body.pq-page .pq-btn:hover:not(:disabled) {
+  background: var(--rd-action-hover);
+  color: var(--rd-on-action);
+}
+
+body.pq-page .pq-btn--danger {
+  background: var(--rd-error);
+}
+
+body.pq-page .pq-btn--danger:hover:not(:disabled) {
+  background: var(--rd-error-text);
+}
+
+/* the big soft tile: "Update the subscription", the log */
+body.pq-page .pq-btn-tile {
+  width: 100%;
+  min-height: 64px;
+  padding: 16px 24px;
+  border-radius: var(--rd-radius-control);
+  background: var(--rd-help);
+  color: var(--rd-on-soft);
+  text-align: center;
+  white-space: normal;
+}
+
+body.pq-page .pq-btn-tile:hover:not(:disabled) {
+  background: var(--rd-action-soft-hover);
+  color: var(--rd-on-soft);
+  text-decoration: none;
+}
+
+body.pq-page .pq-btn-tile--muted {
+  background: var(--rd-chip);
+  color: var(--rd-body);
+}
+
+body.pq-page .pq-btn-tile--muted:hover:not(:disabled) {
+  background: var(--rd-chip-hover);
+  color: var(--rd-heading);
+}
+
+body.pq-page .pq-btn-tile--link {
+  min-height: 56px;
+  padding: 0 var(--rd-space-group);
+  white-space: nowrap;
+}
+
+body.pq-page .pq-links {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--rd-space-item);
+}
+
+@media (min-width: 640px) {
+  body.pq-page .pq-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+body.pq-page .pq-links > .pq-dropdown > button {
+  width: 100%;
+}
+
+body.pq-page .pq-chevron {
+  transition: transform 0.3s ease;
+}
+
+body.pq-page .pq-chevron-btn[aria-expanded="true"] .pq-chevron {
+  transform: rotate(180deg);
+}
+
+body.pq-page .pq-chevron-btn[aria-expanded="true"],
+body.pq-page .pq-icon-btn[aria-expanded="true"] {
+  background: var(--rd-chip-hover);
+}
+
+/* the round icon button of a card */
+body.pq-page .pq-icon-btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--rd-field);
+  color: var(--rd-body);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+body.pq-page .pq-icon-btn:hover:not(:disabled) {
+  background: var(--rd-chip-hover);
+  color: var(--rd-heading);
+}
+
+body.pq-page .pq-link-action {
+  padding: 0;
+  background: none;
+  color: var(--rd-action);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+body.pq-page .pq-link-action:hover:not(:disabled) {
+  color: var(--rd-action-hover);
+}
+
+body.pq-page .pq-btn:focus-visible,
+body.pq-page .pq-btn-tile:focus-visible,
+body.pq-page .pq-icon-btn:focus-visible,
+body.pq-page .pq-pill:focus-visible,
+body.pq-page .pq-link-action:focus-visible,
+body.pq-page .pq-server:focus-visible,
+body.pq-page .pq-power:focus-visible,
+body.pq-page .pq-menu__item:focus-visible,
+body.pq-page .pq-seg > button:focus-visible {
+  outline: 2px solid var(--rd-action);
+  outline-offset: 2px;
+}
+
+/* ── Drop-down menu ──────────────────────────────────────────── */
+
+body.pq-page .pq-dropdown {
+  position: relative;
+}
+
+body.pq-page .pq-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  z-index: 50;
+  display: flex;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  flex-direction: column;
+  padding: 8px;
+  border-radius: var(--rd-radius-md);
+  background: var(--rd-surface);
+  box-shadow:
+    0 0 0 1px var(--rd-border),
+    0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+body.pq-page .pq-menu[hidden] {
+  display: none;
+}
+
+body.pq-page .pq-menu--end {
+  right: 0;
+}
+
+body.pq-page .pq-menu--start {
+  left: 0;
+}
+
+body.pq-page .pq-menu__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--rd-radius-sm);
+  background: none;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+body.pq-page .pq-menu__item:hover {
+  background: var(--rd-field);
+  text-decoration: none;
+}
+
+body.pq-page .pq-menu__title {
+  color: var(--rd-heading);
+  font-size: 16px;
+  line-height: 22px;
+}
+
+body.pq-page .pq-menu__title--danger {
+  color: var(--rd-error-text);
+}
+
+body.pq-page .pq-menu__sub {
+  color: var(--rd-caption);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* ── Fields ──────────────────────────────────────────────────── */
+
+body.pq-page .pq-input,
+body.pq-page .pq-app .pq-input {
+  width: 100%;
+  height: 56px;
+  margin: 0;
+  padding: 0 20px;
+  border: 2px solid transparent;
+  border-radius: var(--rd-radius-btn);
+  background: var(--rd-field);
+  color: var(--rd-heading);
+  font-family: var(--rd-font-text);
+  font-size: 16px;
+  box-shadow: none;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+body.pq-page .pq-input::placeholder {
+  color: var(--rd-placeholder);
+}
+
+body.pq-page .pq-input:focus {
+  border-color: var(--rd-action);
+}
+
+body.pq-page .pq-field-error {
+  margin: 0;
+  color: var(--rd-error-text);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+body.pq-page .pq-field-error:empty {
+  display: none;
+}
+
+body.pq-page .pq-link-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rd-space-group);
+}
+
+/* ── Spinner and placeholders ────────────────────────────────── */
+
+body.pq-page .pq-spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2.25px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  opacity: 0.8;
+  animation: pq-spin 0.7s linear infinite;
+}
+
+body.pq-page .pq-spinner--sm {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  color: var(--rd-placeholder);
+}
+
+body.pq-page .pq-spinner--lg {
+  width: 28px;
+  height: 28px;
+  border-width: 3px;
+}
+
+@keyframes pq-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+body.pq-page .pq-skel {
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-field);
+  animation: pq-pulse 1.4s ease-in-out infinite;
+}
+
+body.pq-page .pq-skel--title {
+  width: 96px;
+  height: 24px;
+}
+
+body.pq-page .pq-skel--server {
+  height: 56px;
+}
+
+@keyframes pq-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ── VPN: the power button, the servers ──────────────────────── */
+
+body.pq-page .pq-vpn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+body.pq-page .pq-vpn__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--rd-space-group);
+}
+
+body.pq-page .pq-row--center {
+  align-items: center;
+}
+
+body.pq-page .pq-power {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--rd-field);
+  color: var(--rd-body);
+  cursor: pointer;
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  body.pq-page .pq-power {
+    width: 72px;
+    height: 72px;
+  }
+}
+
+body.pq-page .pq-power:hover:not(:disabled) {
+  background: var(--rd-chip-hover);
+  color: var(--rd-heading);
+}
+
+body.pq-page .pq-power[aria-pressed="true"] {
+  background: var(--rd-action);
+  color: var(--rd-on-action);
+  box-shadow: 0 8px 24px rgba(255, 33, 129, 0.32);
+}
+
+body.pq-page .pq-power[aria-pressed="true"]:hover:not(:disabled) {
+  background: var(--rd-action-hover);
+  color: var(--rd-on-action);
+}
+
+body.pq-page .pq-power:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+body.pq-page .pq-power:disabled {
+  cursor: progress;
+}
+
+/* the power sign turns into the PostQ VPN mark when the VPN is on */
+body.pq-page .pq-power__icons {
+  display: grid;
+  place-items: center;
+}
+
+body.pq-page .pq-power__icons > * {
+  grid-area: 1 / 1;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+}
+
+body.pq-page .pq-power__on {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.4);
+}
+
+body.pq-page .pq-power[aria-pressed="true"] .pq-power__off {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.4);
+}
+
+body.pq-page .pq-power[aria-pressed="true"] .pq-power__on {
+  opacity: 1;
+  transform: none;
+}
+
+/* one soft wave from the button when the VPN comes on */
+body.pq-page .pq-sonar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 1100px;
+  height: 1100px;
+  margin: -550px 0 0 -550px;
+  pointer-events: none;
+}
+
+body.pq-page .pq-sonar > span {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  opacity: 0;
+  transform: scale(0.065);
+  background: radial-gradient(
+    circle closest-side,
+    transparent 78%,
+    rgba(255, 33, 129, 0.35) 90%,
+    var(--rd-action) 96%,
+    transparent 100%
+  );
+}
+
+body.pq-page .pq-vpn[data-state="running"] .pq-sonar > span {
+  animation: pq-sonar-once 1.4s cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+
+@keyframes pq-sonar-once {
+  0% {
+    transform: scale(0.065);
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 0.16;
+  }
+
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.pq-page .pq-power__icons > *,
+  body.pq-page .pq-vpn[data-state="running"] .pq-sonar > span {
+    transition: none;
+    animation: none;
+  }
+}
+
+body.pq-page .pq-servers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--rd-space-item);
+}
+
+@media (min-width: 640px) {
+  body.pq-page .pq-servers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body.pq-page .pq-server--auto,
+  body.pq-page .pq-grid-note {
+    grid-column: 1 / -1;
+  }
+}
+
+body.pq-page .pq-grid-note {
+  padding-top: var(--rd-space-item);
+}
+
+/* a server: a grey tile, the chosen one framed in pink */
+body.pq-page .pq-server {
+  display: flex;
+  align-items: center;
+  gap: var(--rd-space-item);
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  padding: 0 var(--rd-space-group);
+  border: 2px solid transparent;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-field);
+  color: var(--rd-heading);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+body.pq-page .pq-server:hover:not(:disabled) {
+  background: var(--rd-chip-hover);
+}
+
+body.pq-page .pq-server[aria-checked="true"] {
+  border-color: var(--rd-action);
+  background: var(--rd-help);
+}
+
+:root[data-darkmode="true"] body.pq-page .pq-server[aria-checked="true"] {
+  background: var(--rd-field);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-darkmode]) body.pq-page .pq-server[aria-checked="true"] {
+    background: var(--rd-field);
+  }
+}
+
+body.pq-page .pq-server:disabled {
+  cursor: default;
+}
+
+body.pq-page .pq-server--auto {
+  min-height: 64px;
+}
+
+body.pq-page .pq-server__text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--rd-space-title);
+}
+
+body.pq-page .pq-server__name {
+  min-width: 0;
+  flex: 1;
+}
+
+body.pq-page .pq-server__note {
+  margin-left: 8px;
+  color: var(--rd-caption);
+}
+
+body.pq-page .pq-ping {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Diagnostics screen: the LuCI form in the panel's cards ──── */
+
+body.pq-page .pq-screen--diagnostic #cbi-postq {
+  color: var(--rd-heading);
+}
+
+body.pq-page .pq-screen--diagnostic #cbi-postq > h2 {
+  display: none;
+}
+
+body.pq-page .pq-screen--diagnostic #cbi-postq > .cbi-section {
+  margin: 0 0 var(--rd-space-grid);
+  padding: var(--rd-space-card);
+  border: none;
+  border-radius: var(--rd-radius-md);
+  background: var(--rd-surface);
+  box-shadow: none;
+}
+
+body.pq-page .pq-screen--diagnostic #cbi-postq > .cbi-section > h3 {
+  display: none;
+}
+
+body.pq-page .pq-screen--diagnostic #cbi-postq .cbi-section-node,
+body.pq-page .pq-screen--diagnostic #cbi-postq .cbi-value {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+body.pq-page #cbi-postq-diagnostic .card {
+  border: none;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-field);
+  box-shadow: none;
+  color: var(--rd-heading);
+}
+
+body.pq-page .pq-screen--diagnostic #cbi-postq .btn,
+body.pq-page .pq-screen--diagnostic #cbi-postq .cbi-button {
+  height: auto;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-chip);
+  color: var(--rd-body);
+  font-family: var(--rd-font-text);
+  font-weight: 500;
+  box-shadow: none;
+  text-shadow: none;
+  transition: background-color 0.15s ease;
+}
+
+body.pq-page .pq-screen--diagnostic #cbi-postq .btn:hover,
+body.pq-page .pq-screen--diagnostic #cbi-postq .cbi-button:hover {
+  background: var(--rd-chip-hover);
+  color: var(--rd-heading);
+}
+
+/* the troubleshooting block links to the NetShift wiki, not to PostQ */
+body.pq-page #pdk_diagnostic-page-wiki {
+  display: none;
+}
+
+/* the DNS card in the diagnostics' right column, like its neighbours */
+body.pq-page .pq-dns-card,
+body.pq-page .pq-snapshots-card {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.pq-page .pq-dns-card .pq-dns__now {
+body.pq-page .pq-dns-card .pq-dns__now {
   font-size: 12px;
 }
 
-.pq-page .pq-dns-card__sub {
-  color: var(--pq-muted-fg);
+body.pq-page .pq-dns-card__sub,
+body.pq-page .pq-snapshots-card__sub {
+  color: var(--rd-caption);
   font-size: 12px;
 }
 
-.pq-page .pq-dns-card .btn {
+body.pq-page .pq-dns-card .btn,
+body.pq-page .pq-snapshots-card .btn {
   width: 100%;
   margin-top: 4px;
 }
 
-/* the dialog (LuCI puts it outside the page body's sections) */
-body.pq-page {
-  --pq-surface: #ffffff;
+body.pq-page .pq-snapshots-holder {
+  display: none;
 }
 
-:root[data-darkmode="true"] body.pq-page {
-  --pq-surface: #140b28;
+/* ── Dialogs (LuCI puts them outside the page) ───────────────── */
+
+body.pq-page #modal_overlay {
+  background: var(--rd-overlay);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-darkmode]) body.pq-page {
-    --pq-surface: #140b28;
-  }
+body.pq-page .modal.pq-modal {
+  max-width: 600px;
+  padding: var(--rd-space-card);
+  border: none;
+  border-radius: var(--rd-radius-md);
+  background: var(--rd-surface);
+  color: var(--rd-heading);
+  font-family: var(--rd-font-text);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
 }
 
-.pq-page .modal.pq-modal {
-  max-width: 640px;
-  padding: 20px 24px;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius);
-  background: var(--pq-surface);
-  color: var(--pq-fg);
-  box-shadow: 0 20px 60px rgba(16, 8, 34, 0.25);
+body.pq-page .modal.pq-modal > h4 {
+  margin: 0 0 var(--rd-space-group);
+  color: var(--rd-heading);
+  font-family: var(--rd-font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 28px;
 }
 
-.pq-page .modal.pq-modal > h4 {
-  margin: 0 0 12px;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--pq-fg);
+body.pq-page .pq-modal p {
+  color: var(--rd-body);
 }
 
-.pq-page .pq-modal .btn,
-.pq-page .pq-modal .cbi-button {
-  height: 34px;
-  padding: 0 14px;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-muted);
-  color: var(--pq-fg);
+body.pq-page .pq-modal .btn,
+body.pq-page .pq-modal .cbi-button {
+  height: auto;
+  min-height: 40px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-chip);
+  color: var(--rd-body);
+  font-family: var(--rd-font-text);
   font-weight: 500;
   box-shadow: none;
   text-shadow: none;
 }
 
-.pq-page .pq-modal .pq-dns__check {
-  margin-right: auto;
+body.pq-page .pq-modal .pq-btn,
+body.pq-page .pq-modal .pq-btn-tile {
+  min-height: 56px;
 }
 
-/* the old block styles below (rows, inputs) also dress the dialog */
-
-.pq-page .pq-dns {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+body.pq-page .pq-modal .pq-btn-tile {
+  width: auto;
 }
 
-.pq-page .pq-dns__hint {
-  margin: 0;
-  color: var(--pq-muted-fg);
-  font-size: 13px;
-}
-
-.pq-page .pq-dns__now {
-  color: var(--pq-fg);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-}
-
-.pq-page .pq-dns__list {
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
-  overflow: hidden;
-}
-
-.pq-page .pq-dns__row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 40px;
-  margin: 0;
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--pq-border);
-  background: var(--pq-card);
-  font-size: 13px;
-  font-weight: normal;
-  cursor: pointer;
-  transition: background-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.pq-page .pq-dns__row:last-child {
-  border-bottom: none;
-}
-
-.pq-page .pq-dns__row:hover {
-  background: var(--pq-muted-hover);
-  box-shadow: inset 2px 0 0 var(--pq-ring);
-}
-
-.pq-page .pq-dns__row--active,
-.pq-page .pq-dns__row--active:hover {
-  background: var(--pq-accent);
-  box-shadow: inset 2px 0 0 var(--pq-primary);
-}
-
-/* the same radio circle as the server list */
-.pq-page .pq-dns .pq-dns__radio {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  flex: none;
-  box-sizing: border-box;
-  border: 1.5px solid var(--pq-input);
-  border-radius: 50%;
-  background: var(--pq-card);
-  cursor: pointer;
-}
-
-.pq-page .pq-dns .pq-dns__radio:checked {
-  border: 5px solid var(--pq-primary);
-  background: #ffffff;
-}
-
-/* the theme draws its own mark on a checked radio */
-.pq-page .pq-dns .pq-dns__radio,
-.pq-page .pq-dns .pq-dns__radio:checked {
-  background-image: none;
-  box-shadow: none;
-}
-
-.pq-page .pq-dns .pq-dns__radio::before,
-.pq-page .pq-dns .pq-dns__radio::after {
-  display: none;
-  content: none;
-}
-
-.pq-page .pq-dns .pq-dns__radio:focus-visible {
-  outline: 2px solid var(--pq-ring);
-  outline-offset: 2px;
-}
-
-.pq-page .pq-dns__name {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.pq-page .pq-dns__name b {
-  font-weight: 500;
-}
-
-.pq-page .pq-dns__sub {
-  color: var(--pq-muted-fg);
-  font-size: 11px;
-}
-
-.pq-page .pq-dns .pq-dns__input {
-  flex: 1;
-  min-width: 0;
-  height: 32px;
-  box-sizing: border-box;
-  padding: 0 10px;
-  border: 1px solid var(--pq-input);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-card);
-  color: var(--pq-fg);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-}
-
-.pq-page .pq-dns__ms {
-  min-width: 80px;
-  margin-left: auto;
-  text-align: right;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-
-.pq-page .pq-dns__ms--good {
-  color: var(--pq-green);
-}
-
-.pq-page .pq-dns__ms--mid {
-  color: var(--pq-yellow);
-}
-
-.pq-page .pq-dns__ms--slow {
-  color: var(--pq-orange);
-}
-
-.pq-page .pq-dns__ms--none {
-  color: var(--pq-red);
-}
-
-.pq-page .pq-dns__error {
-  color: var(--pq-red);
-  font-size: 12px;
-}
-
-.pq-page .pq-dns__actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.pq-page .pq-dns .pq-dns__apply:not(:disabled) {
-  border-color: transparent;
-  background: var(--pq-primary-bg);
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.pq-page .pq-dns .pq-dns__apply:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.pq-page .pq-dns .pq-dns__title {
-  margin: 8px 0 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--pq-fg);
-}
-
-/* ── Settings snapshots: a short card, the full list in a dialog ── */
-
-.pq-page .pq-snapshots-holder {
-  display: none;
-}
-
-.pq-page .pq-snapshots-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.pq-page .pq-snapshots-card__sub {
-  color: var(--pq-muted-fg);
-  font-size: 12px;
-}
-
-.pq-page .pq-snapshots-card .btn {
-  width: 100%;
-  margin-top: 4px;
-}
-
-/* the stock widget inside the dialog: its own card frame is not needed */
-.pq-page .pq-snapshots-dialog > .card {
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  box-shadow: none;
-}
-
-.pq-page .pq-snapshots-dialog > .card > b:first-child {
-  display: none;
-}
-
-.pq-page .pq-snapshots-dialog {
-  max-height: 60vh;
-  overflow-y: auto;
-  margin-bottom: 12px;
-}
-
-/* ── Updates like the PostQ XKeen panel: version buttons and a dialog ── */
-
-/* the dashboard's own "a newer version" notice: the frame on the button says it */
-.pq-page #dashboard-update-notice {
-  display: none;
-}
-
-.pq-page .pq-control__versions {
+body.pq-page .pq-upd__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  justify-content: flex-end;
+  gap: var(--rd-space-item);
 }
 
-.pq-page #cbi-postq .pq-version {
+body.pq-page .pq-upd__actions > * {
+  flex: 1 1 160px;
+}
+
+/* the two tabs of the updates dialog */
+body.pq-page .pq-seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-bottom: var(--rd-space-group);
+  padding: 4px;
+  border-radius: var(--rd-radius-btn);
+  background: var(--rd-field);
+}
+
+body.pq-page .pq-seg > button {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding: 0 12px;
-  font-size: 12px;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 16px;
+  border: none;
+  border-radius: var(--rd-radius-sm);
+  background: none;
+  color: var(--rd-caption);
+  font-family: var(--rd-font-text);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
 }
 
-/* a newer version: a pink frame and dot, like the version button of XKeen UI */
-.pq-page #cbi-postq .pq-version--update {
-  border-color: var(--pq-primary);
-  box-shadow: 0 0 0 2px var(--pq-ring);
+body.pq-page .pq-seg > button[aria-selected="true"] {
+  background: var(--rd-surface);
+  color: var(--rd-heading);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-.pq-page #cbi-postq .pq-version--update::after {
+:root[data-darkmode="true"] body.pq-page .pq-seg > button[aria-selected="true"] {
+  background: var(--rd-chip-hover);
+}
+
+body.pq-page .pq-seg__dot::after {
   content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--pq-primary);
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--rd-action);
 }
 
-.pq-page .pq-upd {
+body.pq-page .pq-upd {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
   min-width: min(480px, 80vw);
+  flex-direction: column;
+  gap: var(--rd-space-group);
 }
 
-.pq-page .pq-upd__rows {
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
+body.pq-page .pq-upd__rows {
   overflow: hidden;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-field);
 }
 
-.pq-page .pq-upd__row {
+body.pq-page .pq-upd__row {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--pq-border);
-  background: var(--pq-card);
-  font-size: 13px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--rd-divider);
+  font-size: 16px;
 }
 
-.pq-page .pq-upd__row:last-child {
+body.pq-page .pq-upd__row:last-child {
   border-bottom: none;
 }
 
-.pq-page .pq-upd__row b {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+body.pq-page .pq-upd__row b {
+  overflow-wrap: anywhere;
+  color: var(--rd-heading);
   font-weight: 500;
 }
 
-.pq-page .pq-upd__label,
-.pq-page .pq-upd__wait,
-.pq-page .pq-upd__status {
+body.pq-page .pq-upd__label,
+body.pq-page .pq-upd__status {
   margin: 0;
-  color: var(--pq-muted-fg);
-  font-size: 13px;
+  color: var(--rd-caption);
 }
 
-.pq-page .pq-upd__status--new {
-  color: var(--pq-primary);
-  font-weight: 600;
-}
-
-.pq-page .pq-upd__error {
+body.pq-page .pq-upd__wait {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 0;
-  color: var(--pq-red);
+  padding: var(--rd-space-card) 0;
+  color: var(--rd-caption);
 }
 
-.pq-page .pq-upd__notes {
+body.pq-page .pq-upd__status {
+  font-size: 14px;
+}
+
+body.pq-page .pq-upd__status--new {
+  color: var(--rd-action);
+  font-weight: 500;
+}
+
+body.pq-page .pq-upd__error {
+  margin: 0;
+  color: var(--rd-error-text);
+}
+
+body.pq-page .pq-upd__notes {
   max-height: 40vh;
   overflow-y: auto;
-  padding: 10px 14px;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
-  background: var(--pq-muted);
-  color: var(--pq-fg);
-  font-size: 13px;
-  line-height: 1.5;
+  padding: var(--rd-space-group);
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-field);
+  color: var(--rd-body);
+  font-size: 14px;
+  line-height: 21px;
 }
 
-.pq-page .pq-upd__notes h4,
-.pq-page .pq-upd__notes li,
-.pq-page .pq-upd__notes b {
-  color: var(--pq-fg);
+body.pq-page .pq-upd__notes h4,
+body.pq-page .pq-upd__notes b {
+  color: var(--rd-heading);
 }
 
-.pq-page .pq-upd__notes > :first-child {
+body.pq-page .pq-upd__notes > :first-child {
   margin-top: 0;
 }
 
-.pq-page .pq-upd__notes > :last-child {
+body.pq-page .pq-upd__notes > :last-child {
   margin-bottom: 0;
 }
 
-.pq-page .pq-upd__notes h4 {
+body.pq-page .pq-upd__notes h4 {
   margin: 14px 0 6px;
   font-size: 14px;
   font-weight: 600;
 }
 
-.pq-page .pq-upd__notes p {
+body.pq-page .pq-upd__notes p,
+body.pq-page .pq-upd__notes ul {
   margin: 0 0 8px;
 }
 
-.pq-page .pq-upd__notes ul {
-  margin: 0 0 8px;
+body.pq-page .pq-upd__notes ul {
   padding-left: 18px;
   list-style: disc;
 }
 
-.pq-page .pq-upd__notes li {
+body.pq-page .pq-upd__notes li {
   margin: 0 0 4px;
+  color: var(--rd-body);
 }
 
-.pq-page .pq-upd__notes code,
-.pq-page .pq-upd__notes pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+body.pq-page .pq-upd__notes code,
+body.pq-page .pq-upd__notes pre {
+  font-family: var(--rd-font-mono);
   font-size: 12px;
 }
 
-.pq-page .pq-upd__notes code {
+body.pq-page .pq-upd__notes code {
   padding: 1px 4px;
   border-radius: 4px;
-  background: var(--pq-card);
+  background: var(--rd-surface);
   overflow-wrap: anywhere;
 }
 
-.pq-page .pq-upd__notes pre {
-  margin: 0 0 8px;
+body.pq-page .pq-upd__notes pre {
   padding: 8px 10px;
-  border: 1px solid var(--pq-border);
-  border-radius: 6px;
-  background: var(--pq-card);
+  border-radius: 8px;
+  background: var(--rd-surface);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.pq-page .pq-upd__notes a {
-  color: var(--pq-primary);
+body.pq-page .pq-upd__notes a {
+  color: var(--rd-action);
 }
 
-.pq-page .pq-modal .pq-upd__install:not(:disabled) {
-  border-color: transparent;
-  background: var(--pq-primary-bg);
-  color: #ffffff;
-  font-weight: 600;
-}
-
-.pq-page .pq-modal .pq-upd__install:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-/* The two drop-downs of the dialog about the settings of the previous install */
+/* the dialog about the settings of the previous install */
 body.pq-page .pq-backup {
   margin: 8px 0;
-  border: 1px solid rgba(128, 128, 128, 0.35);
-  border-radius: 8px;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-field);
 }
 
 body.pq-page .pq-backup > summary {
-  padding: 8px 12px;
-  font-weight: 600;
+  padding: 12px 16px;
+  font-weight: 500;
   cursor: pointer;
 }
 
 body.pq-page .pq-backup__body {
   max-height: 260px;
   overflow-y: auto;
-  padding: 0 12px 8px;
+  padding: 0 16px 12px;
 }
 
 body.pq-page .pq-backup__row {
@@ -1235,60 +1712,217 @@ body.pq-page .pq-backup__row ul {
 }
 
 body.pq-page .pq-backup__new {
-  color: #2ecc71;
-  font-weight: 600;
+  color: var(--rd-success-text);
+  font-weight: 500;
 }
 
-/* "⚡ Авто" over the subscriptions, and each subscription as a drop-down of its
-   servers. The dashboard's own block is left empty once its rows have moved. */
-.pq-page #dashboard-sections-grid.pq-placed {
-  display: none;
+/* ── DNS dialog ──────────────────────────────────────────────── */
+
+body.pq-page .pq-modal .pq-dns__check {
+  margin-right: auto;
 }
 
-.pq-page .pq-sub__auto:not(:empty) {
+body.pq-page .pq-dns {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* the row of the Auto group, as a small button */
-.pq-page .pq-sub__auto > * {
-  display: inline-flex;
-  flex: 0 0 auto;
+body.pq-page .pq-dns__hint {
+  margin: 0;
+  color: var(--rd-caption);
+  font-size: 13px;
+}
+
+body.pq-page .pq-dns__now {
+  color: var(--rd-heading);
+  font-family: var(--rd-font-mono);
+  font-size: 12px;
+}
+
+body.pq-page .pq-dns__list {
+  overflow: hidden;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-field);
+}
+
+body.pq-page .pq-dns__row {
+  display: flex;
   align-items: center;
-  gap: 8px;
-  width: auto;
-  min-height: 0;
-  padding: 5px 12px;
-  border: 1px solid var(--pq-border);
-  border-radius: var(--pq-radius-sm);
+  gap: 12px;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--rd-divider);
+  font-size: 14px;
+  font-weight: normal;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+body.pq-page .pq-dns__row:last-child {
+  border-bottom: none;
+}
+
+body.pq-page .pq-dns__row:hover {
+  background: var(--rd-chip-hover);
+}
+
+body.pq-page .pq-dns__row--active,
+body.pq-page .pq-dns__row--active:hover {
+  background: var(--rd-help);
+  box-shadow: inset 3px 0 0 var(--rd-action);
+}
+
+body.pq-page .pq-dns .pq-dns__radio {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 2px solid var(--rd-placeholder);
+  border-radius: 50%;
+  background: var(--rd-surface);
+  background-image: none;
+  box-shadow: none;
   cursor: pointer;
 }
 
-.pq-page .pq-sub__auto [class*="__badge"] {
-  display: none;
+body.pq-page .pq-dns .pq-dns__radio:checked {
+  border: 5px solid var(--rd-action);
+  background: #ffffff;
 }
 
-.pq-page .pq-sub__auto > *::before {
+body.pq-page .pq-dns .pq-dns__radio::before,
+body.pq-page .pq-dns .pq-dns__radio::after {
   display: none;
+  content: none;
 }
 
-.pq-page .pq-sub__auto [class*="__name-block"] {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: baseline;
+body.pq-page .pq-dns .pq-dns__radio:focus-visible {
+  outline: 2px solid var(--rd-action);
+  outline-offset: 2px;
+}
+
+body.pq-page .pq-dns__name {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+body.pq-page .pq-dns__name b {
+  font-weight: 500;
+}
+
+body.pq-page .pq-dns__sub {
+  color: var(--rd-caption);
+  font-size: 12px;
+}
+
+body.pq-page .pq-dns .pq-dns__input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 12px;
+  border: 2px solid transparent;
+  border-radius: var(--rd-radius-sm);
+  background: var(--rd-surface);
+  color: var(--rd-heading);
+  font-family: var(--rd-font-mono);
+  font-size: 12px;
+}
+
+body.pq-page .pq-dns .pq-dns__input:focus {
+  border-color: var(--rd-action);
+  outline: none;
+}
+
+body.pq-page .pq-dns__ms {
+  min-width: 80px;
+  margin-left: auto;
+  font-family: var(--rd-font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+body.pq-page .pq-dns__ms--good {
+  color: var(--pq-green);
+}
+
+body.pq-page .pq-dns__ms--mid {
+  color: var(--pq-yellow);
+}
+
+body.pq-page .pq-dns__ms--slow {
+  color: var(--pq-orange);
+}
+
+body.pq-page .pq-dns__ms--none,
+body.pq-page .pq-dns__error {
+  color: var(--pq-red);
+}
+
+body.pq-page .pq-dns__error {
+  font-size: 12px;
+}
+
+body.pq-page .pq-dns__actions {
+  display: flex;
+  justify-content: flex-end;
   gap: 8px;
 }
 
-.pq-page .pq-sub__toggle svg {
-  transition: transform 0.15s ease;
+body.pq-page .pq-dns .pq-dns__apply:not(:disabled) {
+  background: var(--rd-action);
+  color: var(--rd-on-action);
 }
 
-.pq-page .pq-sub__toggle[aria-expanded="true"] svg {
-  transform: rotate(90deg);
+body.pq-page .pq-dns .pq-dns__apply:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
-.pq-page .pq-feed[hidden] {
+body.pq-page .pq-dns .pq-dns__title {
+  margin: 8px 0 0;
+  color: var(--rd-heading);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* the stock snapshots widget inside its dialog: no card frame of its own */
+body.pq-page .pq-snapshots-dialog {
+  max-height: 60vh;
+  margin-bottom: 12px;
+  overflow-y: auto;
+}
+
+body.pq-page .pq-snapshots-dialog > .card {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+
+body.pq-page .pq-snapshots-dialog > .card > b:first-child {
   display: none;
+}
+
+/* The theme sets every button to 14px !important on a phone
+   (max-device-width: 600px); the panel keeps its own sizes. */
+@media screen and (max-device-width: 600px) {
+  body.pq-page .pq-btn,
+  body.pq-page .pq-btn-tile,
+  body.pq-page .pq-pill,
+  body.pq-page .pq-seg > button,
+  body.pq-page .pq-menu__item,
+  body.pq-page .pq-server {
+    font-size: 16px !important;
+  }
+
+  body.pq-page .pq-link-action {
+    font-size: 14px !important;
+  }
 }

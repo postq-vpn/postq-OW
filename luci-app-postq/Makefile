@@ -49,6 +49,10 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/
 	$(CP) $(PKG_BUILD_DIR)/root/* $(1)/
 	sed -i -e 's/__COMPILED_VERSION_VARIABLE__/$(PKG_VERSION)/g' $(1)$(HTDOCS)/luci-static/resources/view/postq/main.js || true
+	# No comments and indentation on the router's flash: luci.mk minifies in the
+	# install this package replaces (see minify.sh). Before the cache busting,
+	# so the tag is taken from what is installed.
+	PATH="$(STAGING_DIR_HOSTPKG)/bin:$(STAGING_DIR_HOST)/bin:$(PATH)" sh "$(CURDIR)/minify.sh" "$(1)$(HTDOCS)"
 	# Content-hashed view directory + rewritten requires/menu path, so a browser
 	# cannot keep serving the previous version's JS after an update
 	# (see cache-bust.sh). Must run after the version stamp above.

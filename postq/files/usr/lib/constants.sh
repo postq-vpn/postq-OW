@@ -219,6 +219,14 @@ SB_EXTENDED_VLESS_ENCRYPTION_MIN="2.0.0"
 # REALITY servers on Xray-core >= 26.9.8 require). Older extended builds and
 # stock sing-box do not know the field and would fail `sing-box check`.
 SB_EXTENDED_REALITY_MLKEM_MIN="2.7.2"
+# The oldest sing-box-extended release (the part after "-extended-") PostQ installs or keeps,
+# and the full version it stands for, for the messages. 2.7.3 carries the XHTTP fixes and
+# config checks ported from Xray: on an older core the servers of the PostQ subscription
+# with XHTTP fail `sing-box check` and are left out of the list. The update check offers
+# nothing older, and the installer replaces an older extended or lite core
+# (install.sh repeats both values, it cannot source this file).
+SB_EXTENDED_MIN_RELEASE="2.7.3"
+SB_EXTENDED_MIN_VERSION="1.14.3-extended-2.7.3"
 # ── sing-box extended lite (third core variant) ─────────────────────
 # Version suffix that marks a lite build: the release tag and the version
 # banner of the binary are the upstream extended tag plus this suffix

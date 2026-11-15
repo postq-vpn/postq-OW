@@ -8,6 +8,9 @@
         ],
         "/usr/bin/postq": [
           "exec"
+        ],
+        "/proc/stat": [
+          "read"
         ]
       },
       "ubus": {
@@ -16,6 +19,10 @@
         ],
         "luci-rpc": [
           "getHostHints"
+        ],
+        "system": [
+          "board",
+          "info"
         ]
       },
       "uci": [

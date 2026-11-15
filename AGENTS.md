@@ -54,10 +54,10 @@ constants, never hardcode.
 
 ## Quality gates (a change is not "done" until the relevant gate passes)
 
-- **Backend** (`postq/files/**`) and the build script
-  `luci-app-postq/cache-bust.sh`: ShellCheck at severity error
+- **Backend** (`postq/files/**`) and the build scripts
+  `luci-app-postq/cache-bust.sh`, `luci-app-postq/minify.sh`: ShellCheck at severity error
   (`shellcheck -S error -s sh install.sh postq/files/usr/bin/postq
-  postq/files/usr/lib/*.sh luci-app-postq/cache-bust.sh`); smoke suite —
+  postq/files/usr/lib/*.sh luci-app-postq/cache-bust.sh luci-app-postq/minify.sh`); smoke suite —
   `docker compose -f tests/docker-compose.yml run --rm postq-test all`
   (OpenWRT rootfs container; a run passes only with zero FAILs).
 - **Frontend** (`fe-app-postq/**`): `yarn ci`, and the committed `main.js`

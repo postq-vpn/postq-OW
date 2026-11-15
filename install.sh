@@ -298,6 +298,41 @@ sing_box_is_extended() {
     return 1
 }
 
+# The version of the installed sing-box ("1.14.3-extended-2.7.3-lite"): the word after
+# "version" in the first line, like helpers.sh get_sing_box_version.
+sing_box_version() {
+    command -v sing-box >/dev/null 2>&1 || return 0
+    sing-box version 2>/dev/null | head -n 1 | awk '
+        { for (i = 1; i < NF; i++) if ($i == "version") { print $(i + 1); exit }
+          print $NF }'
+}
+
+# Returns 0 if the installed core is an extended (or lite) build of release 2.7.3 or newer:
+# 2.7.3 carries the XHTTP fixes ported from Xray, an older core leaves the servers of the
+# PostQ subscription with XHTTP out of the list. The same floor as SB_EXTENDED_MIN_RELEASE
+# in constants.sh, kept here because the installer cannot source the backend libraries.
+# Only the release part after "-extended-" is compared, number by number.
+sing_box_meets_min() {
+    local min="2.7.3" version release
+
+    version="$(sing_box_version)"
+    case "$version" in
+    *-extended-*) ;;
+    *) return 1 ;;
+    esac
+    release="${version##*-extended-}"
+    release="${release%%-*}"
+
+    awk -v a="$release" -v b="$min" 'BEGIN {
+        n = split(a, x, "."); m = split(b, y, "."); k = (n > m) ? n : m
+        for (i = 1; i <= k; i++) {
+            if (x[i] + 0 > y[i] + 0) exit 0
+            if (x[i] + 0 < y[i] + 0) exit 1
+        }
+        exit 0
+    }'
+}
+
 # The core installed now: stock, extended, extended_lite, or nothing when there is none.
 current_sing_box_core() {
     command -v sing-box >/dev/null 2>&1 || return 0
@@ -324,8 +359,15 @@ select_sing_box_core() {
     # to the full extended build when lite cannot be installed).
     case "$current" in
     extended | extended_lite)
-        msg "sing-box core: $current is kept"
-        SING_BOX_CORE="keep"
+        # ...unless it is older than the release the XHTTP servers need: then
+        # the lite build of a current release takes its place.
+        if sing_box_meets_min; then
+            msg "sing-box core: $current is kept"
+            SING_BOX_CORE="keep"
+        else
+            msg "sing-box core: $current $(sing_box_version) is older than 1.14.3-extended-2.7.3, sing-box-extended-lite will be installed (needed for XHTTP servers)"
+            SING_BOX_CORE="extended_lite"
+        fi
         ;;
     *)
         msg "sing-box core: sing-box-extended-lite will be installed (needed for XHTTP servers)"
@@ -380,7 +422,7 @@ apply_sing_box_core() {
         action="install_extended"
         ;;
     extended_lite)
-        if sing_box_is_lite; then
+        if sing_box_is_lite && sing_box_meets_min; then
             msg "sing-box-extended-lite is already installed"
             return 0
         fi

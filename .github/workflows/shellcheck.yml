@@ -10,6 +10,7 @@ on:
       - 'postq/files/usr/bin/**'
       - 'postq/files/usr/lib/**'
       - 'luci-app-postq/cache-bust.sh'
+      - 'luci-app-postq/minify.sh'
       - '.github/workflows/shellcheck.yml'
   pull_request:
     branches:
@@ -20,6 +21,7 @@ on:
       - 'postq/files/usr/bin/**'
       - 'postq/files/usr/lib/**'
       - 'luci-app-postq/cache-bust.sh'
+      - 'luci-app-postq/minify.sh'
       - '.github/workflows/shellcheck.yml'
 
 permissions:
@@ -49,4 +51,5 @@ jobs:
             postq/files/usr/lib/**.sh
             install.sh
             luci-app-postq/cache-bust.sh
+            luci-app-postq/minify.sh
           token: ${{ secrets.GITHUB_TOKEN }}

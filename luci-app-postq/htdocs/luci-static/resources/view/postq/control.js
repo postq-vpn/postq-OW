@@ -1,43 +1,12 @@
 "use strict";
 "require baseclass";
-"require form";
 "require ui";
 "require view.postq.main as main";
 
-// PostQ: the one card of the simplified page that runs the service. Status of
-// the tunnel, start / stop / restart, the PostQ update and the log for
-// support. Everything else of the full UI (settings, devices, diagnostics) is
-// not shown: the routing and DNS are fixed by /etc/uci-defaults/60_postq-profile.
-
-const STATUS_INTERVAL = 5000;
-
-function button(text, classNames, onClick) {
-  return E(
-    "button",
-    {
-      class: `btn cbi-button ${classNames}`,
-      click: (ev) => {
-        ev.preventDefault();
-        onClick(ev.currentTarget);
-      },
-    },
-    text,
-  );
-}
-
-// Runs an action with the button disabled; the text is restored afterwards.
-async function busy(btn, text, action) {
-  const previous = btn.textContent;
-
-  btn.disabled = true;
-  btn.textContent = text;
-  try {
-    return await action();
-  } finally {
-    btn.disabled = false;
-    btn.textContent = previous;
-  }
-}
+// PostQ: what the page does besides showing the subscription and the servers.
+// The updates dialog of the header (PostQ VPN and the sing-box core, like the
+// "Updates" pill of the PostQ XKeen panel), the log for support and the question
+// about the settings of a previous install.
 
 function downloadText(name, text) {
   const link = E("a", {
@@ -140,495 +109,431 @@ function renderNotes(markdown) {
   return out;
 }
 
-function renderControl() {
-  const statusDot = E("span", { class: "pq-control__dot" });
-  const statusText = E("span", {}, _("Checking..."));
-  const startBtn = button(_("Start"), "cbi-button-save", (b) =>
-    serviceAction(b, "start"),
+// The core's check and install follow the flavour in place: the same actions
+// the component manager of the full UI uses.
+const CORE_ACTIONS = {
+  extended_lite: ["check_update_lite", "install_extended_lite"],
+  extended: ["check_update", "install_extended"],
+  stock: ["check_update_stable", "install_stable"],
+};
+
+// The installed versions and what the daily background check (update_notice)
+// found: { variant, postqVersion, coreVersion, outdated: { app, core } }.
+async function loadVersions() {
+  const [info, notice] = await Promise.all([
+    main.PostQShellMethods.getSystemInfo().catch(() => null),
+    main.PostQShellMethods.getUpdateNotice().catch(() => null),
+  ]);
+  const data = info && info.success && info.data ? info.data : {};
+  const checks = main.parseUpdateNotice(
+    notice && notice.success ? notice.data : {},
   );
-  const stopBtn = button(_("Stop"), "cbi-button-remove", (b) =>
-    serviceAction(b, "stop"),
-  );
-  const restartBtn = button(_("Restart"), "cbi-button-apply", (b) =>
-    serviceAction(b, "restart"),
-  );
+  const isOutdated = (check) => Boolean(check && check.status === "outdated");
 
-  async function refreshStatus() {
-    const [service, singBox] = await Promise.all([
-      main.PostQShellMethods.getStatus(),
-      main.PostQShellMethods.getSingBoxStatus(),
-    ]);
-    const running = singBox.success && singBox.data && singBox.data.running;
-    const enabled = service.success && service.data && service.data.enabled;
-
-    statusDot.classList.toggle("pq-control__dot--on", !!running);
-    statusText.textContent = running
-      ? _("VPN is running")
-      : enabled
-        ? _("VPN is stopped: add a subscription below")
-        : _("VPN is stopped");
-    startBtn.style.display = running ? "none" : "";
-    stopBtn.style.display = running ? "" : "none";
-    restartBtn.style.display = running ? "" : "none";
-  }
-
-  async function serviceAction(btn, action) {
-    await busy(btn, _("Please wait..."), async () => {
-      await main.PostQShellMethods[action]();
-      await refreshStatus();
-    });
-  }
-
-  // Updates like the PostQ XKeen panel: a button per component (its name only,
-  // the versions are in the dialog), framed when the daily background check
-  // (update_notice) found a newer one; it opens a dialog with the versions, the
-  // release notes and the install. The core's check and install follow the flavour in place: the same
-  // actions the component manager of the full UI uses.
-  const CORE_ACTIONS = {
-    extended_lite: ["check_update_lite", "install_extended_lite"],
-    extended: ["check_update", "install_extended"],
-    stock: ["check_update_stable", "install_stable"],
+  return {
+    variant: data.sing_box_variant || "stock",
+    postqVersion: data.postq_version || "",
+    coreVersion: data.sing_box_version || "",
+    outdated: {
+      app: isOutdated(checks.postq),
+      core: isOutdated(checks.sing_box),
+    },
   };
-  let coreVariant = "stock";
+}
 
-  function versionButton(label, onClick) {
+function actionsFor(variant) {
+  return CORE_ACTIONS[variant] || CORE_ACTIONS.stock;
+}
+
+// The "Updates" dialog: PostQ VPN and the sing-box core as two tabs, the
+// installed and the latest version, the release notes and the install.
+// `onUpdated(kind)` runs after an install that went through.
+function openUpdates(kind, versions, onUpdated) {
+  const body = E("div", { class: "pq-upd" });
+  const tabs = E("div", { class: "pq-seg", role: "tablist" });
+  let installing = false;
+  let current = kind;
+  let run = 0;
+
+  function closeBtn() {
     return E(
       "button",
       {
         type: "button",
-        class: "btn cbi-button pq-version",
+        class: "pq-btn-tile pq-btn-tile--muted",
         click: (ev) => {
           ev.preventDefault();
-          onClick();
+          if (!installing) {
+            ui.hideModal();
+          }
         },
       },
-      label,
+      _("Close"),
     );
   }
 
-  const appBtn = versionButton("PostQ VPN", () => openUpdate("app"));
-  const coreBtn = versionButton("sing-box", () => openUpdate("core"));
-
-  function markOutdated(btn, check) {
-    const outdated = Boolean(check && check.status === "outdated");
-
-    btn.classList.toggle("pq-version--update", outdated);
-    btn.title = outdated
-      ? _("Version %s is available").format(check.latest_version)
-      : "";
-  }
-
-  async function loadVersions() {
-    const [info, notice] = await Promise.all([
-      main.PostQShellMethods.getSystemInfo().catch(() => null),
-      main.PostQShellMethods.getUpdateNotice().catch(() => null),
+  function row(label, value) {
+    return E("div", { class: "pq-upd__row" }, [
+      E("span", { class: "pq-upd__label" }, label),
+      E("b", {}, [value || "—"]),
     ]);
-    const data = info && info.success && info.data ? info.data : {};
-
-    coreVariant = data.sing_box_variant || "stock";
-
-    const checks = main.parseUpdateNotice(
-      notice && notice.success ? notice.data : {},
-    );
-
-    markOutdated(appBtn, checks.postq);
-    markOutdated(coreBtn, checks.sing_box);
   }
 
-  async function checkFor(kind) {
-    if (kind === "app") {
-      return main.PostQShellMethods.postqCheckUpdate();
-    }
-
-    const actions = CORE_ACTIONS[coreVariant] || CORE_ACTIONS.stock;
-
-    return main.PostQShellMethods.singBoxCheckUpdate(actions[0]);
-  }
-
-  async function install(kind) {
-    if (kind === "app") {
+  async function install(which) {
+    if (which === "app") {
       return main.PostQShellMethods.postqSelfUpdate();
     }
 
-    const actions = CORE_ACTIONS[coreVariant] || CORE_ACTIONS.stock;
-
-    return main.PostQShellMethods.singBoxComponentAction(actions[1]);
+    return main.PostQShellMethods.singBoxComponentAction(
+      actionsFor(versions.variant)[1],
+    );
   }
 
-  function openUpdate(kind) {
-    const body = E("div", { class: "pq-upd" }, [
-      E("p", { class: "pq-upd__wait" }, _("Checking...")),
-    ]);
-    let installing = false;
-
-    ui.showModal(
-      kind === "app"
-        ? _("Update of PostQ VPN")
-        : _("Update of the sing-box core"),
-      [body],
-      "pq-modal",
-    );
-
-    function row(label, value) {
-      return E("div", { class: "pq-upd__row" }, [
-        E("span", { class: "pq-upd__label" }, label),
-        E("b", {}, [value || "—"]),
-      ]);
-    }
-
-    function closeBtn() {
-      return E(
-        "button",
-        {
-          type: "button",
-          class: "btn cbi-button",
-          click: (ev) => {
-            ev.preventDefault();
-            if (!installing) {
-              ui.hideModal();
-            }
-          },
-        },
-        _("Close"),
-      );
-    }
-
-    function show(result) {
-      if (!result || !result.success) {
-        body.replaceChildren(
-          E(
-            "p",
-            { class: "pq-upd__error" },
-            [_("Could not check for updates: %s").format(
-              (result && result.message) || "?",
-            )],
+  function show(which, result) {
+    if (!result || !result.success) {
+      body.replaceChildren(
+        E("p", { class: "pq-upd__error" }, [
+          _("Could not check for updates: %s").format(
+            (result && result.message) || "?",
           ),
-          E("div", { class: "pq-dns__actions" }, [closeBtn()]),
-        );
-        return;
-      }
+        ]),
+        E("div", { class: "pq-upd__actions" }, [closeBtn()]),
+      );
+      return;
+    }
 
-      const outdated = result.status === "outdated";
-      const installBtn = E(
-        "button",
-        {
-          type: "button",
-          class: "btn cbi-button pq-upd__install",
-          disabled: outdated ? null : "",
-          click: async (ev) => {
-            ev.preventDefault();
-            installing = true;
-            installBtn.disabled = true;
-            installBtn.textContent = _("Updating, do not close the page...");
+    const outdated = result.status === "outdated";
+    const installBtn = E(
+      "button",
+      {
+        type: "button",
+        class: "pq-btn",
+        disabled: outdated ? null : "",
+        click: async (ev) => {
+          ev.preventDefault();
+          installing = true;
+          installBtn.disabled = true;
+          tabs.querySelectorAll("button").forEach((b) => (b.disabled = true));
+          installBtn.textContent = _("Updating, do not close the page...");
 
-            const done = await install(kind).catch((e) => ({
-              success: false,
-              message: String(e),
-            }));
+          const done = await install(which).catch((e) => ({
+            success: false,
+            message: String(e),
+          }));
 
-            installing = false;
-            if (!done || !done.success) {
-              installBtn.disabled = false;
-              installBtn.textContent = _("Install");
-              ui.addNotification(
-                null,
-                E(
-                  "p",
-                  [_("Update failed: %s").format((done && done.message) || "?")],
-                ),
-                "warning",
-              );
-              return;
-            }
-
-            ui.hideModal();
-            if (kind === "app") {
-              ui.addNotification(
-                null,
-                E("p", _("PostQ VPN has been updated")),
-                "info",
-              );
-              setTimeout(() => window.location.reload(), 1500);
-              return;
-            }
-
+          installing = false;
+          tabs.querySelectorAll("button").forEach((b) => (b.disabled = false));
+          if (!done || !done.success) {
+            installBtn.disabled = false;
+            installBtn.textContent = _("Install");
             ui.addNotification(
               null,
-              E(
-                "p",
-                [_("The sing-box core has been updated to %s").format(
-                  done.version || result.latest_version,
-                )],
-              ),
-              "info",
+              E("p", [
+                _("Update failed: %s").format((done && done.message) || "?"),
+              ]),
+              "warning",
             );
-            loadVersions();
-            refreshStatus();
-          },
-        },
-        outdated
-          ? _("Install")
-          : _("Latest version is installed"),
-      );
-
-      body.replaceChildren(
-        E("div", { class: "pq-upd__rows" }, [
-          row(_("Installed"), result.current_version),
-          row(_("Latest"), result.latest_version),
-        ]),
-        E(
-          "p",
-          { class: `pq-upd__status${outdated ? " pq-upd__status--new" : ""}` },
-          outdated
-            ? _("A new version is available")
-            : _("The latest version is installed"),
-        ),
-        result.notes ? E("div", { class: "pq-upd__notes" }, renderNotes(result.notes)) : "",
-        // nothing to install on the latest version: just Close
-        E(
-          "div",
-          { class: "pq-dns__actions" },
-          outdated ? [closeBtn(), installBtn] : [closeBtn()],
-        ),
-      );
-    }
-
-    checkFor(kind)
-      .then(show)
-      .catch((e) => show({ success: false, message: String(e) }));
-  }
-
-  async function downloadLog(btn) {
-    const result = await busy(btn, _("Preparing..."), () =>
-      main.PostQShellMethods.getSupportReport(),
-    );
-
-    if (!result.success || typeof result.data !== "string" || !result.data) {
-      ui.addNotification(
-        null,
-        E("p", _("The report could not be prepared")),
-        "warning",
-      );
-      return;
-    }
-
-    const stamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, "-");
-
-    downloadText(`postq-log-${stamp}.txt`, result.data);
-  }
-
-  // The first install moved the subscriptions it found to the profile and kept a
-  // copy of the routing and DNS: asked once whether to add them.
-  function runBackup(command) {
-    return main
-      .executeShellCommand({
-        command: "/usr/bin/postq",
-        args: ["postq_backup", command],
-      })
-      .then((reply) => JSON.parse(reply.stdout || "{}"))
-      .catch(() => ({}));
-  }
-
-  async function askAboutBackup() {
-    const status = await runBackup("status");
-
-    if (!status.pending) {
-      return;
-    }
-
-    const error = E("p", { class: "pq-upd__error" });
-    const keepBtn = E(
-      "button",
-      {
-        type: "button",
-        class: "btn cbi-button pq-upd__install",
-        click: async (ev) => {
-          ev.preventDefault();
-          await runBackup("dismiss");
-          ui.hideModal();
-        },
-      },
-      _("Add the PostQ routing"),
-    );
-    const applyBtn = E(
-      "button",
-      {
-        type: "button",
-        class: "btn cbi-button",
-        click: async (ev) => {
-          ev.preventDefault();
-          applyBtn.disabled = true;
-          keepBtn.disabled = true;
-          applyBtn.textContent = _("Please wait...");
-
-          const done = await runBackup("apply");
-
-          if (done.ok !== true) {
-            applyBtn.disabled = false;
-            keepBtn.disabled = false;
-            applyBtn.textContent = _("Keep the old settings");
-            error.textContent = _("The saved settings could not be applied");
             return;
           }
 
-          await main.PostQShellMethods.restart();
-          window.location.reload();
+          ui.hideModal();
+          if (which === "app") {
+            ui.addNotification(
+              null,
+              E("p", _("PostQ VPN has been updated")),
+              "info",
+            );
+            setTimeout(() => window.location.reload(), 1500);
+            return;
+          }
+
+          ui.addNotification(
+            null,
+            E("p", [
+              _("The sing-box core has been updated to %s").format(
+                done.version || result.latest_version,
+              ),
+            ]),
+            "info",
+          );
+          if (onUpdated) {
+            onUpdated(which);
+          }
         },
       },
-      _("Keep the old settings"),
+      outdated ? _("Install") : _("Latest version is installed"),
     );
 
-    // One drop-down of the dialog. `compare` is the other configuration: what it
-    // does not have is marked as what the button adds.
-    function settingsView(title, view, compare) {
-      let added = 0;
-
-      function row(label, items, known) {
-        if (!items.length) {
-          return "";
-        }
-
-        return E("div", { class: "pq-backup__row" }, [
-          E("b", {}, [label]),
-          E(
-            "ul",
-            {},
-            items.map((item) => {
-              const isNew = compare && !known.includes(item);
-
-              added += isNew ? 1 : 0;
-
-              return E(
-                "li",
-                { class: isNew ? "pq-backup__new" : "" },
-                [isNew ? `+ ${item}` : item],
-              );
-            }),
-          ),
-        ]);
-      }
-
-      const other = compare || view;
-      const dnsNew = compare && status.dns_own;
-
-      added += dnsNew ? 1 : 0;
-
-      const rows = [
-        E("div", { class: "pq-backup__row" }, [
-          E("b", {}, ["DNS"]),
-          E("ul", {}, [
-            E("li", { class: dnsNew ? "pq-backup__new" : "" }, [
-              `${dnsNew ? "+ " : ""}${view.dns} (bootstrap ${view.bootstrap})`,
-            ]),
-          ]),
-        ]),
-        row(
-          `${_("Through the VPN")}: ${_("Lists")}`,
-          view.vpn.lists,
-          other.vpn.lists,
-        ),
-        row(
-          `${_("Through the VPN")}: ${_("Domains")}`,
-          view.vpn.domains,
-          other.vpn.domains,
-        ),
-        row(
-          `${_("Through the VPN")}: ${_("Subnets")}`,
-          view.vpn.subnets,
-          other.vpn.subnets,
-        ),
-        row(
-          `${_("Directly")}: ${_("Domains")}`,
-          view.direct.domains,
-          other.direct.domains,
-        ),
-        row(
-          `${_("Directly")}: ${_("Subnets")}`,
-          view.direct.subnets,
-          other.direct.subnets,
-        ),
-        row(_("Block and DNS rules"), view.rules, other.rules),
-      ];
-
-      return {
-        added,
-        node: E("details", { class: "pq-backup" }, [
-          E("summary", {}, [title]),
-          E("div", { class: "pq-backup__body" }, rows),
-        ]),
-      };
-    }
-
-    const oldView = settingsView(
-      _("Old settings"),
-      status.old,
-      status.postq,
-    );
-    const postqView = settingsView(_("PostQ settings"), status.postq, null);
-
-    ui.showModal(
-      _("Settings of the previous install"),
-      [
-        E(
-          "p",
-          {},
-          _("This router had its own NetShift settings."),
-        ),
-        status.subscriptions > 0
-          ? E("p", {}, [
-              `${_("Subscriptions moved to PostQ VPN")}: ${status.subscriptions}`,
-            ])
-          : "",
-        E(
-          "p",
-          {},
-          _(
-            "You can add your routing and DNS to the PostQ settings. Nothing else is carried over.",
-          ),
-        ),
-        oldView.node,
-        postqView.node,
-        E("p", {}, [
-          `${_("Will be added (marked with +)")}: ${oldView.added}`,
-        ]),
-        error,
-        E("div", { class: "pq-dns__actions" }, [keepBtn, applyBtn]),
-      ],
-      "pq-modal",
+    body.replaceChildren(
+      E("div", { class: "pq-upd__rows" }, [
+        row(_("Installed"), result.current_version),
+        row(_("Latest"), result.latest_version),
+      ]),
+      E(
+        "p",
+        { class: `pq-upd__status${outdated ? " pq-upd__status--new" : ""}` },
+        outdated
+          ? _("A new version is available")
+          : _("The latest version is installed"),
+      ),
+      result.notes
+        ? E("div", { class: "pq-upd__notes" }, renderNotes(result.notes))
+        : "",
+      // nothing to install on the latest version: just Close
+      E(
+        "div",
+        { class: "pq-upd__actions" },
+        outdated ? [closeBtn(), installBtn] : [closeBtn()],
+      ),
     );
   }
 
-  const node = E("div", { class: "pq-control" }, [
-    E("div", { class: "pq-control__status" }, [statusDot, statusText]),
-    E("div", { class: "pq-control__actions" }, [
-      startBtn,
-      stopBtn,
-      restartBtn,
-      button(_("Download log"), "cbi-button-neutral", (b) => downloadLog(b)),
-    ]),
-    E("div", { class: "pq-control__versions" }, [appBtn, coreBtn]),
-  ]);
+  function check(which) {
+    const mine = ++run;
 
-  refreshStatus();
-  loadVersions();
-  askAboutBackup();
-  const timer = setInterval(() => {
-    if (!document.body.contains(node)) {
-      clearInterval(timer);
-      return;
-    }
-    if (!document.hidden) {
-      refreshStatus();
-    }
-  }, STATUS_INTERVAL);
+    current = which;
+    tabs.querySelectorAll("button").forEach((b) => {
+      b.setAttribute("aria-selected", String(b.dataset.kind === which));
+    });
+    body.replaceChildren(
+      E("p", { class: "pq-upd__wait" }, [
+        E("span", { class: "pq-spinner" }),
+        _("Checking..."),
+      ]),
+    );
 
-  return node;
+    const request =
+      which === "app"
+        ? main.PostQShellMethods.postqCheckUpdate()
+        : main.PostQShellMethods.singBoxCheckUpdate(
+            actionsFor(versions.variant)[0],
+          );
+
+    request
+      .then((result) => mine === run && show(which, result))
+      .catch((e) => mine === run && show(which, { success: false, message: String(e) }));
+  }
+
+  [
+    ["app", "PostQ VPN", versions.outdated.app],
+    ["core", "sing-box", versions.outdated.core],
+  ].forEach(([which, label, outdated]) => {
+    tabs.appendChild(
+      E(
+        "button",
+        {
+          type: "button",
+          role: "tab",
+          "data-kind": which,
+          class: outdated ? "pq-seg__dot" : "",
+          click: (ev) => {
+            ev.preventDefault();
+            if (!installing && current !== which) {
+              check(which);
+            }
+          },
+        },
+        label,
+      ),
+    );
+  });
+
+  ui.showModal(_("Updates"), [tabs, body], "pq-modal");
+  check(kind);
 }
 
-// The look of the page (logo, cards, the server list of the XKeen UI) lives in
-// postq/postq.css, scoped to body.pq-page. Its URL carries the build's tag
-// of the views and assets (put in by cache-bust.sh), so a changed stylesheet is
-// fetched again even when the version stays the same.
+// The log for support: the same report as the diagnostics, saved as a file.
+async function downloadLog() {
+  const result = await main.PostQShellMethods.getSupportReport();
+
+  if (!result.success || typeof result.data !== "string" || !result.data) {
+    ui.addNotification(
+      null,
+      E("p", _("The report could not be prepared")),
+      "warning",
+    );
+    return false;
+  }
+
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[T:]/g, "-");
+
+  downloadText(`postq-log-${stamp}.txt`, result.data);
+
+  return true;
+}
+
+// The first install moved the subscriptions it found to the profile and kept a
+// copy of the routing and DNS: asked once whether to add them.
+function runBackup(command) {
+  return main
+    .executeShellCommand({
+      command: "/usr/bin/postq",
+      args: ["postq_backup", command],
+    })
+    .then((reply) => JSON.parse(reply.stdout || "{}"))
+    .catch(() => ({}));
+}
+
+async function askAboutBackup() {
+  const status = await runBackup("status");
+
+  if (!status.pending) {
+    return;
+  }
+
+  const error = E("p", { class: "pq-upd__error" });
+  const keepBtn = E(
+    "button",
+    {
+      type: "button",
+      class: "pq-btn",
+      click: async (ev) => {
+        ev.preventDefault();
+        await runBackup("dismiss");
+        ui.hideModal();
+      },
+    },
+    _("Add the PostQ routing"),
+  );
+  const applyBtn = E(
+    "button",
+    {
+      type: "button",
+      class: "pq-btn-tile pq-btn-tile--muted",
+      click: async (ev) => {
+        ev.preventDefault();
+        applyBtn.disabled = true;
+        keepBtn.disabled = true;
+        applyBtn.textContent = _("Please wait...");
+
+        const done = await runBackup("apply");
+
+        if (done.ok !== true) {
+          applyBtn.disabled = false;
+          keepBtn.disabled = false;
+          applyBtn.textContent = _("Keep the old settings");
+          error.textContent = _("The saved settings could not be applied");
+          return;
+        }
+
+        await main.PostQShellMethods.restart();
+        window.location.reload();
+      },
+    },
+    _("Keep the old settings"),
+  );
+
+  // One drop-down of the dialog. `compare` is the other configuration: what it
+  // does not have is marked as what the button adds.
+  function settingsView(title, view, compare) {
+    let added = 0;
+
+    function row(label, items, known) {
+      if (!items.length) {
+        return "";
+      }
+
+      return E("div", { class: "pq-backup__row" }, [
+        E("b", {}, [label]),
+        E(
+          "ul",
+          {},
+          items.map((item) => {
+            const isNew = compare && !known.includes(item);
+
+            added += isNew ? 1 : 0;
+
+            return E("li", { class: isNew ? "pq-backup__new" : "" }, [
+              isNew ? `+ ${item}` : item,
+            ]);
+          }),
+        ),
+      ]);
+    }
+
+    const other = compare || view;
+    const dnsNew = compare && status.dns_own;
+
+    added += dnsNew ? 1 : 0;
+
+    const rows = [
+      E("div", { class: "pq-backup__row" }, [
+        E("b", {}, ["DNS"]),
+        E("ul", {}, [
+          E("li", { class: dnsNew ? "pq-backup__new" : "" }, [
+            `${dnsNew ? "+ " : ""}${view.dns} (bootstrap ${view.bootstrap})`,
+          ]),
+        ]),
+      ]),
+      row(
+        `${_("Through the VPN")}: ${_("Lists")}`,
+        view.vpn.lists,
+        other.vpn.lists,
+      ),
+      row(
+        `${_("Through the VPN")}: ${_("Domains")}`,
+        view.vpn.domains,
+        other.vpn.domains,
+      ),
+      row(
+        `${_("Through the VPN")}: ${_("Subnets")}`,
+        view.vpn.subnets,
+        other.vpn.subnets,
+      ),
+      row(
+        `${_("Directly")}: ${_("Domains")}`,
+        view.direct.domains,
+        other.direct.domains,
+      ),
+      row(
+        `${_("Directly")}: ${_("Subnets")}`,
+        view.direct.subnets,
+        other.direct.subnets,
+      ),
+      row(_("Block and DNS rules"), view.rules, other.rules),
+    ];
+
+    return {
+      added,
+      node: E("details", { class: "pq-backup" }, [
+        E("summary", {}, [title]),
+        E("div", { class: "pq-backup__body" }, rows),
+      ]),
+    };
+  }
+
+  const oldView = settingsView(_("Old settings"), status.old, status.postq);
+  const postqView = settingsView(_("PostQ settings"), status.postq, null);
+
+  ui.showModal(
+    _("Settings of the previous install"),
+    [
+      E("p", {}, _("This router had its own NetShift settings.")),
+      status.subscriptions > 0
+        ? E("p", {}, [
+            `${_("Subscriptions moved to PostQ VPN")}: ${status.subscriptions}`,
+          ])
+        : "",
+      E(
+        "p",
+        {},
+        _(
+          "You can add your routing and DNS to the PostQ settings. Nothing else is carried over.",
+        ),
+      ),
+      oldView.node,
+      postqView.node,
+      E("p", {}, [`${_("Will be added (marked with +)")}: ${oldView.added}`]),
+      error,
+      E("div", { class: "pq-upd__actions" }, [applyBtn, keepBtn]),
+    ],
+    "pq-modal",
+  );
+}
+
+// The look of the page lives in postq/postq.css, scoped to body.pq-page. Its URL
+// carries the build's tag of the views and assets (put in by cache-bust.sh), so
+// a changed stylesheet is fetched again even when the version stays the same.
 function injectStyles() {
   document.body.classList.add("pq-page");
 
@@ -645,14 +550,10 @@ function injectStyles() {
   );
 }
 
-function createControlContent(section) {
-  injectStyles();
-
-  const o = section.option(form.DummyValue, "_mount_node");
-  o.rawhtml = true;
-  o.cfgvalue = () => renderControl();
-}
-
 return baseclass.extend({
-  createControlContent,
+  askAboutBackup,
+  downloadLog,
+  injectStyles,
+  loadVersions,
+  openUpdates,
 });

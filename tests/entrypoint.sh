@@ -11239,7 +11239,9 @@ test_luci_cache_bust() {
         # ── backend: version of the installed LuCI app ──────────────────
         log() { :; }
         . "${POSTQ_LIB_DIR}/constants.sh"
-        eval "$(awk -v f="get_luci_app_version" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
+        for f in luci_bundle_version get_luci_app_version; do
+            eval "$(awk -v f="$f" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$bin")"
+        done
         mkver() { mkdir -p "$LUCI_VIEW_DIR/$1"; printf 'var POSTQ_LUCI_APP_VERSION = "%s";\n' "$2" > "$LUCI_VIEW_DIR/$1/main.js"; }
         # The version line of the REAL bundle, as built and stamped, is understood.
         LUCI_VIEW_DIR="$W/a/$view_rel"
@@ -12322,13 +12324,13 @@ config_get() {
 }
 updates_system_uses_musl() { return 0; }
 
-RELEASES='[{"tag_name":"v1.14.1-extended-2.7.2","draft":false,"prerelease":false,"assets":[
- {"name":"sing-box-1.14.1-extended-2.7.2-linux-armv6.tar.gz","browser_download_url":"https://example.invalid/armv6.tar.gz"},
- {"name":"sing-box-1.14.1-extended-2.7.2-linux-armv7-musl.tar.gz","browser_download_url":"https://example.invalid/armv7-musl.tar.gz"},
- {"name":"sing-box-1.14.1-extended-2.7.2-linux-armv7.tar.gz","browser_download_url":"https://example.invalid/armv7.tar.gz"},
- {"name":"sing-box-1.14.1-extended-2.7.2-linux-arm64-musl.tar.gz","browser_download_url":"https://example.invalid/arm64-musl.tar.gz"},
- {"name":"sing-box-extended_1.14.1-extended-2.7.2_openwrt_arm_cortex-a9.ipk","browser_download_url":"https://example.invalid/openwrt_arm_cortex-a9.ipk"},
- {"name":"sing-box-extended_1.14.1-extended-2.7.2_openwrt_arm_cortex-a9.apk","browser_download_url":"https://example.invalid/openwrt_arm_cortex-a9.apk"}]}]'
+RELEASES='[{"tag_name":"v1.14.3-extended-2.7.3","draft":false,"prerelease":false,"assets":[
+ {"name":"sing-box-1.14.3-extended-2.7.3-linux-armv6.tar.gz","browser_download_url":"https://example.invalid/armv6.tar.gz"},
+ {"name":"sing-box-1.14.3-extended-2.7.3-linux-armv7-musl.tar.gz","browser_download_url":"https://example.invalid/armv7-musl.tar.gz"},
+ {"name":"sing-box-1.14.3-extended-2.7.3-linux-armv7.tar.gz","browser_download_url":"https://example.invalid/armv7.tar.gz"},
+ {"name":"sing-box-1.14.3-extended-2.7.3-linux-arm64-musl.tar.gz","browser_download_url":"https://example.invalid/arm64-musl.tar.gz"},
+ {"name":"sing-box-extended_1.14.3-extended-2.7.3_openwrt_arm_cortex-a9.ipk","browser_download_url":"https://example.invalid/openwrt_arm_cortex-a9.ipk"},
+ {"name":"sing-box-extended_1.14.3-extended-2.7.3_openwrt_arm_cortex-a9.apk","browser_download_url":"https://example.invalid/openwrt_arm_cortex-a9.apk"}]}]'
 
 # Real RT-AC88U (Broadcom BCM5301X, Cortex-A9 without any FPU) feature line.
 FEAT_NO_VFP="half thumb fastmult edsp tls"
@@ -12339,7 +12341,7 @@ FEAT_VFPV3D16="half thumb fastmult vfp edsp vfpv3d16 tls"
 # ARMv6-style VFPv2 only (VFP but no VFPv3).
 FEAT_VFP2="half thumb fastmult vfp edsp tls"
 
-REL="$(updates_extended_release_object "$RELEASES" "v1.14.1-extended-2.7.2")"
+REL="$(updates_extended_release_object "$RELEASES" "v1.14.3-extended-2.7.3")"
 
 report() { # <token-name> <expected> <got>
     if [ "$2" = "$3" ]; then
@@ -12752,15 +12754,15 @@ nolog() { :; }
 . "DRV_UPDATER"
 
 # ── injection points ────────────────────────────────────────────────
-LITE_RELEASES='[{"tag_name":"v1.14.1-extended-2.7.2-lite","draft":false,"prerelease":false,"assets":[
+LITE_RELEASES='[{"tag_name":"v1.14.3-extended-2.7.3-lite","draft":false,"prerelease":false,"assets":[
  {"name":"sing-box-extended-lite-linux-amd64.tar.gz","browser_download_url":"https://example.invalid/dl/sing-box-extended-lite-linux-amd64.tar.gz"},
  {"name":"sing-box-extended-lite-linux-amd64-compressed.tar.gz","browser_download_url":"https://example.invalid/dl/sing-box-extended-lite-linux-amd64-compressed.tar.gz"},
  {"name":"sha256sums.txt","browser_download_url":"https://example.invalid/dl/sha256sums.txt"}]}]'
-LITE_RELEASES_NOSUMS='[{"tag_name":"v1.14.1-extended-2.7.2-lite","draft":false,"prerelease":false,"assets":[
+LITE_RELEASES_NOSUMS='[{"tag_name":"v1.14.3-extended-2.7.3-lite","draft":false,"prerelease":false,"assets":[
  {"name":"sing-box-extended-lite-linux-amd64.tar.gz","browser_download_url":"https://example.invalid/dl/sing-box-extended-lite-linux-amd64.tar.gz"},
  {"name":"sing-box-extended-lite-linux-amd64-compressed.tar.gz","browser_download_url":"https://example.invalid/dl/sing-box-extended-lite-linux-amd64-compressed.tar.gz"}]}]'
-EXT_RELEASES='[{"tag_name":"v1.14.1-extended-2.7.2","draft":false,"prerelease":false,"assets":[
- {"name":"sing-box-1.14.1-extended-2.7.2-linux-amd64.tar.gz","browser_download_url":"https://example.invalid/dl/sing-box-1.14.1-extended-2.7.2-linux-amd64.tar.gz"}]}]'
+EXT_RELEASES='[{"tag_name":"v1.14.3-extended-2.7.3","draft":false,"prerelease":false,"assets":[
+ {"name":"sing-box-1.14.3-extended-2.7.3-linux-amd64.tar.gz","browser_download_url":"https://example.invalid/dl/sing-box-1.14.3-extended-2.7.3-linux-amd64.tar.gz"}]}]'
 CASE_UNAME="x86_64"
 CASE_FEATURES=""
 CASE_DISTRIB_ARCH=""
@@ -13284,9 +13286,9 @@ main_body() {
     CASE_PKG_MODE=ok
 
     # ── Part 11: check_update_lite ───────────────────────
-    SB_VER_OVERRIDE="1.14.1-extended-2.7.2-lite"
+    SB_VER_OVERRIDE="1.14.3-extended-2.7.3-lite"
     json="$(updates_check_sing_box_lite 2>/dev/null)"
-    if printf '%s' "$json" | jq -e '.success == true and .status == "latest" and .current_version == "1.14.1-extended-2.7.2-lite" and .latest_version == "1.14.1-extended-2.7.2-lite"' >/dev/null 2>&1; then
+    if printf '%s' "$json" | jq -e '.success == true and .status == "latest" and .current_version == "1.14.3-extended-2.7.3-lite" and .latest_version == "1.14.3-extended-2.7.3-lite"' >/dev/null 2>&1; then
         echo "sblite-check-latest:OK"
     else
         echo "sblite-check-latest:FAIL ($json)"
@@ -13299,9 +13301,9 @@ main_body() {
         echo "sblite-check-outdated:FAIL ($json)"
     fi
     # a manual install without -lite honestly shows up as outdated
-    SB_VER_OVERRIDE="1.14.1-extended-2.7.2"
+    SB_VER_OVERRIDE="1.14.3-extended-2.7.3"
     json="$(updates_check_sing_box_lite 2>/dev/null)"
-    if printf '%s' "$json" | jq -e '.success == true and .status == "outdated" and .current_version == "1.14.1-extended-2.7.2" and .latest_version == "1.14.1-extended-2.7.2-lite"' >/dev/null 2>&1; then
+    if printf '%s' "$json" | jq -e '.success == true and .status == "outdated" and .current_version == "1.14.3-extended-2.7.3" and .latest_version == "1.14.3-extended-2.7.3-lite"' >/dev/null 2>&1; then
         echo "sblite-check-manual-outdated:OK"
     else
         echo "sblite-check-manual-outdated:FAIL ($json)"
@@ -13316,7 +13318,7 @@ main_body() {
     CASE_FETCH_FAIL=0
     SB_VER_OVERRIDE=""
     # sync dispatcher wiring
-    SB_VER_OVERRIDE="1.14.1-extended-2.7.2-lite"
+    SB_VER_OVERRIDE="1.14.3-extended-2.7.3-lite"
     json="$(component_action sing_box check_update_lite 2>/dev/null)"
     if printf '%s' "$json" | jq -e '.success == true and .status == "latest"' >/dev/null 2>&1; then
         echo "sblite-check-dispatch:OK"
@@ -23215,7 +23217,7 @@ SBEOF
         chmod +x "$work/bin/sing-box"
         cat > "$work/drv.sh" << 'DRVEOF'
 msg() { echo "MSG $*" >> "$KC_DIR/msgs"; }
-for f in sing_box_is_extended sing_box_is_lite current_sing_box_core select_sing_box_core apply_sing_box_core; do
+for f in sing_box_version sing_box_meets_min sing_box_is_extended sing_box_is_lite current_sing_box_core select_sing_box_core apply_sing_box_core; do
     eval "$(awk -v f="$f" '$0 ~ "^"f"\\(\\) \\{"{p=1} p{print} p&&/^\}/{exit}' "$KC_INSTALLER")"
 done
 # what apply would switch to; the component action itself is not run here
@@ -23230,7 +23232,7 @@ run() {
     keep) action=none ;;
     stock) sing_box_is_extended && action=install_stable || action=none ;;
     extended) sing_box_is_extended && ! sing_box_is_lite && action=none || action=install_extended ;;
-    extended_lite) sing_box_is_lite && action=none || action=install_extended_lite ;;
+    extended_lite) sing_box_is_lite && sing_box_meets_min && action=none || action=install_extended_lite ;;
     esac
     echo "$3=$SING_BOX_CORE action=$action offered=$(grep -c 'Оставить установленное' "$KC_DIR/msgs")"
 }
@@ -23239,6 +23241,10 @@ run "1.14.3-extended-2.7.3" "" "extended-eof"
 run "1.14.3-extended-2.7.3" "1\n" "extended-chose-stock"
 run "1.14.3-extended-2.7.3-lite" "\n" "lite-enter"
 run "1.12.22" "" "stock-eof"
+# older than 2.7.3 (the XHTTP fixes): replaced by the lite build of a current release
+run "1.14.1-extended-2.7.2-lite" "" "old-lite"
+run "1.14.0-extended-2.7.1" "" "old-extended"
+run "1.14.10-extended-2.10.0" "" "newer-extended"
 # no core at all: a PATH without the directories sing-box lives in (busybox applets are in /bin)
 PATH="/bin"
 command -v sing-box > /dev/null 2>&1 && echo "none-eof=skipped" || run "" "" "none-eof"
@@ -23256,6 +23262,9 @@ DRVEOF
         _kc "...whatever is typed: the installer does not ask" "extended-chose-stock=keep action=none offered=0"
         _kc "the lite core is kept" "lite-enter=keep action=none offered=0"
         _kc "a stock core is replaced by the lite build" "stock-eof=extended_lite action=install_extended_lite offered=0"
+        _kc "a lite core older than 2.7.3 is replaced by a current lite build" "old-lite=extended_lite action=install_extended_lite offered=0"
+        _kc "a full extended core older than 2.7.3 is replaced by the lite build" "old-extended=extended_lite action=install_extended_lite offered=0"
+        _kc "a newer release is compared by number, not as text (2.10.0 > 2.7.3)" "newer-extended=keep action=none offered=0"
         if printf '%s\n' "$out" | grep -q '^none-eof=skipped'; then
             skip "the test image has sing-box on PATH: the first install case is not run"
         else
@@ -23275,6 +23284,7 @@ DRVEOF
         get_sing_box_version() { echo "$KC_V"; }
         KC_V="1.12.22"; echo "stock:$(unsupported_links_hint)"
         KC_V="1.14.3-extended-2.7.3"; echo "extended:$(unsupported_links_hint)"
+        KC_V="1.14.1-extended-2.7.2-lite"; echo "old:$(unsupported_links_hint)"
     )"
     if printf '%s\n' "$hint" | grep -qF 'stock: Installed core: stock sing-box 1.12.22. Links with XHTTP, VMess or VLESS Encryption need sing-box-extended: run the PostQ VPN install command again, it installs sing-box extended lite.'; then
         pass "unsupported links on a stock core: the core and the way to sing-box-extended are named"
@@ -23285,6 +23295,11 @@ DRVEOF
         pass "...on sing-box-extended the core is named"
     else
         fail "...on sing-box-extended the core is named" "$hint"
+    fi
+    if printf '%s\n' "$hint" | grep -qF 'old: Installed core: sing-box 1.14.1-extended-2.7.2-lite (extended_lite), older than 1.14.3-extended-2.7.3: XHTTP links need 1.14.3-extended-2.7.3 or newer.'; then
+        pass "...on an extended core older than 2.7.3 the minimum version is named"
+    else
+        fail "...on an extended core older than 2.7.3 the minimum version is named" "$hint"
     fi
     if [ "$(grep -c 'no usable links (all unsupported).*\$(unsupported_links_hint)' "$bin")" -eq 4 ] &&
         grep -q 'uses an unsupported scheme.*\$(unsupported_links_hint)' "$bin"; then
@@ -24785,6 +24800,11 @@ echo "pin-old=$(UPDATES_PINNED_TAG=1.14.2-extended-2.7.2 updates_extended_releas
 echo "pin-v=$(UPDATES_PINNED_TAG=v1.14.2-extended-2.7.2 updates_extended_release_tag "$rel")"
 echo "pin-missing=[$(UPDATES_PINNED_TAG=1.13.0-extended-1.0.0 updates_extended_release_tag "$rel")]"
 echo "pin-prerelease=[$(UPDATES_PINNED_TAG=1.14.1-extended-2.7.1 updates_extended_release_tag "$rel")]"
+# the newest by version, whatever the order of the list (the lite releases have tags made
+# at the same moment); release numbers are compared as numbers; nothing older than 2.7.3
+echo "order-older-first=$(updates_extended_release_tag '[{"tag_name":"v1.14.1-extended-2.7.2-lite"},{"tag_name":"v1.14.3-extended-2.7.3-lite"}]')"
+echo "order-numeric=$(updates_extended_release_tag '[{"tag_name":"v1.14.3-extended-2.7.3"},{"tag_name":"v1.14.10-extended-2.10.0"},{"tag_name":"v1.14.4-extended-2.9.0"}]')"
+echo "floor=[$(updates_extended_release_tag '[{"tag_name":"v1.14.1-extended-2.7.2-lite"},{"tag_name":"v1.14.0-extended-2.7.1"}]')]"
 updates_github_resolve_redirect() { echo "https://github.com/x/y/releases/tag/0.9.99"; }
 echo "ns-latest=$(updates_postq_latest_tag) ns-pinned=$(UPDATES_PINNED_TAG=0.9.11 updates_postq_latest_tag)"
 echo DONE
@@ -24839,6 +24859,9 @@ DRVEOF
     _au "pin with v" 'pin-v=v1.14.2-extended-2.7.2'
     _au "pin: a release that is not there gives nothing" 'pin-missing=[]'
     _au "pin: a pre-release is not installed" 'pin-prerelease=[]'
+    _au "the newest release by version, not the first of the list" 'order-older-first=v1.14.3-extended-2.7.3-lite'
+    _au "release numbers compare as numbers (2.10.0 > 2.9.0)" 'order-numeric=v1.14.10-extended-2.10.0'
+    _au "nothing older than 2.7.3 is offered" 'floor=[]'
     _au "PostQ: the pinned tag instead of the latest" 'ns-latest=0.9.99 ns-pinned=0.9.11'
     _au "driver completed" 'DONE'
 

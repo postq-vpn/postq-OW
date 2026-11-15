@@ -601,7 +601,13 @@ unsupported_links_hint() {
     variant="$(get_sing_box_variant "$version" 2> /dev/null)"
     case "$variant" in
     stock) printf ' Installed core: stock sing-box %s. Links with XHTTP, VMess or VLESS Encryption need sing-box-extended: run the PostQ VPN install command again, it installs sing-box extended lite.' "$version" ;;
-    *) printf ' Installed core: sing-box %s (%s). The errors before this one say what each link needs.' "$version" "$variant" ;;
+    *)
+        if is_sing_box_extended_at_least "$SB_EXTENDED_MIN_RELEASE" "$version"; then
+            printf ' Installed core: sing-box %s (%s). The errors before this one say what each link needs.' "$version" "$variant"
+        else
+            printf ' Installed core: sing-box %s (%s), older than %s: XHTTP links need %s or newer. Update the sing-box core (Updates) or run the PostQ VPN install command again.' "$version" "$variant" "$SB_EXTENDED_MIN_VERSION" "$SB_EXTENDED_MIN_VERSION"
+        fi
+        ;;
     esac
 }
 
@@ -8302,6 +8308,13 @@ show_system_info() {
 # Version of the installed LuCI app, "not installed" when its views are absent.
 # Reads POSTQ_LUCI_APP_VERSION out of main.js in the hashed views directory
 # (view/postq_<hash>/) or, for a hand-copied dev tree, view/postq/.
+# The version a LuCI bundle carries: the value of `var POSTQ_LUCI_APP_VERSION = "..."`.
+# Matched by the name, not by the position of the quotes in the line: the
+# package build minifies main.js, which can join that statement with others.
+luci_bundle_version() {
+    sed -n 's/.*var POSTQ_LUCI_APP_VERSION *= *"\([^"]*\)".*/\1/p' "$1" 2> /dev/null | head -n 1
+}
+
 get_luci_app_version() {
     local file version found=0 active
 
@@ -8312,7 +8325,7 @@ get_luci_app_version() {
     active="$(sed -n 's#.*"path": *"\(postq_[0-9a-f]*\)/postq".*#\1#p' "$LUCI_MENU_FILE" 2> /dev/null | head -n 1)"
     if [ -n "$active" ] && [ -f "$LUCI_VIEW_DIR/$active/main.js" ]; then
         found=1
-        version="$(grep 'var POSTQ_LUCI_APP_VERSION' "$LUCI_VIEW_DIR/$active/main.js" | cut -d'"' -f2)"
+        version="$(luci_bundle_version "$LUCI_VIEW_DIR/$active/main.js")"
         if [ -n "$version" ]; then
             echo "$version"
             return 0
@@ -8323,7 +8336,7 @@ get_luci_app_version() {
     # shellcheck disable=SC2046
     for file in $(ls -1t "$LUCI_VIEW_DIR"/postq_*/main.js "$LUCI_VIEW_DIR"/postq/main.js 2> /dev/null); do
         found=1
-        version="$(grep 'var POSTQ_LUCI_APP_VERSION' "$file" | cut -d'"' -f2)"
+        version="$(luci_bundle_version "$file")"
         # A main.js without the version line must not yield an empty answer
         # (jq's `// "unknown"` does not catch an empty string).
         [ -n "$version" ] || continue

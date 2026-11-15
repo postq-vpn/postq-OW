@@ -782,15 +782,28 @@ updates_extended_release_tag() {
         return 0
     fi
 
-    printf '%s' "$json" | jq -r '
-        map(select((.draft != true) and (.prerelease != true)))
+    # The newest by version, not the first of the list: GitHub orders releases by the
+    # creation time of their tags, and the lite repository publishes several releases
+    # from tags made at the same moment, so the list order says nothing about which is
+    # newer. A tag is "<upstream>-extended-<release>[-lite]"; the version key is the
+    # fork's release, then the upstream version, both as arrays of numbers (split, no
+    # regex: OpenWrt's jq has no Oniguruma). Releases older than SB_EXTENDED_MIN_RELEASE
+    # are never offered (see constants.sh).
+    printf '%s' "$json" | jq -r --arg min "${SB_EXTENDED_MIN_RELEASE:-0}" '
+        def nums: split(".") | map(tonumber? // 0);
+        def vkey: ltrimstr("v") | split("-extended-") as $p
+            | [(($p[1] // "") | split("-") | .[0] // "" | nums), ($p[0] | nums)];
+        ($min | nums) as $floor
+        | map(select((.draft != true) and (.prerelease != true)))
         | map(.tag_name)
         | map(select(. != null and . != ""))
         | map(select(
             (ascii_downcase) as $t
             | ($t | contains("-alpha") or contains("-beta") or contains("-rc")) | not
           ))
-        | .[0] // empty
+        | map(select(vkey[0] >= $floor))
+        | sort_by(vkey)
+        | last // empty
     ' 2>/dev/null
 }
 
@@ -1453,8 +1466,8 @@ _updates_install_sing_box_extended_core() {
 
     tag="$(updates_extended_release_tag "$releases")"
     if [ -z "$tag" ]; then
-        updates_log "No stable sing-box-extended release tag found in the GitHub response" "error"
-        echo "{\"success\":false,\"message\":\"No stable sing-box-extended release found\"}"
+        updates_log "No stable sing-box-extended release $SB_EXTENDED_MIN_VERSION or newer found in the GitHub response" "error"
+        echo "{\"success\":false,\"message\":\"No stable sing-box-extended release $SB_EXTENDED_MIN_VERSION or newer found\"}"
         return 1
     fi
 
@@ -2078,7 +2091,7 @@ updates_check_sing_box_extended() {
 
     tag="$(updates_extended_release_tag "$releases")"
     if [ -z "$tag" ]; then
-        echo "{\"success\":false,\"message\":\"No stable sing-box-extended release found\"}"
+        echo "{\"success\":false,\"message\":\"No stable sing-box-extended release $SB_EXTENDED_MIN_VERSION or newer found\"}"
         return 1
     fi
 
@@ -2424,8 +2437,8 @@ _updates_install_sing_box_lite_core() {
 
     tag="$(updates_extended_release_tag "$releases")"
     if [ -z "$tag" ]; then
-        updates_log "No stable sing-box extended lite release tag found in the GitHub response" "error"
-        echo "{\"success\":false,\"message\":\"No stable sing-box extended lite release found\"}"
+        updates_log "No stable sing-box extended lite release $SB_EXTENDED_MIN_VERSION or newer found in the GitHub response" "error"
+        echo "{\"success\":false,\"message\":\"No stable sing-box extended lite release $SB_EXTENDED_MIN_VERSION or newer found\"}"
         return 1
     fi
 
@@ -2617,7 +2630,7 @@ updates_check_sing_box_lite() {
 
     tag="$(updates_extended_release_tag "$releases")"
     if [ -z "$tag" ]; then
-        echo "{\"success\":false,\"message\":\"No stable sing-box extended lite release found\"}"
+        echo "{\"success\":false,\"message\":\"No stable sing-box extended lite release $SB_EXTENDED_MIN_VERSION or newer found\"}"
         return 1
     fi
 

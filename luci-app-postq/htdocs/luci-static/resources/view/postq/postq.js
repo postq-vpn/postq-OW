@@ -5,8 +5,9 @@
 "require network";
 "require view.postq.main as main";
 
-// PostQ: the subscription line and the server list under it
-"require view.postq.subscription as subscription";
+// PostQ: the main page (subscription, router, VPN and servers), laid out like
+// the PostQ XKeen panel
+"require view.postq.home as home";
 
 // Diagnostic content
 "require view.postq.diagnostic as diagnostic";
@@ -17,70 +18,76 @@
 // PostQ: the settings snapshots as a short card with a dialog
 "require view.postq.snapshots as snapshots";
 
-// PostQ: service status, update and log
+// PostQ: the updates dialog, the log for support, the page's stylesheet
 "require view.postq.control as control";
 
-// PostQ: the two tabs of the page. The data-tab names are the ones the dashboard
-// and the diagnostics listen to (TabService): the hidden one stops polling the
-// router. The open tab is kept in the address (#diagnostic).
-const TABS = [
-  { tab: "dashboard", title: () => _("Main") },
-  { tab: "diagnostic", title: () => _("Diagnostics") },
-];
+// Two screens, like the PostQ XKeen panel: the main one and the diagnostics,
+// opened from the "Diagnostics" pill of the header and left with "Back". The
+// data-tab names are the ones the diagnostics listen to (TabService): the hidden
+// screen stops polling the router. The open screen is kept in the address
+// (#diagnostic).
+function mountScreens(mapNode) {
+  let screen = "dashboard";
 
-// The diagnostics (with the DNS card) are the second tab; every other section of
-// the page (service, subscription and servers) is the main one.
-const DIAGNOSTIC_SECTIONS = ["cbi-postq-diagnostic"];
+  const { header, node: homeNode } = home.createHome({
+    onDiagnostics: () => show("diagnostic"),
+  });
 
-function sectionTab(section) {
-  return DIAGNOSTIC_SECTIONS.includes(section.id) ? "diagnostic" : "dashboard";
-}
-
-function addTabs(node) {
-  const items = TABS.map((tab) =>
-    E("li", { "data-tab": tab.tab }, [
-      E(
-        "a",
-        {
-          href: `#${tab.tab}`,
-          click: (ev) => {
-            ev.preventDefault();
-            showTab(tab.tab);
-          },
-        },
-        tab.title(),
-      ),
-    ]),
+  const back = E(
+    "button",
+    {
+      type: "button",
+      class: "pq-pill pq-pill--icon",
+      "aria-label": _("Back"),
+      title: _("Back"),
+      click: (ev) => {
+        ev.preventDefault();
+        show("dashboard");
+      },
+    },
+    [],
   );
 
-  function showTab(name) {
-    TABS.forEach((tab, index) => {
-      items[index].className =
-        tab.tab === name ? "cbi-tab" : "cbi-tab-disabled";
-    });
-    node.querySelectorAll(":scope > .cbi-section").forEach((section) => {
-      section.style.display = sectionTab(section) === name ? "" : "none";
-    });
-    document.body.classList.toggle(
-      "pq-page--diagnostic",
-      name === "diagnostic",
-    );
+  back.innerHTML =
+    '<span class="pq-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></span>';
+
+  const diagHead = E("div", { class: "pq-head", role: "banner" }, [
+    back,
+    E("div", { class: "pq-pill pq-pill--logo" }, [E("span", { class: "pq-logo" })]),
+    E("h1", { class: "pq-head__title" }, _("Diagnostics")),
+  ]);
+
+  // the TabService of the diagnostics listens to these items
+  const tabs = E("ul", { class: "pq-hidden-tabs", hidden: "" }, [
+    E("li", { "data-tab": "dashboard" }),
+    E("li", { "data-tab": "diagnostic" }),
+  ]);
+
+  const homeScreen = E("div", { class: "pq-screen pq-screen--home" }, [
+    header,
+    homeNode,
+  ]);
+  const diagScreen = E("div", { class: "pq-screen pq-screen--diagnostic" }, [
+    diagHead,
+    mapNode,
+  ]);
+
+  function show(name) {
+    screen = name;
+    tabs.children[0].className = name === "dashboard" ? "cbi-tab" : "cbi-tab-disabled";
+    tabs.children[1].className = name === "diagnostic" ? "cbi-tab" : "cbi-tab-disabled";
+    homeScreen.hidden = name !== "dashboard";
+    diagScreen.hidden = name !== "diagnostic";
+    document.body.classList.toggle("pq-page--diagnostic", name === "diagnostic");
     history.replaceState(
       null,
       "",
       name === "dashboard" ? location.pathname + location.search : `#${name}`,
     );
+    window.scrollTo(0, 0);
   }
 
-  const heading = node.querySelector("h2");
-  const menu = E("ul", { class: "cbi-tabmenu pq-tabs" }, items);
-
-  if (heading) {
-    heading.after(menu);
-  } else {
-    node.prepend(menu);
-  }
-  // the tab to open: the address, or the one an apply asked to come back to
+  // the screen to open: the address, or the one an apply asked to come back to
   let reopen = null;
 
   try {
@@ -89,58 +96,39 @@ function addTabs(node) {
   } catch {
     // no storage: the address decides
   }
-  showTab(
+
+  const app = E("div", { class: "pq-app" }, [tabs, homeScreen, diagScreen]);
+
+  show(
     location.hash === "#diagnostic" || reopen === "diagnostic"
       ? "diagnostic"
       : "dashboard",
   );
   window.addEventListener("hashchange", () => {
-    showTab(location.hash === "#diagnostic" ? "diagnostic" : "dashboard");
+    const wanted = location.hash === "#diagnostic" ? "diagnostic" : "dashboard";
+
+    if (wanted !== screen) {
+      show(wanted);
+    }
   });
+
+  return app;
 }
 
-// PostQ simplified UI: the service card, the subscription and the servers on the
-// main tab, the diagnostics on the second one. The routing and DNS are fixed by
+// PostQ simplified UI: the main page drawn by home.js and the
+// diagnostics on a second screen. The routing and DNS are fixed by
 // /etc/uci-defaults/60_postq-profile, so the settings, sections, devices,
 // connections and component manager of the full UI are not shown.
 const EntryPoint = {
   async render() {
+    control.injectStyles();
     main.injectGlobalStyles();
     // what the installed core can do, for the validators and the hints
     await main.loadCoreCapabilities();
 
     const postqMap = new form.Map("postq", _("PostQ VPN"));
 
-    // Service card
-    const controlSection = postqMap.section(
-      form.TypedSection,
-      "control",
-      _("Service"),
-    );
-    controlSection.anonymous = true;
-    controlSection.addremove = false;
-    controlSection.cfgsections = function () {
-      return ["control"];
-    };
-
-    control.createControlContent(controlSection);
-
-    // Subscription and servers: the subscription line (name, actions, term,
-    // traffic) over the server list, like the PostQ XKeen panel. Its own
-    // actions save and apply at once.
-    const dashboardSection = postqMap.section(
-      form.TypedSection,
-      "dashboard",
-    );
-    dashboardSection.anonymous = true;
-    dashboardSection.addremove = false;
-    dashboardSection.cfgsections = function () {
-      return ["dashboard"];
-    };
-
-    subscription.createSubscriptionContent(dashboardSection);
-
-    // Diagnostics (second tab)
+    // Diagnostics (second screen)
     const diagnosticSection = postqMap.section(
       form.TypedSection,
       "diagnostic",
@@ -158,11 +146,17 @@ const EntryPoint = {
     main.coreService();
 
     return postqMap.render().then((node) => {
-      addTabs(node);
       dns.mountDnsCard(node);
       snapshots.mountSnapshotsCard(node);
-      return node;
+      control.askAboutBackup();
+
+      return mountScreens(node);
     });
+  },
+
+  // the page saves and applies by itself: no form buttons
+  addFooter() {
+    return E("div");
   },
 };
 

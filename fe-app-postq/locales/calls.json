@@ -3,7 +3,7 @@
     "call": "%d ms",
     "key": "%d ms",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1054"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1055"
     ]
   },
   {
@@ -17,21 +17,21 @@
     "call": "%s (stock): servers with XHTTP do not work",
     "key": "%s (stock): servers with XHTTP do not work",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:871"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:873"
     ]
   },
   {
     "call": "%s is older than %s: servers with XHTTP do not work",
     "key": "%s is older than %s: servers with XHTTP do not work",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:873"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:875"
     ]
   },
   {
     "call": "%s of %s",
     "key": "%s of %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:676"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:678"
     ]
   },
   {
@@ -73,7 +73,7 @@
     "call": "A new version is available",
     "key": "A new version is available",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:276"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:228"
     ]
   },
   {
@@ -91,17 +91,17 @@
     ]
   },
   {
-    "call": "A Reality server may need a newer client than the stock sing-box core: run the PostQ VPN install command again, it installs sing-box extended lite",
-    "key": "A Reality server may need a newer client than the stock sing-box core: run the PostQ VPN install command again, it installs sing-box extended lite",
+    "call": "A Reality server may need a newer client than the stock sing-box core: open Updates, select sing-box and install the extended lite build",
+    "key": "A Reality server may need a newer client than the stock sing-box core: open Updates, select sing-box and install the extended lite build",
     "places": [
-      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:75"
+      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:77"
     ]
   },
   {
     "call": "A server answered with the certificate of another site",
     "key": "A server answered with the certificate of another site",
     "places": [
-      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:73"
+      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:75"
     ]
   },
   {
@@ -122,21 +122,21 @@
     "call": "Add",
     "key": "Add",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:651"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:653"
     ]
   },
   {
     "call": "Add another",
     "key": "Add another",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:648"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:650"
     ]
   },
   {
     "call": "Add the PostQ routing",
     "key": "Add the PostQ routing",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:396"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:422"
     ]
   },
   {
@@ -178,7 +178,7 @@
     "call": "Another link for this subscription",
     "key": "Another link for this subscription",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:638"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:640"
     ]
   },
   {
@@ -199,21 +199,21 @@
     "call": "Auto",
     "key": "Auto",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1010"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1011"
     ]
   },
   {
     "call": "Auto, now %s",
     "key": "Auto, now %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1025"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1026"
     ]
   },
   {
     "call": "Auto: the fastest working server",
     "key": "Auto: the fastest working server",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1026"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1027"
     ]
   },
   {
@@ -227,7 +227,7 @@
     "call": "B",
     "key": "B",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94"
     ]
   },
   {
@@ -242,7 +242,7 @@
     "call": "Block and DNS rules",
     "key": "Block and DNS rules",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:493"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:519"
     ]
   },
   {
@@ -293,8 +293,9 @@
     "key": "Cancel",
     "places": [
       "../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:391",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:376",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:404"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:377",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:405",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:100"
     ]
   },
   {
@@ -311,14 +312,21 @@
     "call": "Change",
     "key": "Change",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:637"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:639"
+    ]
+  },
+  {
+    "call": "Change build",
+    "key": "Change build",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:892"
     ]
   },
   {
     "call": "Chat on web.postq.space",
     "key": "Chat on web.postq.space",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:570"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:572"
     ]
   },
   {
@@ -326,6 +334,13 @@
     "key": "Check",
     "places": [
       "src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:68"
+    ]
+  },
+  {
+    "call": "Check IPv6 advertisements on the home LAN on the main page",
+    "key": "Check IPv6 advertisements on the home LAN on the main page",
+    "places": [
+      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:62"
     ]
   },
   {
@@ -339,14 +354,14 @@
     "call": "Check the ping",
     "key": "Check the ping",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1221"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1222"
     ]
   },
   {
     "call": "Check the public key, short id and SNI of the server",
     "key": "Check the public key, short id and SNI of the server",
     "places": [
-      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:78"
+      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:80"
     ]
   },
   {
@@ -364,7 +379,7 @@
     "call": "Checking the ping…",
     "key": "Checking the ping…",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1221"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1222"
     ]
   },
   {
@@ -384,7 +399,7 @@
     "key": "Checking...",
     "places": [
       "src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:34",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:301",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:327",
       "../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:379"
     ]
   },
@@ -392,7 +407,7 @@
     "call": "Checking…",
     "key": "Checking…",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1289"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1290"
     ]
   },
   {
@@ -452,7 +467,7 @@
     "places": [
       "src/partials/modal/renderModal.ts:26",
       "src/postq/tabs/dashboard/initController.ts:791",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:171",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:188",
       "../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:74"
     ]
   },
@@ -488,14 +503,14 @@
     "call": "Connect",
     "key": "Connect",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:799"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:801"
     ]
   },
   {
     "call": "Connect PostQ VPN",
     "key": "Connect PostQ VPN",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:771"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:773"
     ]
   },
   {
@@ -517,7 +532,14 @@
     "call": "Copy the subscription link in the personal account and paste it here. The VPN starts working on every device at home.",
     "key": "Copy the subscription link in the personal account and paste it here. The VPN starts working on every device at home.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:775"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:777"
+    ]
+  },
+  {
+    "call": "Core build",
+    "key": "Core build",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:162"
     ]
   },
   {
@@ -539,7 +561,14 @@
     "call": "Could not check for updates: %s",
     "key": "Could not check for updates: %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:196"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:213"
+    ]
+  },
+  {
+    "call": "Could not save the home LAN IPv6 settings.",
+    "key": "Could not save the home LAN IPv6 settings.",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:84"
     ]
   },
   {
@@ -561,7 +590,7 @@
     "key": "day|days|days",
     "places": [
       "src/postq/tabs/dashboard/partials/renderSections.ts:181",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:620"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:622"
     ]
   },
   {
@@ -576,15 +605,15 @@
     "call": "Delete",
     "key": "Delete",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:656",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:665"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:658",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:667"
     ]
   },
   {
     "call": "Delete the subscription?",
     "key": "Delete the subscription?",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:661"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:663"
     ]
   },
   {
@@ -598,7 +627,14 @@
     "call": "Devices go to the internet directly",
     "key": "Devices go to the internet directly",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1301"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1302"
+    ]
+  },
+  {
+    "call": "Devices may connect over IPv6 outside the VPN.",
+    "key": "Devices may connect over IPv6 outside the VPN.",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:98"
     ]
   },
   {
@@ -612,7 +648,7 @@
     "call": "Diagnostics",
     "key": "Diagnostics",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:510",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:512",
       "../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:57",
       "../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:135"
     ]
@@ -628,8 +664,8 @@
     "call": "Directly",
     "key": "Directly",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:484",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:489"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:510",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:515"
     ]
   },
   {
@@ -695,8 +731,8 @@
     "call": "Domains",
     "key": "Domains",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:474",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:484"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:500",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:510"
     ]
   },
   {
@@ -719,8 +755,15 @@
     "call": "Download the log for support",
     "key": "Download the log for support",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1351",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1354"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1352",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1355"
+    ]
+  },
+  {
+    "call": "Enable",
+    "key": "Enable",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:104"
     ]
   },
   {
@@ -731,17 +774,24 @@
     ]
   },
   {
+    "call": "Enable IPv6 on the home LAN?",
+    "key": "Enable IPv6 on the home LAN?",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:97"
+    ]
+  },
+  {
     "call": "Ended on %s",
     "key": "Ended on %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:625"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:627"
     ]
   },
   {
     "call": "Ends soon",
     "key": "Ends soon",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:723"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:725"
     ]
   },
   {
@@ -839,8 +889,8 @@
     "places": [
       "src/postq/tabs/dashboard/initController.ts:310",
       "src/postq/tabs/dashboard/initController.ts:316",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:598",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:605"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:600",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:607"
     ]
   },
   {
@@ -860,7 +910,7 @@
       "src/postq/methods/custom/buildSubscriptionOutboundGroup.ts:111",
       "src/postq/methods/custom/getDashboardSections.ts:209",
       "src/postq/tabs/diagnostic/checks/runSectionsCheck.ts:56",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1010"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1011"
     ]
   },
   {
@@ -902,7 +952,7 @@
     "call": "GB",
     "key": "GB",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94"
     ]
   },
   {
@@ -934,6 +984,21 @@
     ]
   },
   {
+    "call": "Got it",
+    "key": "Got it",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:24"
+    ]
+  },
+  {
+    "call": "Home LAN IPv6 settings are unavailable.",
+    "key": "Home LAN IPv6 settings are unavailable.",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:62",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:70"
+    ]
+  },
+  {
     "call": "How the router finds the addresses of sites. If sites do not open, check the servers and pick one that answers.",
     "key": "How the router finds the addresses of sites. If sites do not open, check the servers and pick one that answers.",
     "places": [
@@ -958,14 +1023,14 @@
     "call": "In Telegram",
     "key": "In Telegram",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:574"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:576"
     ]
   },
   {
     "call": "In the personal account",
     "key": "In the personal account",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:569"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:571"
     ]
   },
   {
@@ -973,8 +1038,7 @@
     "key": "Install",
     "places": [
       "src/postq/tabs/manager/cards.ts:402",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:228",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:264"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:225"
     ]
   },
   {
@@ -985,14 +1049,15 @@
       "src/postq/tabs/manager/cards.ts:246",
       "src/postq/tabs/manager/cards.ts:292",
       "src/postq/tabs/manager/cards.ts:347",
-      "src/postq/tabs/manager/cards.ts:410"
+      "src/postq/tabs/manager/cards.ts:410",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:225"
     ]
   },
   {
     "call": "Installed",
     "key": "Installed",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:269"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:295"
     ]
   },
   {
@@ -1475,14 +1540,21 @@
     "call": "IPv6 handling matches the network",
     "key": "IPv6 handling matches the network",
     "places": [
-      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:65"
+      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:67"
     ]
   },
   {
-    "call": "IPv6 traffic goes around the tunnel: enable IPv6 in the settings",
-    "key": "IPv6 traffic goes around the tunnel: enable IPv6 in the settings",
+    "call": "IPv6 may interfere with the VPN",
+    "key": "IPv6 may interfere with the VPN",
     "places": [
-      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:58"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:18"
+    ]
+  },
+  {
+    "call": "IPv6 on the home LAN",
+    "key": "IPv6 on the home LAN",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:29"
     ]
   },
   {
@@ -1497,22 +1569,22 @@
     "call": "Its servers disappear from the list.",
     "key": "Its servers disappear from the list.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:663"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:665"
     ]
   },
   {
     "call": "KB",
     "key": "KB",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94"
     ]
   },
   {
     "call": "Keep the old settings",
     "key": "Keep the old settings",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:414",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:423"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:440",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:449"
     ]
   },
   {
@@ -1542,15 +1614,14 @@
     "places": [
       "src/postq/tabs/diagnostic/helpers/getPostqVersionRow.ts:46",
       "src/postq/tabs/manager/cards.ts:153",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:270"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:298"
     ]
   },
   {
     "call": "Latest version is installed",
     "key": "Latest version is installed",
     "places": [
-      "src/postq/tabs/manager/initController.ts:121",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:264"
+      "src/postq/tabs/manager/initController.ts:121"
     ]
   },
   {
@@ -1578,13 +1649,14 @@
     "call": "Lists",
     "key": "Lists",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:469"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:495"
     ]
   },
   {
     "call": "Loading...",
     "key": "Loading...",
     "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:14",
       "../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:28"
     ]
   },
@@ -1592,8 +1664,8 @@
     "call": "Log out",
     "key": "Log out",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:526",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:527"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:528",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:529"
     ]
   },
   {
@@ -1614,8 +1686,8 @@
     "call": "Manage the subscription",
     "key": "Manage the subscription",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:705",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:706"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:707",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:708"
     ]
   },
   {
@@ -1636,7 +1708,7 @@
     "call": "MB",
     "key": "MB",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94"
     ]
   },
   {
@@ -1678,7 +1750,7 @@
     "call": "New subscription",
     "key": "New subscription",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:651"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:653"
     ]
   },
   {
@@ -1693,14 +1765,14 @@
     "key": "no answer",
     "places": [
       "../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:201",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1045"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1046"
     ]
   },
   {
     "call": "No end date",
     "key": "No end date",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:628"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:630"
     ]
   },
   {
@@ -1729,7 +1801,7 @@
     "call": "No subscription: there are no servers yet",
     "key": "No subscription: there are no servers yet",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1302"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1303"
     ]
   },
   {
@@ -1846,14 +1918,28 @@
     "call": "now %s",
     "key": "now %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1139"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1140"
+    ]
+  },
+  {
+    "call": "Off — the VPN works more reliably",
+    "key": "Off — the VPN works more reliably",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:65"
     ]
   },
   {
     "call": "Old settings",
     "key": "Old settings",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:505"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:531"
+    ]
+  },
+  {
+    "call": "On — some services may connect outside the VPN",
+    "key": "On — some services may connect outside the VPN",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:64"
     ]
   },
   {
@@ -1925,8 +2011,8 @@
     "call": "Paste the subscription link https://…",
     "key": "Paste the subscription link https://…",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:334",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:763"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:335",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:765"
     ]
   },
   {
@@ -1959,22 +2045,29 @@
     "call": "Personal account",
     "key": "Personal account",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:556",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:808"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:558",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:810"
     ]
   },
   {
     "call": "Please wait...",
     "key": "Please wait...",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:407"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:433"
     ]
   },
   {
     "call": "PostQ settings",
     "key": "PostQ settings",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:506"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:532"
+    ]
+  },
+  {
+    "call": "PostQ turned off IPv6 advertisements on the home LAN. The router keeps its WAN settings.",
+    "key": "PostQ turned off IPv6 advertisements on the home LAN. The router keeps its WAN settings.",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:23"
     ]
   },
   {
@@ -1990,7 +2083,7 @@
     "call": "PostQ VPN has been updated",
     "key": "PostQ VPN has been updated",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:243"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:269"
     ]
   },
   {
@@ -2025,7 +2118,7 @@
     "call": "Preparing...",
     "key": "Preparing...",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1348"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1349"
     ]
   },
   {
@@ -2054,6 +2147,13 @@
     "key": "Read it before you send it: servers are shown as host-N and links, passwords and lists are hidden, but check that nothing of yours is left.",
     "places": [
       "src/postq/tabs/diagnostic/partials/renderSupportReport.ts:65"
+    ]
+  },
+  {
+    "call": "Reconnect devices to the home network to renew their addresses.",
+    "key": "Reconnect devices to the home network to renew their addresses.",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:82"
     ]
   },
   {
@@ -2102,14 +2202,14 @@
     "call": "Renew the subscription in the personal account so the VPN does not turn off.",
     "key": "Renew the subscription in the personal account so the VPN does not turn off.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:724"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:726"
     ]
   },
   {
     "call": "Renew the subscription in the personal account, then update it here.",
     "key": "Renew the subscription in the personal account, then update it here.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:719"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:721"
     ]
   },
   {
@@ -2130,15 +2230,15 @@
     "call": "Restart the VPN",
     "key": "Restart the VPN",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1371",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1372"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1372",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1373"
     ]
   },
   {
     "call": "Restarting…",
     "key": "Restarting…",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1234"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1235"
     ]
   },
   {
@@ -2187,14 +2287,14 @@
     "call": "Router settings",
     "key": "Router settings",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:516"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:518"
     ]
   },
   {
     "call": "Router settings (OpenWrt)",
     "key": "Router settings (OpenWrt)",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:517"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:519"
     ]
   },
   {
@@ -2250,7 +2350,7 @@
     "call": "Save",
     "key": "Save",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:640"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:642"
     ]
   },
   {
@@ -2299,21 +2399,21 @@
     "call": "Server",
     "key": "Server",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1206"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1207"
     ]
   },
   {
     "call": "Server · %s",
     "key": "Server · %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1205"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1206"
     ]
   },
   {
     "call": "Servers of one more subscription",
     "key": "Servers of one more subscription",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:649"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:651"
     ]
   },
   {
@@ -2327,7 +2427,7 @@
     "call": "Settings of the previous install",
     "key": "Settings of the previous install",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:509"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:535"
     ]
   },
   {
@@ -2365,7 +2465,7 @@
     "call": "sing-box core",
     "key": "sing-box core",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:868"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:870"
     ]
   },
   {
@@ -2414,7 +2514,7 @@
     "call": "Sites from the lists go through the VPN",
     "key": "Sites from the lists go through the VPN",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1304"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1305"
     ]
   },
   {
@@ -2435,7 +2535,7 @@
     "call": "Slower than the others: choose them only if the others do not work",
     "key": "Slower than the others: choose them only if the others do not work",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1195"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1196"
     ]
   },
   {
@@ -2460,6 +2560,13 @@
     ]
   },
   {
+    "call": "Some VPN servers do not support IPv6. Turning it off on the home LAN lets devices connect over IPv4. The router can still use IPv6 on the WAN.",
+    "key": "Some VPN servers do not support IPv6. Turning it off on the home LAN lets devices connect over IPv4. The router can still use IPv6 on the WAN.",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:40"
+    ]
+  },
+  {
     "call": "Sort by ping",
     "key": "Sort by ping",
     "places": [
@@ -2481,6 +2588,13 @@
     ]
   },
   {
+    "call": "Stock",
+    "key": "Stock",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:158"
+    ]
+  },
+  {
     "call": "Stop PostQ VPN",
     "key": "Stop PostQ VPN",
     "places": [
@@ -2498,22 +2612,22 @@
     "call": "Subnets",
     "key": "Subnets",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:479",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:489"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:505",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:515"
     ]
   },
   {
     "call": "Subscription",
     "key": "Subscription",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:682"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:684"
     ]
   },
   {
     "call": "Subscription active",
     "key": "Subscription active",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:685"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:687"
     ]
   },
   {
@@ -2527,7 +2641,7 @@
     "call": "Subscription ended",
     "key": "Subscription ended",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:684"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:686"
     ]
   },
   {
@@ -2541,9 +2655,9 @@
     "call": "Subscription link",
     "key": "Subscription link",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:335",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:640",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:764"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:336",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:642",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:766"
     ]
   },
   {
@@ -2558,7 +2672,7 @@
     "key": "Subscription updated",
     "places": [
       "src/postq/tabs/dashboard/initController.ts:306",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:597"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:599"
     ]
   },
   {
@@ -2572,7 +2686,7 @@
     "call": "Subscriptions moved to PostQ VPN",
     "key": "Subscriptions moved to PostQ VPN",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:514"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:540"
     ]
   },
   {
@@ -2586,7 +2700,7 @@
     "call": "Support",
     "key": "Support",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:565"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:567"
     ]
   },
   {
@@ -2649,7 +2763,7 @@
     "call": "TB",
     "key": "TB",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94"
     ]
   },
   {
@@ -2686,7 +2800,7 @@
     "call": "the fastest of the working ones",
     "key": "the fastest of the working ones",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1140"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1141"
     ]
   },
   {
@@ -2700,21 +2814,21 @@
     "call": "The latest version is installed",
     "key": "The latest version is installed",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:277"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:226"
     ]
   },
   {
     "call": "The list of servers has not been received yet: update the subscription.",
     "key": "The list of servers has not been received yet: update the subscription.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1329"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1330"
     ]
   },
   {
     "call": "The PostQ VPN and sing-box log in one file",
     "key": "The PostQ VPN and sing-box log in one file",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1344"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1345"
     ]
   },
   {
@@ -2723,7 +2837,7 @@
     "places": [
       "src/postq/tabs/diagnostic/partials/renderSupportReport.ts:56",
       "src/postq/tabs/diagnostic/partials/renderSupportReport.ts:71",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:352"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:378"
     ]
   },
   {
@@ -2751,14 +2865,21 @@
     "call": "The router has a global IPv6 address, IPv6 handling is off",
     "key": "The router has a global IPv6 address, IPv6 handling is off",
     "places": [
-      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:57"
+      "src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:61"
     ]
   },
   {
     "call": "The saved settings could not be applied",
     "key": "The saved settings could not be applied",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:415"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:441"
+    ]
+  },
+  {
+    "call": "The selected build will replace the installed core.",
+    "key": "The selected build will replace the installed core.",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:227"
     ]
   },
   {
@@ -2772,7 +2893,7 @@
     "call": "The servers appear once you add a subscription.",
     "key": "The servers appear once you add a subscription.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1312"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1313"
     ]
   },
   {
@@ -2800,7 +2921,7 @@
     "call": "The sing-box core has been updated to %s",
     "key": "The sing-box core has been updated to %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:253"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:279"
     ]
   },
   {
@@ -2821,44 +2942,44 @@
     "call": "The VPN stopped working",
     "key": "The VPN stopped working",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:718"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:720"
     ]
   },
   {
     "call": "The VPN stops until a subscription is added.",
     "key": "The VPN stops until a subscription is added.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:664"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:666"
     ]
   },
   {
     "call": "The VPN stops working",
     "key": "The VPN stops working",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:657"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:659"
     ]
   },
   {
     "call": "This router had its own NetShift settings.",
     "key": "This router had its own NetShift settings.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:511"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:537"
     ]
   },
   {
     "call": "This takes a few seconds",
     "key": "This takes a few seconds",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1296"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1297"
     ]
   },
   {
     "call": "Through the VPN",
     "key": "Through the VPN",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:469",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:474",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:479"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:495",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:500",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:505"
     ]
   },
   {
@@ -2889,8 +3010,8 @@
       "src/postq/tabs/dashboard/initController.ts:461",
       "src/postq/tabs/dashboard/partials/renderSections.ts:168",
       "src/postq/tabs/dashboard/partials/renderSections.ts:169",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:729",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:732"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:731",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:734"
     ]
   },
   {
@@ -2915,38 +3036,45 @@
     ]
   },
   {
+    "call": "Turn it off if some services do not open through the VPN.",
+    "key": "Turn it off if some services do not open through the VPN.",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:19"
+    ]
+  },
+  {
     "call": "Turn the VPN off",
     "key": "Turn the VPN off",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1256"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1257"
     ]
   },
   {
     "call": "Turn the VPN on",
     "key": "Turn the VPN on",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1256"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1257"
     ]
   },
   {
     "call": "Turn the VPN on to choose a server.",
     "key": "Turn the VPN on to choose a server.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1325"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1326"
     ]
   },
   {
     "call": "Turning off…",
     "key": "Turning off…",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1234"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1235"
     ]
   },
   {
     "call": "Turning on…",
     "key": "Turning on…",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1234"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1235"
     ]
   },
   {
@@ -2987,7 +3115,7 @@
     "call": "Unlimited",
     "key": "Unlimited",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:735"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:737"
     ]
   },
   {
@@ -3001,7 +3129,7 @@
     "call": "Until %s · %s left",
     "key": "Until %s · %s left",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:626"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:628"
     ]
   },
   {
@@ -3012,14 +3140,14 @@
       "src/postq/tabs/manager/cards.ts:292",
       "src/postq/tabs/manager/cards.ts:347",
       "src/postq/tabs/manager/cards.ts:411",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:891"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:892"
     ]
   },
   {
     "call": "Update failed: %s",
     "key": "Update failed: %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:232"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:258"
     ]
   },
   {
@@ -3047,7 +3175,7 @@
     "call": "Update the subscription",
     "key": "Update the subscription",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:752"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:754"
     ]
   },
   {
@@ -3061,8 +3189,8 @@
     "call": "Updates",
     "key": "Updates",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:341",
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:502"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:367",
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:504"
     ]
   },
   {
@@ -3083,14 +3211,14 @@
     "call": "Updating the subscription…",
     "key": "Updating the subscription…",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:751"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:753"
     ]
   },
   {
     "call": "Updating, do not close the page...",
     "key": "Updating, do not close the page...",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:217"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:242"
     ]
   },
   {
@@ -3189,7 +3317,7 @@
     "call": "via %s",
     "key": "via %s",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1029"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1030"
     ]
   },
   {
@@ -3218,28 +3346,28 @@
     "call": "VPN is off",
     "key": "VPN is off",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1292"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1293"
     ]
   },
   {
     "call": "VPN is on",
     "key": "VPN is on",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1291"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1292"
     ]
   },
   {
     "call": "VPN server",
     "key": "VPN server",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1227"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1228"
     ]
   },
   {
     "call": "Waiting for the panel's answer",
     "key": "Waiting for the panel's answer",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:621"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:623"
     ]
   },
   {
@@ -3257,10 +3385,17 @@
     ]
   },
   {
+    "call": "Why is that?",
+    "key": "Why is that?",
+    "places": [
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:39"
+    ]
+  },
+  {
     "call": "Will be added (marked with +)",
     "key": "Will be added (marked with +)",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:526"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:552"
     ]
   },
   {
@@ -3283,7 +3418,7 @@
     "call": "You can add your routing and DNS to the PostQ settings. Nothing else is carried over.",
     "key": "You can add your routing and DNS to the PostQ settings. Nothing else is carried over.",
     "places": [
-      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:520"
+      "../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:546"
     ]
   }
 ]

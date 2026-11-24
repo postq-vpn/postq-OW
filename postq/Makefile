@@ -66,6 +66,10 @@ define Package/postq/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/etc/uci-defaults/60_postq-profile $(1)/etc/uci-defaults/60_postq-profile
 
+	$(INSTALL_DIR) $(1)/usr/libexec $(1)/lib/upgrade/keep.d
+	$(INSTALL_BIN) ./files/usr/libexec/postq-lan-ipv6 $(1)/usr/libexec/postq-lan-ipv6
+	$(INSTALL_DATA) ./files/lib/upgrade/keep.d/postq-lan-ipv6 $(1)/lib/upgrade/keep.d/postq-lan-ipv6
+
 	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_BIN) ./files/usr/bin/postq $(1)/usr/bin/postq
 

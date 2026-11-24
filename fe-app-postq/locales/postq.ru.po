@@ -1,15 +1,15 @@
 # RU translations for POSTQ package.
 # Copyright (C) 2026 THE POSTQ'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the POSTQ package.
-# postQuintus, 2026.
+# PostqVPN, 2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: POSTQ\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-15 22:35+0300\n"
-"PO-Revision-Date: 2026-11-15 22:35+0300\n"
-"Last-Translator: postQuintus\n"
+"POT-Creation-Date: 2026-11-24 12:06+0300\n"
+"PO-Revision-Date: 2026-11-24 12:06+0300\n"
+"Last-Translator: PostqVPN\n"
 "Language-Team: none\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -56,8 +56,8 @@ msgstr "Доступна новая версия"
 msgid "A path is only allowed for doh and doh3"
 msgstr "Путь допустим только для doh и doh3"
 
-msgid "A Reality server may need a newer client than the stock sing-box core: run the PostQ VPN install command again, it installs sing-box extended lite"
-msgstr "Серверу Reality может требоваться более новый клиент, чем шлёт обычное ядро sing-box: выполните команду установки PostQ VPN ещё раз, она поставит sing-box extended lite"
+msgid "A Reality server may need a newer client than the stock sing-box core: open Updates, select sing-box and install the extended lite build"
+msgstr "Серверу Reality может требоваться более новое ядро. Откройте «Обновления» → «sing-box» и установите Extended Lite."
 
 msgid "A server answered with the certificate of another site"
 msgstr "Сервер ответил сертификатом другого сайта"
@@ -149,11 +149,17 @@ msgstr "Не удалось получить результаты проверк
 msgid "Change"
 msgstr "Изменить"
 
+msgid "Change build"
+msgstr "Сменить сборку"
+
 msgid "Chat on web.postq.space"
 msgstr "Чат на web.postq.space"
 
 msgid "Check"
 msgstr "Проверить"
+
+msgid "Check IPv6 advertisements on the home LAN on the main page"
+msgstr "Проверьте настройку IPv6 домашней сети на главной странице"
 
 msgid "Check servers"
 msgstr "Проверить серверы"
@@ -230,6 +236,9 @@ msgstr "Копировать"
 msgid "Copy the subscription link in the personal account and paste it here. The VPN starts working on every device at home."
 msgstr "Скопируйте ссылку на подписку в личном кабинете и вставьте её сюда. VPN заработает на всех устройствах дома."
 
+msgid "Core build"
+msgstr "Сборка ядра"
+
 msgid "Core switch failed"
 msgstr "Не удалось переключить ядро"
 
@@ -238,6 +247,9 @@ msgstr "Истекло время ожидания переключения яд
 
 msgid "Could not check for updates: %s"
 msgstr "Не удалось проверить обновления: %s"
+
+msgid "Could not save the home LAN IPv6 settings."
+msgstr "Не удалось сохранить настройки IPv6 домашней сети."
 
 msgid "Currently unavailable"
 msgstr "Временно недоступно"
@@ -262,6 +274,9 @@ msgstr "Dev"
 
 msgid "Devices go to the internet directly"
 msgstr "Устройства выходят в интернет напрямую"
+
+msgid "Devices may connect over IPv6 outside the VPN."
+msgstr "Устройства смогут подключаться по IPv6 в обход VPN."
 
 msgid "DHCP has DNS server"
 msgstr "DHCP содержит DNS сервер"
@@ -311,8 +326,14 @@ msgstr "Скачать"
 msgid "Download the log for support"
 msgstr "Скачать журнал для поддержки"
 
+msgid "Enable"
+msgstr "Включить"
+
 msgid "Enable autostart"
 msgstr "Включить автостарт"
+
+msgid "Enable IPv6 on the home LAN?"
+msgstr "Включить IPv6 в домашней сети?"
 
 msgid "Ended on %s"
 msgstr "Закончилась %s"
@@ -388,6 +409,12 @@ msgstr "Идёт напрямую, мимо секций"
 
 msgid "Goes through the section"
 msgstr "Идёт через секцию"
+
+msgid "Got it"
+msgstr "Понятно"
+
+msgid "Home LAN IPv6 settings are unavailable."
+msgstr "Настройки IPv6 домашней сети недоступны."
 
 msgid "How the router finds the addresses of sites. If sites do not open, check the servers and pick one that answers."
 msgstr "Через этот сервер роутер узнаёт адреса сайтов. Если сайты не открываются, проверьте серверы и выберите тот, что отвечает."
@@ -617,8 +644,11 @@ msgstr "IPv6 CIDR должен быть от 0 до 128"
 msgid "IPv6 handling matches the network"
 msgstr "Обработка IPv6 соответствует сети"
 
-msgid "IPv6 traffic goes around the tunnel: enable IPv6 in the settings"
-msgstr "IPv6-трафик идёт мимо туннеля: включите IPv6 в настройках"
+msgid "IPv6 may interfere with the VPN"
+msgstr "IPv6 может мешать VPN"
+
+msgid "IPv6 on the home LAN"
+msgstr "IPv6 в домашней сети"
 
 msgid "Issues detected"
 msgstr "Обнаружены проблемы"
@@ -767,8 +797,14 @@ msgstr "Сейчас"
 msgid "now %s"
 msgstr "сейчас %s"
 
+msgid "Off — the VPN works more reliably"
+msgstr "Отключён — так VPN работает надёжнее"
+
 msgid "Old settings"
 msgstr "Старые настройки"
+
+msgid "On — some services may connect outside the VPN"
+msgstr "Включён — часть сервисов может открываться мимо VPN"
 
 msgid "on schedule"
 msgstr "по расписанию"
@@ -818,6 +854,9 @@ msgstr "Подождите..."
 msgid "PostQ settings"
 msgstr "Настройки PostQ"
 
+msgid "PostQ turned off IPv6 advertisements on the home LAN. The router keeps its WAN settings."
+msgstr "PostQ отключил раздачу IPv6 в домашней сети. Настройки подключения роутера к провайдеру сохранены."
+
 msgid "PostQ VPN"
 msgstr "PostQ VPN"
 
@@ -850,6 +889,9 @@ msgstr "Прокси-трафик направляется через FakeIP"
 
 msgid "Read it before you send it: servers are shown as host-N and links, passwords and lists are hidden, but check that nothing of yours is left."
 msgstr "Прочитайте перед отправкой: серверы показаны как host-N, ссылки, пароли и списки скрыты, но проверьте, не осталось ли что-то ваше."
+
+msgid "Reconnect devices to the home network to renew their addresses."
+msgstr "Переподключите устройства к домашней сети, чтобы обновить их адреса."
 
 msgid "Refresh all subscriptions"
 msgstr "Обновить все подписки"
@@ -1022,6 +1064,9 @@ msgstr "Снимков"
 msgid "Some rules depend on the client address, traffic type or lists that are not available here and were skipped. Enter the address of the device for a precise answer."
 msgstr "Часть правил зависит от адреса клиента, типа трафика или списков, недоступных здесь, и была пропущена. Для точного ответа укажите адрес устройства."
 
+msgid "Some VPN servers do not support IPv6. Turning it off on the home LAN lets devices connect over IPv4. The router can still use IPv6 on the WAN."
+msgstr "Некоторые VPN-серверы не поддерживают IPv6. Если отключить его в домашней сети, устройства смогут подключаться по IPv4. Сам роутер по-прежнему сможет использовать IPv6 для подключения к провайдеру."
+
 msgid "Sort by ping"
 msgstr "Сортировать по пингу"
 
@@ -1030,6 +1075,9 @@ msgstr "Запустить PostQ VPN"
 
 msgid "started by hand"
 msgstr "запущено вручную"
+
+msgid "Stock"
+msgstr "Обычная"
 
 msgid "Stop PostQ VPN"
 msgstr "Остановить PostQ VPN"
@@ -1148,6 +1196,9 @@ msgstr "У роутера есть глобальный адрес IPv6, а об
 msgid "The saved settings could not be applied"
 msgstr "Не удалось применить сохранённые настройки"
 
+msgid "The selected build will replace the installed core."
+msgstr "Выбранная сборка заменит текущее ядро."
+
 msgid "The server must be an IP address, optionally with #port"
 msgstr "Сервер должен быть IP-адресом, при необходимости с #портом"
 
@@ -1210,6 +1261,9 @@ msgstr "Устранение неполадок"
 
 msgid "TUIC needs a sing-box core built with QUIC"
 msgstr "TUIC требует ядро sing-box, собранное с QUIC"
+
+msgid "Turn it off if some services do not open through the VPN."
+msgstr "Отключите его, если какие-то сервисы не открываются через VPN."
 
 msgid "Turn the VPN off"
 msgstr "Выключить VPN"
@@ -1336,6 +1390,9 @@ msgstr "Что нового в этой сборке"
 
 msgid "Where will a request go"
 msgstr "Куда пойдёт запрос"
+
+msgid "Why is that?"
+msgstr "Почему так"
 
 msgid "Will be added (marked with +)"
 msgstr "Будет добавлено (отмечено +)"

@@ -51,13 +51,15 @@ export function getEnvironmentItems(
     });
   }
 
-  if (data.ipv6.router_has_global && !data.ipv6.postq_enabled) {
+  if (
+    data.ipv6.router_has_global &&
+    !data.ipv6.postq_enabled &&
+    data.ipv6.lan_advertises !== false
+  ) {
     items.push({
       state: 'warning',
       key: _('The router has a global IPv6 address, IPv6 handling is off'),
-      value: _(
-        'IPv6 traffic goes around the tunnel: enable IPv6 in the settings',
-      ),
+      value: _('Check IPv6 advertisements on the home LAN on the main page'),
     });
   } else {
     items.push({
@@ -73,7 +75,7 @@ export function getEnvironmentItems(
       key: _('A server answered with the certificate of another site'),
       value: data.reality.stock_core
         ? _(
-            'A Reality server may need a newer client than the stock sing-box core: run the PostQ VPN install command again, it installs sing-box extended lite',
+            'A Reality server may need a newer client than the stock sing-box core: open Updates, select sing-box and install the extended lite build',
           )
         : _('Check the public key, short id and SNI of the server'),
     });

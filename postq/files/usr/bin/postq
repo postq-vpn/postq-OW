@@ -8727,6 +8727,14 @@ check_environment() {
     ntp_enabled="$(uci -q get system.ntp.enabled 2> /dev/null)"
     [ "$ntp_enabled" = "0" ] || ntp_enabled=1
 
+    local lan_section lan_advertises=null
+    if [ -r "$POSTQ_LIB/lan_ipv6.sh" ]; then
+        . "$POSTQ_LIB/lan_ipv6.sh"
+        if lan_section=$(lan_ipv6_section); then
+            lan_advertises=false
+            lan_ipv6_enabled "$lan_section" && lan_advertises=true
+        fi
+    fi
     ipv6_global=0
     if ip -6 addr show scope global 2> /dev/null | grep 'inet6' | grep -vqE 'inet6 f[cd]'; then
         ipv6_global=1
@@ -8753,6 +8761,7 @@ check_environment() {
         --arg zone "$zone" \
         --arg timezone "$timezone" \
         --argjson ntp "$([ "$ntp_enabled" = "1" ] && echo true || echo false)" \
+        --argjson lan_advertises "$lan_advertises" \
         --argjson ipv6_global "$([ "$ipv6_global" -eq 1 ] && echo true || echo false)" \
         --argjson ipv6_enabled "$([ "$ipv6_enabled" -eq 1 ] && echo true || echo false)" \
         --argjson reality_rejected "$reality_rejected" \
@@ -8761,7 +8770,7 @@ check_environment() {
             flow_offloading: {software: $flow_software, hardware: $flow_hardware, active: $flow_active},
             clock: {plausible: $plausible, skew_seconds: (if $skew == "" then null else ($skew | tonumber) end),
                     ntp_enabled: $ntp, timezone: (if $zone != "" then $zone else $timezone end)},
-            ipv6: {router_has_global: $ipv6_global, postq_enabled: $ipv6_enabled},
+            ipv6: {router_has_global: $ipv6_global, postq_enabled: $ipv6_enabled, lan_advertises: $lan_advertises},
             reality: {rejected: $reality_rejected, stock_core: $core_stock}
         }'
 }
@@ -9492,6 +9501,10 @@ get_pin_guard_events)
 dns_benchmark)
     shift
     dns_benchmark "$@"
+    ;;
+lan_ipv6_status)
+    . "$POSTQ_LIB/lan_ipv6.sh"
+    lan_ipv6_status
     ;;
 get_subscription_info)
     get_subscription_info

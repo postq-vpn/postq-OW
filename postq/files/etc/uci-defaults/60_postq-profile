@@ -216,6 +216,19 @@ release="$(. /etc/openwrt_release 2>/dev/null && printf '%s' "$DISTRIB_RELEASE")
 # last, after the block and DNS sections brought back from an earlier setup
 uci reorder postq.direct=1
 uci reorder postq.main=99
-uci commit postq
+uci commit postq || exit 1
 
-exit 0
+# An earlier local build shipped a router-wide policy. If opkg left its
+# unmodified file behind, retire it. Existing interfaces recover their own
+# network settings at boot; enabling IPv6 everywhere now would override them.
+legacy=/etc/sysctl.d/99-postq-ipv4-only.conf
+if [ -f "$legacy" ] && cmp -s "$legacy" - <<'OLD_POLICY'
+# Disable IPv6 on interfaces present now and on interfaces created later.
+net.ipv6.conf.default.disable_ipv6=1
+net.ipv6.conf.all.disable_ipv6=1
+OLD_POLICY
+then
+    rm -f "$legacy" || exit 1
+fi
+
+/usr/libexec/postq-lan-ipv6 first

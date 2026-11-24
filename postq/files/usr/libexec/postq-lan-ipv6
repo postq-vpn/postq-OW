@@ -1,0 +1,74 @@
+#!/bin/sh
+. /usr/lib/postq/lan_ipv6.sh
+set -eu
+umask 077
+
+action=${1:-}
+case "$action" in first|on|off|accept) ;; *) exit 2 ;; esac
+state=/etc/postq/lan-ipv6.json
+mkdir -p /etc/postq /var/lock
+exec 9>/var/lock/postq-lan-ipv6.lock
+flock -x 9
+record='{}'
+if [ -f "$state" ]; then
+    record=$(jq -ce 'select(type == "object")' "$state")
+    if [ "$action" = first ] && [ "$(echo "$record" | jq -r '.pending // ""')" != first ]; then
+        exit 0
+    fi
+fi
+
+save() {
+    printf '%s\n' "$record" > "$state.tmp" && mv -f "$state.tmp" "$state"
+}
+
+if [ "$action" = accept ]; then
+    [ -f "$state" ] || exit 0
+    record=$(echo "$record" | jq -c '.notice = false')
+    save
+    exit 0
+fi
+if ! section=$(lan_ipv6_section); then
+    [ "$action" = first ] && exit 0
+    exit 1
+fi
+# Do not commit unrelated edits another UCI client has staged.
+[ -z "$(uci -q changes dhcp)" ] || exit 1
+if [ "$action" = on ] && lan_ipv6_enabled "$section" &&
+    [ "$(echo "$record" | jq -r '.pending // ""')" != on ]; then
+    exit 0
+fi
+if [ "$action" = first ] && ! lan_ipv6_enabled "$section" &&
+    [ "$(echo "$record" | jq -r '.pending // ""')" != first ]; then
+    save
+    exit 0
+fi
+if [ "$action" != on ] && lan_ipv6_enabled "$section"; then
+    record=$(jq -nc --arg ra "$(uci -q get "dhcp.$section.ra")" \
+        --arg dhcpv6 "$(uci -q get "dhcp.$section.dhcpv6")" \
+        --arg ndp "$(uci -q get "dhcp.$section.ndp")" \
+        '{saved:{ra:$ra,dhcpv6:$dhcpv6,ndp:$ndp}}')
+fi
+record=$(echo "$record" | jq -c --arg action "$action" '.pending = $action')
+save
+
+# Private delta directory: an error before commit leaves no partial UCI edits.
+delta=$(mktemp -d)
+trap 'rm -rf "$delta"' EXIT
+for option in ra dhcpv6 ndp; do
+    value=disabled
+    if [ "$action" = on ]; then
+        value=$(echo "$record" | jq -r --arg opt "$option" '(.saved // {ra:"server",dhcpv6:"server"})[$opt] // ""')
+    fi
+    key="dhcp.$section.$option"
+    if [ -n "$value" ]; then
+        uci -t "$delta" set "$key=$value"
+    elif uci -t "$delta" -q get "$key" >/dev/null; then
+        uci -t "$delta" delete "$key"
+    fi
+done
+uci -t "$delta" commit dhcp
+if /etc/init.d/odhcpd running >/dev/null 2>&1; then
+    /etc/init.d/odhcpd reload 9>&-
+fi
+record=$(echo "$record" | jq -c --arg action "$action" 'del(.pending) | .notice = ($action == "first")')
+save

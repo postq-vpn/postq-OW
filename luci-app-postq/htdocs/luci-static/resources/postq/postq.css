@@ -692,6 +692,96 @@ body.pq-page .pq-core {
   border-top: 1px solid var(--rd-divider);
 }
 
+/* Home LAN IPv6 uses the same 44 × 26 switch as the XKeen panel. */
+body.pq-page .pq-ipv6 {
+  border-top: 1px solid var(--rd-divider);
+  padding-top: var(--rd-space-card);
+}
+
+body.pq-page .pq-ipv6__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rd-space-group);
+}
+
+body.pq-page .pq-ipv6__titles {
+  display: grid;
+  gap: var(--rd-space-title);
+}
+
+body.pq-page .pq-ipv6 label {
+  color: var(--rd-heading);
+  cursor: pointer;
+}
+
+body.pq-page .pq-ipv6__switch {
+  position: relative;
+  flex: 0 0 44px;
+  height: 26px;
+  margin-top: 2px;
+}
+
+body.pq-page .pq-ipv6__switch input {
+  position: absolute;
+  z-index: 1;
+  inset: -9px 0;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+body.pq-page .pq-ipv6__track {
+  display: block;
+  height: 100%;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--rd-chip-hover);
+  transition: background-color .2s;
+}
+
+body.pq-page .pq-ipv6__track::after {
+  content: "";
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .2);
+  transition: transform .2s;
+}
+
+body.pq-page .pq-ipv6 input:checked + span { background: var(--rd-action); }
+body.pq-page .pq-ipv6 input:checked + span::after { transform: translateX(18px); }
+body.pq-page .pq-ipv6 input:focus-visible + span { outline: 2px solid var(--rd-action); outline-offset: 2px; }
+body.pq-page .pq-ipv6 input:disabled { cursor: not-allowed; }
+body.pq-page .pq-ipv6 input:disabled + span { opacity: .5; }
+body.pq-page .pq-ipv6 [hidden], body.pq-page .pq-ipv6 p:empty { display: none; }
+
+body.pq-page .pq-ipv6 summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+}
+
+body.pq-page .pq-ipv6 summary::-webkit-details-marker { display: none; }
+body.pq-page .pq-ipv6 summary::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-2px) rotate(45deg);
+}
+body.pq-page .pq-ipv6 details[open] summary::after { transform: translateY(2px) rotate(225deg); }
+body.pq-page .pq-ipv6 details p { padding-top: var(--rd-space-item); }
+@media (prefers-reduced-motion: reduce) {
+  body.pq-page .pq-ipv6__track, body.pq-page .pq-ipv6__track::after { transition: none; }
+}
+
 body.pq-page .pq-notice {
   display: flex;
   align-items: flex-start;
@@ -1549,6 +1639,59 @@ body.pq-page .pq-seg__dot::after {
   border-radius: 999px;
   background: var(--rd-action);
 }
+
+body.pq-page .pq-core-builds {
+  min-width: 0;
+  margin: 0 0 var(--rd-space-group);
+  padding: 0;
+  border: 0;
+}
+body.pq-page .pq-core-builds[hidden] { display: none; }
+body.pq-page .pq-core-builds legend {
+  width: auto;
+  margin: 0 0 var(--rd-space-item);
+  padding: 0;
+  border: 0;
+  font: 500 14px/20px var(--rd-font-text);
+}
+body.pq-page .pq-core-builds__options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--rd-radius-btn);
+  background: var(--rd-field);
+}
+body.pq-page .pq-core-builds label { position: relative; margin: 0; }
+body.pq-page .pq-core-builds input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+body.pq-page .pq-core-builds span {
+  display: grid;
+  min-height: 44px;
+  padding: 4px;
+  place-items: center;
+  border-radius: var(--rd-radius-sm);
+  color: var(--rd-caption);
+  text-align: center;
+  font: 500 14px/18px var(--rd-font-text);
+}
+body.pq-page .pq-core-builds input:checked + span {
+  background: var(--rd-action-soft);
+  color: var(--rd-on-soft);
+}
+body.pq-page .pq-core-builds input:focus-visible + span {
+  outline: 2px solid var(--rd-action);
+  outline-offset: -2px;
+}
+body.pq-page .pq-core-builds input:disabled { cursor: not-allowed; }
+body.pq-page .pq-core-builds input:disabled + span { opacity: .5; }
 
 body.pq-page .pq-upd {
   display: flex;

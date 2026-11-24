@@ -30,6 +30,9 @@
       ]
     },
     "write": {
+      "file": {
+        "/usr/libexec/postq-lan-ipv6": ["exec"]
+      },
       "uci": [
         "postq"
       ]

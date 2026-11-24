@@ -21856,6 +21856,58 @@ test_core_caps() {
     rm -rf "$work"
 }
 
+test_home_lan_ipv6() {
+    header "IPv6 advertisements: first application, upgrade and restore on the home LAN"
+    local work
+    work="$(mktemp -d)" || return 1
+    if (
+        set -e
+        mkdir -p "$work/config" "$work/bin"
+        export IPV6_TEST_CONFIG="$work/config"
+        printf '#!/bin/sh\nexec /sbin/uci -c "$IPV6_TEST_CONFIG" "$@"\n' > "$work/bin/uci"
+        chmod +x "$work/bin/uci"
+        export PATH="$work/bin:$PATH"
+        sed -e "s|/usr/lib/postq/lan_ipv6.sh|$work/lib.sh|" \
+            -e "s|/etc/postq|$work/state|g" -e "s|/var/lock|$work/lock|g" \
+            -e "s|/etc/init.d/odhcpd|$work/service|g" \
+            "$POSTQ_SRC/usr/libexec/postq-lan-ipv6" > "$work/change"
+        sed "s|/etc/postq|$work/state|g" "$POSTQ_LIB_DIR/lan_ipv6.sh" > "$work/lib.sh"
+        . "$work/lib.sh"
+        printf '#!/bin/sh\nexit 0\n' > "$work/service"
+        chmod +x "$work/service"
+        cat > "$work/config/dhcp" <<'LAN'
+config dhcp 'home'
+ option interface 'lan'
+ option ra 'hybrid'
+ option ndp 'relay'
+config dhcp 'guest'
+ option interface 'guest'
+ option ra 'server'
+LAN
+        sh "$work/change" first || exit 1
+        lan_ipv6_status | jq -e '.available and .notice and (.enabled == false)' || exit 1
+        [ "$(uci get dhcp.guest.ra)" = server ] || exit 1
+        sh "$work/change" accept || exit 1
+        sh "$work/change" on || exit 1
+        sh "$work/change" first || exit 1
+        [ "$(uci get dhcp.home.ra)" = hybrid ] && [ "$(uci get dhcp.home.ndp)" = relay ] || exit 1
+        if uci -q get dhcp.home.dhcpv6; then exit 1; fi
+        lan_ipv6_status | jq -e '.enabled and (.notice == false)' || exit 1
+        sh "$work/change" off || exit 1
+        uci set dhcp.home.ra=server && uci commit dhcp || exit 1
+        sh "$work/change" first || exit 1
+        [ "$(uci get dhcp.home.ra)" = server ] || exit 1
+        sh "$work/change" off || exit 1
+        sh "$work/change" on || exit 1
+        [ "$(uci get dhcp.home.ra)" = server ]
+    ) >/dev/null; then
+        pass "restores exact LAN modes, preserves other networks and respects later choices"
+    else
+        fail "LAN IPv6 settings did not round-trip"
+    fi
+    rm -rf "$work"
+}
+
 test_ipv6_dns_policy() {
     header "IPv6 answers of a section (ipv6_dns_policy=real)"
 

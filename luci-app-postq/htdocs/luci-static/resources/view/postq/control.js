@@ -109,8 +109,7 @@ function renderNotes(markdown) {
   return out;
 }
 
-// The core's check and install follow the flavour in place: the same actions
-// the component manager of the full UI uses.
+// Each build has its own release source and installer.
 const CORE_ACTIONS = {
   extended_lite: ["check_update_lite", "install_extended_lite"],
   extended: ["check_update", "install_extended"],
@@ -134,6 +133,7 @@ async function loadVersions() {
     variant: data.sing_box_variant || "stock",
     postqVersion: data.postq_version || "",
     coreVersion: data.sing_box_version || "",
+    liteSupported: data.sing_box_lite_supported !== 0,
     outdated: {
       app: isOutdated(checks.postq),
       core: isOutdated(checks.sing_box),
@@ -154,6 +154,23 @@ function openUpdates(kind, versions, onUpdated) {
   let installing = false;
   let current = kind;
   let run = 0;
+
+  const names = { stock: _("Stock"), extended_lite: "Extended Lite", extended: "Extended" };
+  const installed = Object.hasOwn(CORE_ACTIONS, versions.variant) ? versions.variant : "stock";
+  let selected = installed;
+  const builds = E("fieldset", { class: "pq-core-builds" }, [
+    E("legend", { class: "pq-upd__label" }, _("Core build")),
+    E("div", { class: "pq-core-builds__options" }, Object.entries(names).map(([variant, name]) => {
+      const input = E("input", { type: "radio", name: "pq-core-build", value: variant });
+      input.checked = variant === selected;
+      input.disabled = variant === "extended_lite" && versions.liteSupported === false;
+      input.addEventListener("change", () => {
+        selected = variant;
+        check("core");
+      });
+      return E("label", {}, [input, E("span", {}, name)]);
+    })),
+  ]);
 
   function closeBtn() {
     return E(
@@ -185,7 +202,7 @@ function openUpdates(kind, versions, onUpdated) {
     }
 
     return main.PostQShellMethods.singBoxComponentAction(
-      actionsFor(versions.variant)[1],
+      actionsFor(selected)[1],
     );
   }
 
@@ -203,15 +220,23 @@ function openUpdates(kind, versions, onUpdated) {
     }
 
     const outdated = result.status === "outdated";
+    const switching = which === "core" && selected !== installed;
+    const canInstall = outdated || switching || result.status === "not_installed";
+    const installLabel = switching ? _("Install %s").format(names[selected]) : _("Install");
+    let statusText = _("The latest version is installed");
+    if (switching) statusText = _("The selected build will replace the installed core.");
+    else if (canInstall) statusText = _("A new version is available");
+
     const installBtn = E(
       "button",
       {
         type: "button",
         class: "pq-btn",
-        disabled: outdated ? null : "",
+        disabled: canInstall ? null : "",
         click: async (ev) => {
           ev.preventDefault();
           installing = true;
+          builds.disabled = true;
           installBtn.disabled = true;
           tabs.querySelectorAll("button").forEach((b) => (b.disabled = true));
           installBtn.textContent = _("Updating, do not close the page...");
@@ -222,10 +247,11 @@ function openUpdates(kind, versions, onUpdated) {
           }));
 
           installing = false;
+          builds.disabled = false;
           tabs.querySelectorAll("button").forEach((b) => (b.disabled = false));
           if (!done || !done.success) {
             installBtn.disabled = false;
-            installBtn.textContent = _("Install");
+            installBtn.textContent = installLabel;
             ui.addNotification(
               null,
               E("p", [
@@ -261,29 +287,28 @@ function openUpdates(kind, versions, onUpdated) {
           }
         },
       },
-      outdated ? _("Install") : _("Latest version is installed"),
+      installLabel,
     );
 
     body.replaceChildren(
       E("div", { class: "pq-upd__rows" }, [
-        row(_("Installed"), result.current_version),
+        row(_("Installed"), which === "core" && versions.coreVersion
+          ? `${names[installed]} · ${versions.coreVersion}`
+          : result.current_version),
         row(_("Latest"), result.latest_version),
       ]),
       E(
         "p",
         { class: `pq-upd__status${outdated ? " pq-upd__status--new" : ""}` },
-        outdated
-          ? _("A new version is available")
-          : _("The latest version is installed"),
+        statusText,
       ),
       result.notes
         ? E("div", { class: "pq-upd__notes" }, renderNotes(result.notes))
         : "",
-      // nothing to install on the latest version: just Close
       E(
         "div",
         { class: "pq-upd__actions" },
-        outdated ? [closeBtn(), installBtn] : [closeBtn()],
+        canInstall ? [closeBtn(), installBtn] : [closeBtn()],
       ),
     );
   }
@@ -292,6 +317,7 @@ function openUpdates(kind, versions, onUpdated) {
     const mine = ++run;
 
     current = which;
+    builds.hidden = which !== "core";
     tabs.querySelectorAll("button").forEach((b) => {
       b.setAttribute("aria-selected", String(b.dataset.kind === which));
     });
@@ -306,7 +332,7 @@ function openUpdates(kind, versions, onUpdated) {
       which === "app"
         ? main.PostQShellMethods.postqCheckUpdate()
         : main.PostQShellMethods.singBoxCheckUpdate(
-            actionsFor(versions.variant)[0],
+            actionsFor(selected)[0],
           );
 
     request
@@ -338,7 +364,7 @@ function openUpdates(kind, versions, onUpdated) {
     );
   });
 
-  ui.showModal(_("Updates"), [tabs, body], "pq-modal");
+  ui.showModal(_("Updates"), [tabs, builds, body], "pq-modal");
   check(kind);
 }
 

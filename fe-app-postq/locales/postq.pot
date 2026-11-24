@@ -1,22 +1,22 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the POSTQ package.
-# postQuintus <89167298+postQuintus@users.noreply.github.com>, 2026.
+# PostqVPN <postq.space>, 2026.
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: POSTQ\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-15 19:35+0300\n"
-"PO-Revision-Date: 2026-11-15 19:35+0300\n"
-"Last-Translator: postQuintus <89167298+postQuintus@users.noreply.github.com>\n"
+"POT-Creation-Date: 2026-11-24 09:06+0300\n"
+"PO-Revision-Date: 2026-11-24 09:06+0300\n"
+"Last-Translator: PostqVPN <postq.space>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1054
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1055
 msgid "%d ms"
 msgstr ""
 
@@ -24,15 +24,15 @@ msgstr ""
 msgid "%d of %d MB"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:871
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:873
 msgid "%s (stock): servers with XHTTP do not work"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:873
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:875
 msgid "%s is older than %s: servers with XHTTP do not work"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:676
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:678
 msgid "%s of %s"
 msgstr ""
 
@@ -56,7 +56,7 @@ msgstr ""
 msgid "A dead server was left"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:276
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:228
 msgid "A new version is available"
 msgstr ""
 
@@ -68,11 +68,11 @@ msgstr ""
 msgid "A path is only allowed for doh and doh3"
 msgstr ""
 
-#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:75
-msgid "A Reality server may need a newer client than the stock sing-box core: run the PostQ VPN install command again, it installs sing-box extended lite"
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:77
+msgid "A Reality server may need a newer client than the stock sing-box core: open Updates, select sing-box and install the extended lite build"
 msgstr ""
 
-#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:73
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:75
 msgid "A server answered with the certificate of another site"
 msgstr ""
 
@@ -84,15 +84,15 @@ msgstr ""
 msgid "Active Connections"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:651
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:653
 msgid "Add"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:648
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:650
 msgid "Add another"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:396
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:422
 msgid "Add the PostQ routing"
 msgstr ""
 
@@ -116,7 +116,7 @@ msgstr ""
 msgid "Another build is available"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:638
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:640
 msgid "Another link for this subscription"
 msgstr ""
 
@@ -128,15 +128,15 @@ msgstr ""
 msgid "At least one proxy link must be specified."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1010
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1011
 msgid "Auto"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1025
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1026
 msgid "Auto, now %s"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1026
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1027
 msgid "Auto: the fastest working server"
 msgstr ""
 
@@ -144,7 +144,7 @@ msgstr ""
 msgid "Available actions"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94
 msgid "B"
 msgstr ""
 
@@ -153,7 +153,7 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:493
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:519
 msgid "Block and DNS rules"
 msgstr ""
 
@@ -183,8 +183,9 @@ msgid "Browser is using FakeIP correctly"
 msgstr ""
 
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:391
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:376
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:404
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:377
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:405
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:100
 msgid "Cancel"
 msgstr ""
 
@@ -195,11 +196,15 @@ msgstr ""
 msgid "Cannot receive checks result"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:637
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:639
 msgid "Change"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:570
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:892
+msgid "Change build"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:572
 msgid "Chat on web.postq.space"
 msgstr ""
 
@@ -207,15 +212,19 @@ msgstr ""
 msgid "Check"
 msgstr ""
 
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:62
+msgid "Check IPv6 advertisements on the home LAN on the main page"
+msgstr ""
+
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:379
 msgid "Check servers"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1221
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1222
 msgid "Check the ping"
 msgstr ""
 
-#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:78
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:80
 msgid "Check the public key, short id and SNI of the server"
 msgstr ""
 
@@ -227,7 +236,7 @@ msgstr ""
 msgid "Check update"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1221
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1222
 msgid "Checking the ping…"
 msgstr ""
 
@@ -241,12 +250,12 @@ msgid "Checking, please wait"
 msgstr ""
 
 #: src/postq/tabs/diagnostic/partials/renderRouteCheck.ts:34
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:301
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:327
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:379
 msgid "Checking..."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1289
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1290
 msgid "Checking…"
 msgstr ""
 
@@ -282,7 +291,7 @@ msgstr ""
 
 #: src/partials/modal/renderModal.ts:26
 #: src/postq/tabs/dashboard/initController.ts:791
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:171
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:188
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:74
 msgid "Close"
 msgstr ""
@@ -303,11 +312,11 @@ msgstr ""
 msgid "Configure DNS"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:799
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:801
 msgid "Connect"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:771
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:773
 msgid "Connect PostQ VPN"
 msgstr ""
 
@@ -320,8 +329,12 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:775
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:777
 msgid "Copy the subscription link in the personal account and paste it here. The VPN starts working on every device at home."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:162
+msgid "Core build"
 msgstr ""
 
 #: src/postq/methods/shell/index.ts:319
@@ -333,8 +346,12 @@ msgstr ""
 msgid "Core switch timed out"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:196
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:213
 msgid "Could not check for updates: %s"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:84
+msgid "Could not save the home LAN IPv6 settings."
 msgstr ""
 
 #: src/postq/tabs/dashboard/partials/renderWidget.ts:22
@@ -346,7 +363,7 @@ msgid "Dashboard currently unavailable"
 msgstr ""
 
 #: src/postq/tabs/dashboard/partials/renderSections.ts:181
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:620
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:622
 msgid "day|days|days"
 msgstr ""
 
@@ -355,12 +372,12 @@ msgstr ""
 msgid "default"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:656
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:665
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:658
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:667
 msgid "Delete"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:661
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:663
 msgid "Delete the subscription?"
 msgstr ""
 
@@ -368,15 +385,19 @@ msgstr ""
 msgid "Dev"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1301
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1302
 msgid "Devices go to the internet directly"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:98
+msgid "Devices may connect over IPv6 outside the VPN."
 msgstr ""
 
 #: src/postq/tabs/diagnostic/checks/runDnsCheck.ts:93
 msgid "DHCP has DNS server"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:510
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:512
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:57
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/postq.js:135
 msgid "Diagnostics"
@@ -386,8 +407,8 @@ msgstr ""
 msgid "did not work, rolled back to"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:484
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:489
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:510
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:515
 msgid "Directly"
 msgstr ""
 
@@ -426,8 +447,8 @@ msgstr ""
 msgid "Do not panic, everything can be fixed, just..."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:474
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:484
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:500
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:510
 msgid "Domains"
 msgstr ""
 
@@ -441,20 +462,28 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1351
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1354
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1352
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1355
 msgid "Download the log for support"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:104
+msgid "Enable"
 msgstr ""
 
 #: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:91
 msgid "Enable autostart"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:625
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:97
+msgid "Enable IPv6 on the home LAN?"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:627
 msgid "Ended on %s"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:723
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:725
 msgid "Ends soon"
 msgstr ""
 
@@ -519,8 +548,8 @@ msgstr ""
 
 #: src/postq/tabs/dashboard/initController.ts:310
 #: src/postq/tabs/dashboard/initController.ts:316
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:598
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:605
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:600
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:607
 msgid "Failed to update subscription"
 msgstr ""
 
@@ -534,7 +563,7 @@ msgstr ""
 #: src/postq/methods/custom/buildSubscriptionOutboundGroup.ts:111
 #: src/postq/methods/custom/getDashboardSections.ts:209
 #: src/postq/tabs/diagnostic/checks/runSectionsCheck.ts:56
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1010
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1011
 msgid "Fastest"
 msgstr ""
 
@@ -558,7 +587,7 @@ msgstr ""
 msgid "From the device (optional)"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94
 msgid "GB"
 msgstr ""
 
@@ -578,6 +607,15 @@ msgstr ""
 msgid "Goes through the section"
 msgstr ""
 
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:24
+msgid "Got it"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:62
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:70
+msgid "Home LAN IPv6 settings are unavailable."
+msgstr ""
+
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:284
 msgid "How the router finds the addresses of sites. If sites do not open, check the servers and pick one that answers."
 msgstr ""
@@ -590,17 +628,16 @@ msgstr ""
 msgid "Hysteria2 needs a sing-box core built with QUIC"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:574
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:576
 msgid "In Telegram"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:569
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:571
 msgid "In the personal account"
 msgstr ""
 
 #: src/postq/tabs/manager/cards.ts:402
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:228
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:264
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:225
 msgid "Install"
 msgstr ""
 
@@ -609,10 +646,11 @@ msgstr ""
 #: src/postq/tabs/manager/cards.ts:292
 #: src/postq/tabs/manager/cards.ts:347
 #: src/postq/tabs/manager/cards.ts:410
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:225
 msgid "Install %s"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:269
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:295
 msgid "Installed"
 msgstr ""
 
@@ -891,12 +929,16 @@ msgstr ""
 msgid "IPv6 CIDR must be between 0 and 128"
 msgstr ""
 
-#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:65
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:67
 msgid "IPv6 handling matches the network"
 msgstr ""
 
-#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:58
-msgid "IPv6 traffic goes around the tunnel: enable IPv6 in the settings"
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:18
+msgid "IPv6 may interfere with the VPN"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:29
+msgid "IPv6 on the home LAN"
 msgstr ""
 
 #: src/postq/tabs/diagnostic/checks/runEnvironmentCheck.ts:50
@@ -904,16 +946,16 @@ msgstr ""
 msgid "Issues detected"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:663
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:665
 msgid "Its servers disappear from the list."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94
 msgid "KB"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:414
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:423
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:440
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:449
 msgid "Keep the old settings"
 msgstr ""
 
@@ -931,12 +973,11 @@ msgstr ""
 
 #: src/postq/tabs/diagnostic/helpers/getPostqVersionRow.ts:46
 #: src/postq/tabs/manager/cards.ts:153
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:270
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:298
 msgid "Latest"
 msgstr ""
 
 #: src/postq/tabs/manager/initController.ts:121
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:264
 msgid "Latest version is installed"
 msgstr ""
 
@@ -952,16 +993,17 @@ msgstr ""
 msgid "List"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:469
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:495
 msgid "Lists"
 msgstr ""
 
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:14
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/snapshots.js:28
 msgid "Loading..."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:526
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:527
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:528
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:529
 msgid "Log out"
 msgstr ""
 
@@ -973,8 +1015,8 @@ msgstr ""
 msgid "Main DNS via outbound"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:705
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:706
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:707
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:708
 msgid "Manage the subscription"
 msgstr ""
 
@@ -986,7 +1028,7 @@ msgstr ""
 msgid "Matches no list, goes through the global proxy section"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94
 msgid "MB"
 msgstr ""
 
@@ -1010,7 +1052,7 @@ msgstr ""
 msgid "NaiveProxy client removed"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:651
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:653
 msgid "New subscription"
 msgstr ""
 
@@ -1019,11 +1061,11 @@ msgid "newest"
 msgstr ""
 
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/dns.js:201
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1045
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1046
 msgid "no answer"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:628
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:630
 msgid "No end date"
 msgstr ""
 
@@ -1040,7 +1082,7 @@ msgstr ""
 msgid "No subscription yet"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1302
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1303
 msgid "No subscription: there are no servers yet"
 msgstr ""
 
@@ -1112,12 +1154,20 @@ msgstr ""
 msgid "Now"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1139
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1140
 msgid "now %s"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:505
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:65
+msgid "Off — the VPN works more reliably"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:531
 msgid "Old settings"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:64
+msgid "On — some services may connect outside the VPN"
 msgstr ""
 
 #: src/helpers/autoUpdateStatus.ts:43
@@ -1158,8 +1208,8 @@ msgstr ""
 msgid "Own server"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:334
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:763
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:335
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:765
 msgid "Paste the subscription link https://…"
 msgstr ""
 
@@ -1180,17 +1230,21 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:556
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:808
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:558
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:810
 msgid "Personal account"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:407
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:433
 msgid "Please wait..."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:506
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:532
 msgid "PostQ settings"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:23
+msgid "PostQ turned off IPv6 advertisements on the home LAN. The router keeps its WAN settings."
 msgstr ""
 
 #: src/postq/tabs/dashboard/initController.ts:566
@@ -1199,7 +1253,7 @@ msgstr ""
 msgid "PostQ VPN"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:243
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:269
 msgid "PostQ VPN has been updated"
 msgstr ""
 
@@ -1219,7 +1273,7 @@ msgstr ""
 msgid "Preparing the report..."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1348
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1349
 msgid "Preparing..."
 msgstr ""
 
@@ -1237,6 +1291,10 @@ msgstr ""
 
 #: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:65
 msgid "Read it before you send it: servers are shown as host-N and links, passwords and lists are hidden, but check that nothing of yours is left."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:82
+msgid "Reconnect devices to the home network to renew their addresses."
 msgstr ""
 
 #: src/postq/tabs/dashboard/partials/renderSectionsToolbar.ts:31
@@ -1263,11 +1321,11 @@ msgstr ""
 msgid "renew it"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:724
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:726
 msgid "Renew the subscription in the personal account so the VPN does not turn off."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:719
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:721
 msgid "Renew the subscription in the personal account, then update it here."
 msgstr ""
 
@@ -1279,12 +1337,12 @@ msgstr ""
 msgid "Restart PostQ VPN"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1371
 #: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1372
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1373
 msgid "Restart the VPN"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1234
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1235
 msgid "Restarting…"
 msgstr ""
 
@@ -1312,11 +1370,11 @@ msgstr ""
 msgid "Router DNS is routed through sing-box"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:516
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:518
 msgid "Router settings"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:517
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:519
 msgid "Router settings (OpenWrt)"
 msgstr ""
 
@@ -1348,7 +1406,7 @@ msgstr ""
 msgid "same as now"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:640
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:642
 msgid "Save"
 msgstr ""
 
@@ -1376,15 +1434,15 @@ msgstr ""
 msgid "Self-update failed"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1206
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1207
 msgid "Server"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1205
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1206
 msgid "Server · %s"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:649
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:651
 msgid "Servers of one more subscription"
 msgstr ""
 
@@ -1392,7 +1450,7 @@ msgstr ""
 msgid "Services info"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:509
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:535
 msgid "Settings of the previous install"
 msgstr ""
 
@@ -1415,7 +1473,7 @@ msgstr ""
 msgid "Sing-box autostart disabled"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:868
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:870
 msgid "sing-box core"
 msgstr ""
 
@@ -1443,7 +1501,7 @@ msgstr ""
 msgid "Sing-box version is compatible (newer than 1.12.4)"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1304
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1305
 msgid "Sites from the lists go through the VPN"
 msgstr ""
 
@@ -1455,7 +1513,7 @@ msgstr ""
 msgid "skipped: this release was rolled back earlier"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1195
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1196
 msgid "Slower than the others: choose them only if the others do not work"
 msgstr ""
 
@@ -1471,6 +1529,10 @@ msgstr ""
 msgid "Some rules depend on the client address, traffic type or lists that are not available here and were skipped. Enter the address of the device for a precise answer."
 msgstr ""
 
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:40
+msgid "Some VPN servers do not support IPv6. Turning it off on the home LAN lets devices connect over IPv4. The router can still use IPv6 on the WAN."
+msgstr ""
+
 #: src/postq/tabs/dashboard/partials/renderSections.ts:393
 msgid "Sort by ping"
 msgstr ""
@@ -1483,6 +1545,10 @@ msgstr ""
 msgid "started by hand"
 msgstr ""
 
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:158
+msgid "Stock"
+msgstr ""
+
 #: src/postq/tabs/diagnostic/partials/renderAvailableActions.ts:61
 msgid "Stop PostQ VPN"
 msgstr ""
@@ -1491,16 +1557,16 @@ msgstr ""
 msgid "stopped answering, the automatic choice is on again"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:479
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:489
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:505
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:515
 msgid "Subnets"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:682
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:684
 msgid "Subscription"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:685
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:687
 msgid "Subscription active"
 msgstr ""
 
@@ -1508,7 +1574,7 @@ msgstr ""
 msgid "Subscription cache cleared and re-downloaded"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:684
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:686
 msgid "Subscription ended"
 msgstr ""
 
@@ -1516,9 +1582,9 @@ msgstr ""
 msgid "Subscription ends in"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:335
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:640
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:764
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:336
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:642
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:766
 msgid "Subscription link"
 msgstr ""
 
@@ -1527,7 +1593,7 @@ msgid "Subscription update timed out"
 msgstr ""
 
 #: src/postq/tabs/dashboard/initController.ts:306
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:597
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:599
 msgid "Subscription updated"
 msgstr ""
 
@@ -1535,7 +1601,7 @@ msgstr ""
 msgid "Subscriptions"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:514
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:540
 msgid "Subscriptions moved to PostQ VPN"
 msgstr ""
 
@@ -1543,7 +1609,7 @@ msgstr ""
 msgid "Successfully copied!"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:565
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:567
 msgid "Support"
 msgstr ""
 
@@ -1579,7 +1645,7 @@ msgstr ""
 msgid "Table exist"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:93
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:94
 msgid "TB"
 msgstr ""
 
@@ -1601,7 +1667,7 @@ msgstr ""
 msgid "The DNS query is blocked"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1140
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1141
 msgid "the fastest of the working ones"
 msgstr ""
 
@@ -1609,21 +1675,21 @@ msgstr ""
 msgid "the latest version"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:277
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:226
 msgid "The latest version is installed"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1329
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1330
 msgid "The list of servers has not been received yet: update the subscription."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1344
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1345
 msgid "The PostQ VPN and sing-box log in one file"
 msgstr ""
 
 #: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:56
 #: src/postq/tabs/diagnostic/partials/renderSupportReport.ts:71
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:352
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:378
 msgid "The report could not be prepared"
 msgstr ""
 
@@ -1639,19 +1705,23 @@ msgstr ""
 msgid "The router clock is right"
 msgstr ""
 
-#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:57
+#: src/postq/tabs/diagnostic/helpers/getEnvironmentItems.ts:61
 msgid "The router has a global IPv6 address, IPv6 handling is off"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:415
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:441
 msgid "The saved settings could not be applied"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:227
+msgid "The selected build will replace the installed core."
 msgstr ""
 
 #: src/validators/validateDnsForward.ts:70
 msgid "The server must be an IP address, optionally with #port"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1312
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1313
 msgid "The servers appear once you add a subscription."
 msgstr ""
 
@@ -1667,7 +1737,7 @@ msgstr ""
 msgid "The settings are kept every time the service starts successfully (the last ten). A snapshot brings them back after a change that broke the service."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:253
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:279
 msgid "The sing-box core has been updated to %s"
 msgstr ""
 
@@ -1679,29 +1749,29 @@ msgstr ""
 msgid "The snapshot could not be saved"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:718
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:720
 msgid "The VPN stopped working"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:664
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:666
 msgid "The VPN stops until a subscription is added."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:657
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:659
 msgid "The VPN stops working"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:511
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:537
 msgid "This router had its own NetShift settings."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1296
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1297
 msgid "This takes a few seconds"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:469
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:474
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:479
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:495
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:500
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:505
 msgid "Through the VPN"
 msgstr ""
 
@@ -1720,8 +1790,8 @@ msgstr ""
 #: src/postq/tabs/dashboard/initController.ts:461
 #: src/postq/tabs/dashboard/partials/renderSections.ts:168
 #: src/postq/tabs/dashboard/partials/renderSections.ts:169
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:729
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:732
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:731
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:734
 msgid "Traffic"
 msgstr ""
 
@@ -1737,23 +1807,27 @@ msgstr ""
 msgid "TUIC needs a sing-box core built with QUIC"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1256
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:19
+msgid "Turn it off if some services do not open through the VPN."
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1257
 msgid "Turn the VPN off"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1256
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1257
 msgid "Turn the VPN on"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1325
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1326
 msgid "Turn the VPN on to choose a server."
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1234
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1235
 msgid "Turning off…"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1234
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1235
 msgid "Turning on…"
 msgstr ""
 
@@ -1782,7 +1856,7 @@ msgstr ""
 msgid "Unknown error"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:735
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:737
 msgid "Unlimited"
 msgstr ""
 
@@ -1790,7 +1864,7 @@ msgstr ""
 msgid "Unlimited subscription"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:626
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:628
 msgid "Until %s · %s left"
 msgstr ""
 
@@ -1798,11 +1872,11 @@ msgstr ""
 #: src/postq/tabs/manager/cards.ts:292
 #: src/postq/tabs/manager/cards.ts:347
 #: src/postq/tabs/manager/cards.ts:411
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:891
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:892
 msgid "Update"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:232
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:258
 msgid "Update failed: %s"
 msgstr ""
 
@@ -1818,7 +1892,7 @@ msgstr ""
 msgid "Update PostQ VPN"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:752
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:754
 msgid "Update the subscription"
 msgstr ""
 
@@ -1826,8 +1900,8 @@ msgstr ""
 msgid "updated"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:341
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:502
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:367
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:504
 msgid "Updates"
 msgstr ""
 
@@ -1839,11 +1913,11 @@ msgstr ""
 msgid "Updating PostQ VPN, this may take a few minutes; the page will reload…"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:751
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:753
 msgid "Updating the subscription…"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:217
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:242
 msgid "Updating, do not close the page..."
 msgstr ""
 
@@ -1912,7 +1986,7 @@ msgstr ""
 msgid "Version"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1029
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1030
 msgid "via %s"
 msgstr ""
 
@@ -1929,19 +2003,19 @@ msgstr ""
 msgid "VMess needs the sing-box-extended core"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1292
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1293
 msgid "VPN is off"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1291
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1292
 msgid "VPN is on"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1227
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:1228
 msgid "VPN server"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:621
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/home.js:623
 msgid "Waiting for the panel's answer"
 msgstr ""
 
@@ -1953,7 +2027,11 @@ msgstr ""
 msgid "Where will a request go"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:526
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/lan_ipv6.js:39
+msgid "Why is that?"
+msgstr ""
+
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:552
 msgid "Will be added (marked with +)"
 msgstr ""
 
@@ -1967,6 +2045,6 @@ msgstr ""
 msgid "Yandex"
 msgstr ""
 
-#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:520
+#: ../luci-app-postq/htdocs/luci-static/resources/view/postq/control.js:546
 msgid "You can add your routing and DNS to the PostQ settings. Nothing else is carried over."
 msgstr ""

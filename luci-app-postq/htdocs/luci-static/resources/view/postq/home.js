@@ -6,6 +6,7 @@
 "require ui";
 "require view.postq.main as main";
 "require view.postq.control as control";
+"require view.postq.lan_ipv6 as lanIPv6";
 
 // PostQ: the main page, laid out like the PostQ XKeen panel. A header of
 // "pills" (logo, updates, diagnostics, the router's own settings, log out) over
@@ -448,6 +449,7 @@ function createHome({ onDiagnostics }) {
 
   const subscriptionSlot = E("div", { class: "pq-stack" });
   const routerSlot = E("div");
+  const ipv6Setting = lanIPv6.render(notice);
   const vpnSlot = E("div", { class: "pq-stack" });
   const updatesDot = E("span", { class: "pq-pill__dot", hidden: "" });
 
@@ -877,20 +879,18 @@ function createHome({ onDiagnostics }) {
                 : version,
           ]),
         ]),
-        old || versions.outdated.core
-          ? E(
-              "button",
-              {
-                type: "button",
-                class: "pq-link-action",
-                click: (ev) => {
-                  ev.preventDefault();
-                  openUpdates("core");
-                },
-              },
-              _("Update"),
-            )
-          : "",
+        E(
+          "button",
+          {
+            type: "button",
+            class: "pq-link-action",
+            click: (ev) => {
+              ev.preventDefault();
+              openUpdates("core");
+            },
+          },
+          old || versions.outdated.core ? _("Update") : _("Change build"),
+        ),
       ]),
     ]);
   }
@@ -928,6 +928,7 @@ function createHome({ onDiagnostics }) {
           ),
         ]),
         coreRow(),
+        ipv6Setting,
       ]),
     );
   }

@@ -64,6 +64,19 @@ describe('getEnvironmentItems', () => {
     ).toBe('success');
   });
 
+  it('allows a global WAN address when LAN advertisements are disabled', () => {
+    expect(
+      states({
+        ...clean,
+        ipv6: {
+          router_has_global: true,
+          postq_enabled: false,
+          lan_advertises: false,
+        },
+      })[2],
+    ).toBe('success');
+  });
+
   it('says nothing about Reality when no server was refused, or the backend does not know it', () => {
     expect(getEnvironmentItems(clean)).toHaveLength(3);
     expect(

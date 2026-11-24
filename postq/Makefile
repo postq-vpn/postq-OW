@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 
 PKG_NAME:=postq
 
-PKG_VERSION := $(if $(POSTQ_VERSION),$(POSTQ_VERSION),1.0.8)
+PKG_VERSION := $(if $(POSTQ_VERSION),$(POSTQ_VERSION),1.0.9)
 
 PKG_RELEASE:=1
 
